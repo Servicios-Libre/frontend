@@ -75,6 +75,13 @@ export default function LandingPage() {
             className="w-full max-w-md mx-auto"
           />
         </div>
+        <div className="flex-1">
+          <img
+            src="img//hero-illustration.png"
+            alt="Ilustración de busqueda de trabajos"
+            className="w-full max-w-md mx-auto"
+          />
+        </div>
       </section>
 
       <section className="max-w-7xl mx-auto px-4 py-16">
