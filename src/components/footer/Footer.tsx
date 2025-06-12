@@ -1,5 +1,3 @@
-"use client";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faFacebook,
@@ -7,40 +5,41 @@ import {
     faYoutube,
     faInstagram,
 } from "@fortawesome/free-brands-svg-icons";
+import Image from "next/image";
 
 export default function Footer() {
     return (
-        <footer class="bg-white">
-            <div class="mx-auto w-full max-w-screen-xl px-8 py-6 lg:py-8">
-                <hr class="my-6 border-gray-200 sm:mx-auto lg:my-8" />
+        <footer className="bg-white">
+            <div className="mx-auto w-full max-w-screen-xl px-8 py-6 lg:py-8">
+                <hr className="my-6 border-gray-200 sm:mx-auto lg:my-8" />
 
                 {/* Logo + Topics */}
-                <div class="md:flex md:justify-between">
-                    <div class="mb-6 md:mb-0">
-                        <a href="https://flowbite.com/" class="flex items-center">
-                            <img src="img/logosl-dark.png" class="h-8 me-3" alt="FlowBite Logo" />
+                <div className="md:flex md:justify-between">
+                    <div className="mb-6 md:mb-0">
+                        <a href="https://flowbite.com/" className="flex items-center">
+                            <Image width={100} height={100} src="/img/logosl-dark.png" className="h-8 me-3" alt="FlowBite Logo" />
                         </a>
                     </div>
-                    <div class="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
+                    <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
                         <div>
-                            <h2 class="mb-6 font-semibold text-gray-900">Empresa</h2>
-                            <ul class="text-gray-500">
+                            <h2 className="mb-6 font-semibold text-gray-900">Empresa</h2>
+                            <ul className="text-gray-500">
                                 <li><a href="#" className="hover:underline">Trabaja con nosotros</a></li>
                                 <li><a href="#" className="hover:underline">Proyectos</a></li>
                                 <li><a href="#" className="hover:underline">Contacto</a></li>
                             </ul>
                         </div>
                         <div>
-                            <h2 class="mb-6 font-semibold text-gray-900">Soporte</h2>
-                            <ul class="text-gray-500">
+                            <h2 className="mb-6 font-semibold text-gray-900">Soporte</h2>
+                            <ul className="text-gray-500">
                                 <li><a href="#" className="hover:underline">Ayuda</a></li>
                                 <li><a href="#" className="hover:underline">Preguntas frecuentes</a></li>
                                 <li><a href="#" className="hover:underline">Centro de soporte</a></li>
                             </ul>
                         </div>
                         <div>
-                            <h2 class="mb-6 font-semibold text-gray-900">Legal</h2>
-                            <ul class="text-gray-500">
+                            <h2 className="mb-6 font-semibold text-gray-900">Legal</h2>
+                            <ul className="text-gray-500">
                                 <li><a href="#" className="hover:underline">Términos y condiciones</a></li>
                                 <li><a href="#" className="hover:underline">Política de privacidad</a></li>
                                 <li><a href="#" className="hover:underline">Cookies</a></li>
@@ -49,7 +48,7 @@ export default function Footer() {
                     </div>
                 </div>
 
-                <hr class="my-6 border-gray-200 sm:mx-auto lg:my-8" />
+                <hr className="my-6 border-gray-200 sm:mx-auto lg:my-8" />
 
                 {/* CopyRight + Enlaces */}
                 <div className="sm:flex sm:items-center sm:justify-between">

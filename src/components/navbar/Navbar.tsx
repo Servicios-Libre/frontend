@@ -1,5 +1,5 @@
-"use client";
-
+'use client';
+import Image from "next/image";
 import { useState } from "react";
 
 export default function Navbar() {
@@ -13,8 +13,10 @@ export default function Navbar() {
 
                     {/* Logo */}
                     <div className="text-xl font-bold">
-                        <img
-                            src="img/logosl.png"
+                        <Image
+                            width={100}
+                            height={100}
+                            src="/img/logosl.png"
                             alt="logo-servicio-libre"
                             className="h-10 w-auto"
                         />
@@ -56,7 +58,7 @@ export default function Navbar() {
                     <a href="/ayuda" className="block py-2 hover:underline">Ayuda</a>
                 </div>
 
-                <hr class="my-6 border-gray-200 sm:mx-auto" />
+                <hr className="my-6 border-gray-200 sm:mx-auto" />
 
                 <a
                     href="/login"

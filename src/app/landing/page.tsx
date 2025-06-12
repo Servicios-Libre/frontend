@@ -1,8 +1,8 @@
-import JobCard from './components/JobCard';
-import StoryCard from "./components/StoryCard";
-import ReviewCard from "./components/ReviewCard";
-import Navbar from '../navbar/Navbar';
-import Footer from '../footer/Footer';
+import JobCard from '../../components/landing/JobCard';
+import StoryCard from "../../components/landing/StoryCard";
+import ReviewCard from "../../components/landing/ReviewCard";
+import Image from 'next/image';
+
 
 /* Temporal */
 const jobs = [
@@ -56,11 +56,6 @@ const opiniones = [
 export default function LandingPage() {
   return (
     <>
-
-      <header>
-        <Navbar />
-      </header>
-
       <main className="bg-gray-50 min-h-screen">
         {/* HERO */}
         <section className="max-w-7xl mx-auto px-4 py-20 flex flex-col lg:flex-row items-center gap-12">
@@ -75,8 +70,10 @@ export default function LandingPage() {
 
           {/* Imagen */}
           <div className="flex-1">
-            <img
-              src="img//hero-illustration.png"
+            <Image  
+              width={100}
+              height={100}
+              src="/img/hero-illustration.png"
               alt="Ilustración de busqueda de trabajos"
               className="w-full max-w-md mx-auto"
             />
@@ -112,7 +109,9 @@ export default function LandingPage() {
           </div>
 
           <div className="flex-1">
-            <img
+            <Image
+              width={100}
+              height={100}
               src="/img/ServicioLibre.jpg"
               alt="Servicio Libre"
               className="w-full max-w-sm mx-auto"
@@ -162,10 +161,6 @@ export default function LandingPage() {
         </section>
 
       </main>
-
-      <footer>
-        <Footer />
-      </footer>
     </>
   );
 }
