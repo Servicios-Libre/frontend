@@ -1,4 +1,4 @@
-import JobCard from '../../components/landing/JobCard';
+import JobCard from "../../components/landing/JobCard";
 import StoryCard from "../../components/landing/StoryCard";
 import ReviewCard from "../../components/landing/ReviewCard";
 import Image from 'next/image';
