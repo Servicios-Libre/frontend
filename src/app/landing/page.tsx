@@ -1,16 +1,8 @@
-<<<<<<< HEAD
-import JobCard from './components/JobCard';
-import StoryCard from "./components/StoryCard";
-import ReviewCard from "./components/ReviewCard";
-import Navbar from '../navbar/Navbar';
-import Footer from '../footer/Footer';
-=======
 import JobCard from "../../components/landing/JobCard";
 import StoryCard from "../../components/landing/StoryCard";
 import ReviewCard from "../../components/landing/ReviewCard";
 import Image from 'next/image';
 
->>>>>>> e04950b6369adf5ff5dc4666fdc1ebe8bcd327fa
 
 /* Temporal */
 const jobs = [
@@ -117,13 +109,9 @@ export default function LandingPage() {
           </div>
 
           <div className="flex-1">
-<<<<<<< HEAD
-            <img
-=======
             <Image
               width={100}
               height={100}
->>>>>>> e04950b6369adf5ff5dc4666fdc1ebe8bcd327fa
               src="/img/ServicioLibre.jpg"
               alt="Servicio Libre"
               className="w-full max-w-sm mx-auto"
@@ -173,13 +161,6 @@ export default function LandingPage() {
         </section>
 
       </main>
-<<<<<<< HEAD
-
-      <footer>
-        <Footer />
-      </footer>
-=======
->>>>>>> e04950b6369adf5ff5dc4666fdc1ebe8bcd327fa
     </>
   );
 }
