@@ -1,6 +1,8 @@
 'use client';
 import Image from "next/image";
 import { useState } from "react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBars, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
@@ -39,30 +41,32 @@ export default function Navbar() {
                     <div className="md:hidden">
                         <button
                             onClick={() => setIsOpen(!isOpen)}
-                            className="text-gray-900 text-2xl focus:outline-none"
+                            className="text-white text-4xl focus:outline-none"
+                            aria-label="Menú"
                         >
-                            <i className={`fa-solid ${isOpen ? "fa-xmark" : "fa-bars"}`}></i>
+                            <FontAwesomeIcon icon={isOpen ? faXmark : faBars} />
                         </button>
                     </div>
+
                 </div>
             </nav>
 
             {/* Menú Mobile (fuera del <nav>) */}
             <div
                 className={`md:hidden overflow-hidden fixed top-20 left-0 w-full z-40 transition-all duration-300 ease-in-out transform origin-top ${isOpen ? "scale-y-100 opacity-100" : "scale-y-0 opacity-0 pointer-events-none"
-                    } bg-white text-gray-900 px-8 pb-4 shadow-md`}
+                    } bg-white text-gray-900 px-8 pb-6 shadow-md`}
             >
-                <div className="mt-4">
-                    <a href="/trabajos" className="block py-2 hover:underline">Trabajos</a>
-                    <a href="/buscar" className="block py-2 hover:underline">Buscar Trabajadores</a>
+                <div className="mt-4 mb-2">
+                    <a href="/servicios" className="block py-2 hover:underline">Servicios</a>
+                    <a href="/buscar-trabajadores" className="block py-2 hover:underline">Buscar Trabajadores</a>
                     <a href="/ayuda" className="block py-2 hover:underline">Ayuda</a>
                 </div>
 
-                <hr className="my-6 border-gray-200 sm:mx-auto" />
+                <hr className="mb-6 border-gray-200 sm:mx-auto" />
 
                 <a
                     href="/login"
-                    className="inline-block bg-sky-800 hover:bg-sky-950 text-white px-4 py-2 rounded transition"
+                    className="inline-block bg-blue-500 hover:bg-blue-950 text-white px-4 py-2 rounded transition"
                 >
                     Iniciar Sesión
                 </a>
