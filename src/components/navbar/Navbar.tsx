@@ -8,7 +8,7 @@ export default function Navbar() {
     return (
         <>
             {/* NAVBAR principal */}
-            <nav className="fixed top-0 left-0 w-full z-50 bg-blue-500/30 backdrop-blur-md text-white">
+            <nav className="fixed top-0 left-0 w-full z-50 bg-[#2563EB] backdrop-blur-md text-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-8 h-20 flex items-center justify-between">
 
                     {/* Logo */}
@@ -24,12 +24,12 @@ export default function Navbar() {
 
                     {/* Menú Desktop */}
                     <div className="hidden md:flex items-center">
-                        <a href="/trabajos" className="text-gray-900 font-medium hover:underline-offset-0">Trabajos</a>
-                        <a href="/buscar" className="text-gray-900 font-medium hover:underline-offset-0 ml-6">Buscar Trabajadores</a>
-                        <a href="/ayuda" className="text-gray-900 font-medium hover:underline-offset-0 ml-6">Ayuda</a>
+                        <a href="/trabajos" className=" font-medium hover:underline-offset-0">Trabajos</a>
+                        <a href="/buscar" className=" font-medium hover:underline-offset-0 ml-6">Buscar Trabajadores</a>
+                        <a href="/ayuda" className=" font-medium hover:underline-offset-0 ml-6">Ayuda</a>
                         <a
                             href="/login"
-                            className="ml-6 bg-sky-800 hover:bg-sky-950 text-white px-4 py-2 rounded transition"
+                            className="ml-6 bg-[#8EC2FF] hover:bg-sky-950 text-black hover:text-white px-4 py-2 rounded transition"
                         >
                             Iniciar Sesión
                         </a>

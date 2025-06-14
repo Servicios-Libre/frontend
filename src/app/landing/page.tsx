@@ -56,7 +56,7 @@ const opiniones = [
 export default function LandingPage() {
   return (
     <>
-      <main className="bg-gray-50 min-h-screen">
+      <main className="bg-gray-50 min-h-screen mt-10">
         {/* HERO */}
         <section className="max-w-7xl mx-auto px-4 py-20 flex flex-col lg:flex-row items-center gap-12">
           <div className="flex-1 text-center lg:text-left">
@@ -71,8 +71,8 @@ export default function LandingPage() {
           {/* Imagen */}
           <div className="flex-1">
             <Image  
-              width={100}
-              height={100}
+              width={300}
+              height={300}
               src="/img/hero-illustration.png"
               alt="Ilustración de busqueda de trabajos"
               className="w-full max-w-md mx-auto"
@@ -110,8 +110,8 @@ export default function LandingPage() {
 
           <div className="flex-1">
             <Image
-              width={100}
-              height={100}
+              width={300}
+              height={300}
               src="/img/ServicioLibre.jpg"
               alt="Servicio Libre"
               className="w-full max-w-sm mx-auto"
