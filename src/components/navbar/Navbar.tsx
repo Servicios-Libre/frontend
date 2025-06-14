@@ -26,9 +26,9 @@ export default function Navbar() {
                     <div className="hidden md:flex items-center">
                         <a href="/trabajos" className="text-gray-900 font-medium hover:underline-offset-0">Trabajos</a>
                         <a href="/buscar" className="text-gray-900 font-medium hover:underline-offset-0 ml-6">Buscar Trabajadores</a>
-                        <a href="/ayuda" className="text-gray-900 font-medium hover:underline-offset-0 ml-6">Ayuda</a>
+                        <a href="/dashboard" className="text-gray-900 font-medium hover:underline-offset-0 ml-6">Ayuda</a>
                         <a
-                            href="/login"
+                            href="/auth"
                             className="ml-6 bg-sky-800 hover:bg-sky-950 text-white px-4 py-2 rounded transition"
                         >
                             Iniciar Sesión
