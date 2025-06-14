@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { loginUser, registerUser } from "@/services/authService";
 import axios, { AxiosError } from "axios";
 import { locationOptions, countries } from "@/databauti/locations";
+import Image from "next/image";
 
 export default function AuthForm() {
   const [isLogin, setIsLogin] = useState(true);
@@ -111,28 +112,40 @@ export default function AuthForm() {
   };
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-purple-600 via-indigo-800 to-yellow-500 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-gray-50 flex items-center justify-center z-50">
       <div className="relative w-full max-w-md">
         <Link
           href="/"
-          className="absolute right-4 top-4 text-gray-500 hover:text-black text-2xl font-bold"
+          className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 text-2xl font-bold"
         >
           ×
         </Link>
 
-        <div className="bg-white rounded-2xl p-8 shadow-xl">
-          <div className="flex mb-6 overflow-hidden rounded-full bg-gray-200">
+        <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
+
+          <div className="my-6">
+            <a href="/landing" className="flex justify-center">
+              <Image
+                width={100}
+                height={100}
+                src="/img/logosl-dark.png"
+                className="h-10 w-auto"
+                alt="ServicioLibre-logo"
+              />
+            </a>
+          </div>
+
+          <div className="flex mb-6 overflow-hidden rounded-full bg-gray-100">
             <button
               onClick={() => {
                 setIsLogin(false);
                 setMessage("");
                 setError("");
               }}
-              className={`w-1/2 py-2 text-sm font-semibold transition-all ${
-                !isLogin
-                  ? "bg-black text-white"
-                  : "text-gray-700 hover:bg-gray-300"
-              }`}
+              className={`w-1/2 py-2 text-sm font-semibold transition-all duration-200 cursor-pointer ${!isLogin
+                ? "bg-blue-500 text-white"
+                : "text-gray-700 hover:bg-gray-200"
+                }`}
             >
               Sign up
             </button>
@@ -142,27 +155,26 @@ export default function AuthForm() {
                 setMessage("");
                 setError("");
               }}
-              className={`w-1/2 py-2 text-sm font-semibold transition-all ${
-                isLogin
-                  ? "bg-black text-white"
-                  : "text-gray-700 hover:bg-gray-300"
-              }`}
+              className={`w-1/2 py-2 text-sm font-semibold transition-all duration-200 cursor-pointer ${isLogin
+                ? "bg-blue-500 text-white"
+                : "text-gray-700 hover:bg-gray-200"
+                }`}
             >
               Log in
             </button>
           </div>
 
-          <h2 className="text-black text-center text-lg font-bold mb-4">
+          <h2 className="text-blue-500 text-center text-lg font-normal mb-4">
             {isLogin ? "Iniciar Sesión" : "Registrar"}
           </h2>
 
           {message && (
-            <div className="text-green-600 text-sm text-center font-semibold mb-2">
+            <div className="text-green-600 text-sm text-center font-medium mb-2">
               {message}
             </div>
           )}
           {error && (
-            <div className="text-red-600 text-sm text-center font-semibold mb-2">
+            <div className="text-red-600 text-sm text-center font-medium mb-2">
               {error}
             </div>
           )}
@@ -176,16 +188,16 @@ export default function AuthForm() {
                 <input
                   name="firstName"
                   type="text"
-                  placeholder="First name"
-                  className="w-full rounded border px-4 py-2"
+                  placeholder="Nombre"
+                  className="w-full rounded-md border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   value={formData.firstName}
                   onChange={handleChange}
                 />
                 <input
                   name="lastName"
                   type="text"
-                  placeholder="Last name"
-                  className="w-full rounded border px-4 py-2"
+                  placeholder="Apellido"
+                  className="w-full rounded-md border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   value={formData.lastName}
                   onChange={handleChange}
                 />
@@ -196,7 +208,7 @@ export default function AuthForm() {
               name="email"
               type="email"
               placeholder="Email"
-              className="px-4 py-2 border border-black rounded-md text-sm"
+              className="px-4 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
               value={formData.email}
               onChange={handleChange}
               required
@@ -204,8 +216,8 @@ export default function AuthForm() {
             <input
               name="password"
               type="password"
-              placeholder="Password"
-              className="px-4 py-2 border border-black rounded-md text-sm"
+              placeholder="Contraseña"
+              className="px-4 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
               value={formData.password}
               onChange={handleChange}
               required
@@ -216,8 +228,8 @@ export default function AuthForm() {
                 <input
                   name="confirmPassword"
                   type="password"
-                  placeholder="Confirm password"
-                  className="px-4 py-2 border border-black rounded-md text-sm"
+                  placeholder="Confirmar contraseña"
+                  className="px-4 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   required
@@ -225,8 +237,8 @@ export default function AuthForm() {
                 <input
                   name="phone"
                   type="tel"
-                  placeholder="Phone"
-                  className="px-4 py-2 border border-black rounded-md text-sm"
+                  placeholder="Teléfono"
+                  className="px-4 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   value={formData.phone}
                   onChange={handleChange}
                   required
@@ -234,15 +246,15 @@ export default function AuthForm() {
                 <input
                   name="street"
                   type="text"
-                  placeholder="Street"
-                  className="px-4 py-2 border border-black rounded-md text-sm"
+                  placeholder="Calle"
+                  className="px-4 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   value={formData.street}
                   onChange={handleChange}
                   required
                 />
                 <select
                   name="state"
-                  className="px-4 py-2 border border-black rounded-md text-sm"
+                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-800 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   value={formData.state}
                   onChange={handleChange}
                   required
@@ -257,7 +269,7 @@ export default function AuthForm() {
 
                 <select
                   name="city"
-                  className="px-4 py-2 border border-black rounded-md text-sm"
+                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-800 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   value={formData.city}
                   onChange={handleChange}
                   required
@@ -276,9 +288,9 @@ export default function AuthForm() {
 
             <button
               type="submit"
-              className="bg-gray-300 hover:bg-gray-400 text-black font-bold text-sm py-2 rounded-full mt-2"
+              className="bg-blue-500 hover:bg-blue-600 text-white font-bold text-sm py-2 rounded-md mt-2 transition-colors cursor-pointer"
             >
-              {isLogin ? "Log in" : "Sign up"}
+              {isLogin ? "Iniciar Sesión" : "Crear Cuenta"}
             </button>
           </form>
         </div>

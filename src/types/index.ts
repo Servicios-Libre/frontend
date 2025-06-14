@@ -12,9 +12,35 @@ export interface Service {
 }
 
 export interface Perfil {
-    id: number;
-    nombre: string;
-    profesion: string;
-    imagen: string;
-    descripcion: string;
+  id: number;
+  nombre: string;
+  profesion: string;
+  imagen: string;
+  descripcion: string;
+}
+
+export interface Servicio {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
+  categoryId: number;
+  user: string;
+}
+
+export type IconName =
+  | "tractor"
+  | "laptop-code"
+  | "user-nurse"
+  | "dumbbell"
+  | "bullhorn"
+  | "handshake"
+  | "screwdriver-wrench"
+  | "chalkboard-teacher"
+  | "face-smile";
+
+export interface Categoria {
+  id: number;
+  name: string;
+  icon: IconName;
 }
