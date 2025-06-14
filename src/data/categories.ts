@@ -1,4 +1,6 @@
-export const categories = [
+import { Categoria } from "@/types/index";
+
+export const categories: Categoria[] = [
   { id: 1, name: 'Agricultura', icon: 'tractor' },
   { id: 2, name: 'Desarrollo web', icon: 'laptop-code' },
   { id: 3, name: 'Salud', icon: 'user-nurse' },
