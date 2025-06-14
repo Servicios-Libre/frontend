@@ -1,13 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
 import BannerServicios from "@/components/banner-servicios/BannerServicios";
-import { services } from "@/data/services";
 import SearchAndFilter from "@/components/servicios/search-filter/SearchAndFilter";
 import ServicesGrid from "@/components/servicios/services-grid/ServicesGrid";
 import Pagination from "@/components/ui/pagination-services/PaginationServices";
 import NoResults from "@/components/ui/no-results/NoResults";
 import InformacionServicios from "@/components/ui/sections/informacio-servicios/InformacioServicios";
 import PerfilesDestacados from "@/components/servicios/perfiles-destacados/PerfilesDestacados";
+import { Servicio } from "@/types";
+import { obtenerServicios } from "@/services/serviciosService";
 
 export default function ServiciosPage() {
     const [paginaActual, setPaginaActual] = useState(1);
@@ -16,6 +17,8 @@ export default function ServiciosPage() {
     const [enfocado, setEnfocado] = useState(false);
     const [categoriasSeleccionadas, setCategoriasSeleccionadas] = useState<number[]>([]);
     const [busqueda, setBusqueda] = useState("");
+    const [servicios, setServicios] = useState<Servicio[]>([]);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const actualizarCantidad = () => {
@@ -28,26 +31,25 @@ export default function ServiciosPage() {
         return () => window.removeEventListener("resize", actualizarCantidad);
     }, []);
 
-    const serviciosFiltrados = services
-        .filter(service => {
-            if (categoriasSeleccionadas.length > 0 && !categoriasSeleccionadas.includes(service.categoryId)) {
-                return false;
+    useEffect(() => {
+        const fetchServicios = async () => {
+            try {
+                setLoading(true);
+                const data = await obtenerServicios(busqueda, categoriasSeleccionadas);
+                setServicios(data);
+            } catch (error) {
+                console.error("Error al obtener servicios:", error);
+            } finally {
+                setLoading(false);
             }
+        };
 
-            if (busqueda.trim() !== "") {
-                const termino = busqueda.toLowerCase();
-                return (
-                    service.title.toLowerCase().includes(termino) ||
-                    service.description.toLowerCase().includes(termino)
-                );
-            }
+        fetchServicios();
+    }, [busqueda, categoriasSeleccionadas]);
 
-            return true;
-        });
+    const totalPaginas = Math.ceil(servicios.length / serviciosPorPagina);
 
-    const totalPaginas = Math.ceil(serviciosFiltrados.length / serviciosPorPagina);
-
-    const serviciosVisibles = serviciosFiltrados.slice(
+    const serviciosVisibles = servicios.slice(
         (paginaActual - 1) * serviciosPorPagina,
         paginaActual * serviciosPorPagina
     );
@@ -80,7 +82,9 @@ export default function ServiciosPage() {
                     setBusqueda={setBusqueda}
                 />
 
-                {serviciosVisibles.length > 0 ? (
+                {loading ? (
+                    <p className="text-gray-500 text-center py-8">Cargando servicios...</p>
+                ) : serviciosVisibles.length > 0 ? (
                     <ServicesGrid servicios={serviciosVisibles} />
                 ) : (
                     <NoResults mensaje="No hay servicios que coincidan con los filtros seleccionados." />
