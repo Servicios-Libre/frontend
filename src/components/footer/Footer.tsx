@@ -18,7 +18,13 @@ export default function Footer() {
                 <div className="md:flex md:justify-between">
                     <div className="mb-6 md:mb-0">
                         <a href="https://flowbite.com/" className="flex items-center">
-                            <Image width={100} height={100} src="/img/logosl-dark.png" className="h-8 me-3" alt="FlowBite Logo" />
+                            <Image
+                                width={100}
+                                height={100}
+                                src="/img/logosl-dark.png"
+                                className="h-8 w-auto me-3"
+                                alt="ServicioLibre-logo"
+                            />
                         </a>
                     </div>
                     <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
