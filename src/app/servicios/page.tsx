@@ -9,6 +9,7 @@ import InformacionServicios from "@/components/ui/sections/informacio-servicios/
 import PerfilesDestacados from "@/components/servicios/perfiles-destacados/PerfilesDestacados";
 import { Servicio } from "@/types";
 import { obtenerServicios } from "@/services/serviciosService";
+import ServiciosSkeleton from "@/components/ui/serviciosSkeleton/ServiciosSkeleton";
 
 export default function ServiciosPage() {
     const [paginaActual, setPaginaActual] = useState(1);
@@ -18,6 +19,7 @@ export default function ServiciosPage() {
     const [categoriasSeleccionadas, setCategoriasSeleccionadas] = useState<string[]>([]);
     const [busqueda, setBusqueda] = useState("");
     const [servicios, setServicios] = useState<Servicio[]>([]);
+    const [totalServicios, setTotalServicios] = useState(0);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -33,10 +35,16 @@ export default function ServiciosPage() {
 
     useEffect(() => {
         const fetchServicios = async () => {
+            setLoading(true);
             try {
-                setLoading(true);
-                const data = await obtenerServicios(busqueda, categoriasSeleccionadas);
-                setServicios(data);
+                const data = await obtenerServicios(
+                    busqueda,
+                    categoriasSeleccionadas,
+                    paginaActual,
+                    serviciosPorPagina
+                );
+                setServicios(data.servicios);
+                setTotalServicios(data.total);
             } catch (error) {
                 console.error("Error al obtener servicios:", error);
             } finally {
@@ -45,14 +53,11 @@ export default function ServiciosPage() {
         };
 
         fetchServicios();
-    }, [busqueda, categoriasSeleccionadas]);
+    }, [busqueda, categoriasSeleccionadas, paginaActual, serviciosPorPagina]);
 
-    const totalPaginas = Math.ceil(servicios.length / serviciosPorPagina);
+    const totalPaginas = Math.ceil(totalServicios / serviciosPorPagina);
 
-    const serviciosVisibles = servicios.slice(
-        (paginaActual - 1) * serviciosPorPagina,
-        paginaActual * serviciosPorPagina
-    );
+    const serviciosVisibles = servicios;
 
     useEffect(() => {
         if (paginaActual > totalPaginas) {
@@ -82,21 +87,27 @@ export default function ServiciosPage() {
                     setBusqueda={setBusqueda}
                 />
 
-                {loading ? (
-                    <p className="text-gray-500 text-center py-8">Cargando servicios...</p>
-                ) : serviciosVisibles.length > 0 ? (
-                    <ServicesGrid servicios={serviciosVisibles} />
-                ) : (
+                {loading && (
+                    <ServiciosSkeleton cantidad={serviciosPorPagina} />
+                )}
+
+                {!loading && serviciosVisibles.length > 0 && (
+                    <>
+                        <ServicesGrid servicios={serviciosVisibles} />
+                        {totalPaginas > 1 && (
+                            <Pagination
+                                totalPages={totalPaginas}
+                                currentPage={paginaActual}
+                                setPage={setPaginaActual}
+                            />
+                        )}
+                    </>
+                )}
+
+                {!loading && servicios.length > 0 && serviciosVisibles.length === 0 && (
                     <NoResults mensaje="No hay servicios que coincidan con los filtros seleccionados." />
                 )}
 
-                {totalPaginas > 1 && (
-                    <Pagination
-                        totalPages={totalPaginas}
-                        currentPage={paginaActual}
-                        setPage={setPaginaActual}
-                    />
-                )}
             </div>
 
             <PerfilesDestacados />
