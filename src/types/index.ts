@@ -45,13 +45,17 @@ export interface Categoria {
   icon: IconName;
 }
 
-
-export type UserProfile = {
-  phone: string;
-  user_pic: string;
+interface Address {
   street: string;
-  house_number: string;
+  house_number?: string; // opcional, no está en backend
   city: string;
   state: string;
-  zip_code: string;
-};
+  zip_code?: string; // opcional
+  country: string;
+}
+export interface UserProfile {
+  address_id: Address;
+  name: string;
+  phone: string; // aunque sea number en backend, lo tratás como string
+  user_pic?: string; // opcional, ya que no existe aún
+}
