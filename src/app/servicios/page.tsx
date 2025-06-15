@@ -15,7 +15,7 @@ export default function ServiciosPage() {
     const [serviciosPorPagina, setServiciosPorPagina] = useState(4);
     const [mostrarFiltro, setMostrarFiltro] = useState(false);
     const [enfocado, setEnfocado] = useState(false);
-    const [categoriasSeleccionadas, setCategoriasSeleccionadas] = useState<number[]>([]);
+    const [categoriasSeleccionadas, setCategoriasSeleccionadas] = useState<string[]>([]);
     const [busqueda, setBusqueda] = useState("");
     const [servicios, setServicios] = useState<Servicio[]>([]);
     const [loading, setLoading] = useState(false);

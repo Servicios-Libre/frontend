@@ -16,8 +16,8 @@ export default function SearchAndFilter({
     setMostrarFiltro: (v: boolean) => void;
     enfocado: boolean;
     setEnfocado: (v: boolean) => void;
-    categoriasSeleccionadas: number[];
-    setCategoriasSeleccionadas: (ids: number[]) => void;
+    categoriasSeleccionadas: string[];
+    setCategoriasSeleccionadas: (ids: string[]) => void;
     busqueda: string;
     setBusqueda: (text: string) => void;
 }) {
