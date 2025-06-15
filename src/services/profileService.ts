@@ -1,17 +1,28 @@
-import axios from 'axios';
+import axios from "axios";
+import { UserProfile } from "@/types";
 
-// Tipo estricto para los datos del perfil
-export type UserProfile = {
-  phone: string;
-  user_pic: string;
-  street: string;
-  house_number: string;
-  city: string;
-  state: string;
-  zip_code: string;
+export const getProfile = async (): Promise<UserProfile> => {
+  const token = localStorage.getItem("token");
+
+  if (!token) throw new Error("No se encontró el token");
+
+  const res = await axios.get<UserProfile>("http://localhost:8080/users/byId", {
+    headers: {
+      Authorization: `Bearer ${token}`, // importante el Bearer
+    },
+  });
+
+  return res.data;
 };
 
-// Función para actualizar el perfil del usuario
 export const updateProfile = async (data: UserProfile): Promise<void> => {
-  await axios.put('/api/profile', data); // Reemplazá esta URL por la real si cambia
+  const token = localStorage.getItem("token");
+
+  if (!token) throw new Error("No se encontró el token");
+
+  await axios.put("http://localhost:8080/users/update", data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 };

@@ -1,5 +1,6 @@
-import { FaCamera } from 'react-icons/fa';
-import { useRef } from 'react';
+import { FaCamera } from "react-icons/fa";
+import { useRef } from "react";
+import Image from "next/image";
 
 type Props = {
   userPic: string;
@@ -23,8 +24,10 @@ const ProfilePhoto = ({ userPic, setUserPic, editable }: Props) => {
 
   return (
     <div className="relative w-20 h-20">
-      <img
-        src={userPic}
+      <Image
+        width={150}
+        height={150}
+        src={userPic || "/img/avatar.jpg"}
         alt="Avatar"
         className="w-20 h-20 rounded-full object-cover border-2 border-white shadow"
       />
