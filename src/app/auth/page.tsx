@@ -20,8 +20,10 @@ export default function AuthForm() {
     confirmPassword: "",
     phone: "",
     street: "",
+    house_number: "", // Nuevo campo
     city: "",
     state: "",
+    zip_code: "",    // Nuevo campo
   });
 
   const router = useRouter();
@@ -61,8 +63,10 @@ export default function AuthForm() {
         confirmPassword,
         phone,
         street,
+        house_number, // Nuevo campo
         city,
         state,
+        zip_code,     // Nuevo campo
       } = formData;
 
       if (
@@ -73,8 +77,10 @@ export default function AuthForm() {
         !confirmPassword ||
         !phone ||
         !street ||
+        !house_number || // Validación
         !city ||
-        !state
+        !state ||
+        !zip_code        // Validación
       ) {
         setError("Todos los campos son obligatorios.");
         return;
@@ -94,8 +100,10 @@ export default function AuthForm() {
           confirmPassword,
           phone: Number(phone),
           street,
+          house_number: Number(house_number), // Enviar a backend
           city,
           state,
+          zip_code,     // Enviar a backend
         });
 
         setMessage("¡Registro exitoso!");
@@ -184,24 +192,98 @@ export default function AuthForm() {
             className="text-black flex flex-col gap-4"
           >
             {!isLogin && (
-              <div className="flex flex-col sm:flex-row gap-2">
+              <>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input
+                    name="firstName"
+                    type="text"
+                    placeholder="Nombre"
+                    className="w-full rounded-md border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                  />
+                  <input
+                    name="lastName"
+                    type="text"
+                    placeholder="Apellido"
+                    className="w-full rounded-md border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                  />
+                </div>
                 <input
-                  name="firstName"
-                  type="text"
-                  placeholder="Nombre"
-                  className="w-full rounded-md border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  value={formData.firstName}
+                  name="phone"
+                  type="tel"
+                  placeholder="Teléfono"
+                  className="px-4 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  value={formData.phone}
                   onChange={handleChange}
+                  required
                 />
-                <input
-                  name="lastName"
-                  type="text"
-                  placeholder="Apellido"
-                  className="w-full rounded-md border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                />
-              </div>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input
+                    name="street"
+                    type="text"
+                    placeholder="Calle"
+                    className="w-full rounded-md border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    value={formData.street}
+                    onChange={handleChange}
+                    required
+                  />
+                  <input
+                    name="house_number"
+                    type="text"
+                    placeholder="Número"
+                    className="w-full rounded-md border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    value={formData.house_number}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <select
+                    name="state"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-800 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    value={formData.state}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">Seleccionar país</option>
+                    {countries.map((country) => (
+                      <option key={country} value={country}>
+                        {country}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    name="city"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-800 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    value={formData.city}
+                    onChange={handleChange}
+                    required
+                    disabled={!formData.state}
+                  >
+                    <option value="">Seleccionar ciudad</option>
+                    {formData.state &&
+                      locationOptions[formData.state].map((city) => (
+                        <option key={city} value={city}>
+                          {city}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input
+                    name="zip_code"
+                    type="text"
+                    placeholder="Código Postal"
+                    className="w-full rounded-md border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    value={formData.zip_code}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </>
             )}
 
             <input
@@ -224,66 +306,15 @@ export default function AuthForm() {
             />
 
             {!isLogin && (
-              <>
-                <input
-                  name="confirmPassword"
-                  type="password"
-                  placeholder="Confirmar contraseña"
-                  className="px-4 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  required
-                />
-                <input
-                  name="phone"
-                  type="tel"
-                  placeholder="Teléfono"
-                  className="px-4 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  required
-                />
-                <input
-                  name="street"
-                  type="text"
-                  placeholder="Calle"
-                  className="px-4 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  value={formData.street}
-                  onChange={handleChange}
-                  required
-                />
-                <select
-                  name="state"
-                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-800 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  value={formData.state}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Seleccionar país</option>
-                  {countries.map((country) => (
-                    <option key={country} value={country}>
-                      {country}
-                    </option>
-                  ))}
-                </select>
-
-                <select
-                  name="city"
-                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-800 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  value={formData.city}
-                  onChange={handleChange}
-                  required
-                  disabled={!formData.state}
-                >
-                  <option value="">Seleccionar ciudad</option>
-                  {formData.state &&
-                    locationOptions[formData.state].map((city) => (
-                      <option key={city} value={city}>
-                        {city}
-                      </option>
-                    ))}
-                </select>
-              </>
+              <input
+                name="confirmPassword"
+                type="password"
+                placeholder="Confirmar contraseña"
+                className="px-4 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                required
+              />
             )}
 
             <button
