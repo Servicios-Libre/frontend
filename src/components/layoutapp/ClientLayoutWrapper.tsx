@@ -17,7 +17,8 @@ export default function ClientLayoutWrapper({
 
   useEffect(() => {
     // ⚠️ Solo para desarrollo: borra el token cada vez que se inicia el frontend
-    localStorage.removeItem("token");
+    console.log("Borrando token");
+    
   }, []);
 
   return (

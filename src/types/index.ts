@@ -51,11 +51,21 @@ interface Address {
   city: string;
   state: string;
   zip_code?: string; // opcional
-  country: string;
 }
 export interface UserProfile {
   address_id: Address;
   name: string;
   phone: string; // aunque sea number en backend, lo tratás como string
   user_pic?: string; // opcional, ya que no existe aún
+}
+
+export interface ProfileForm {
+  phone: number;
+  street: string;
+  house_number: number;
+  city: string;
+  state: string;
+  zip_code: number;
+  country: string;
+  user_pic?: string; // Solo para mostrar, no se envía al backend
 }
