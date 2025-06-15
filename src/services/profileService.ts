@@ -1,17 +1,13 @@
-import axios from 'axios';
+import axios from "axios";
+import { UserProfile } from "@/types";
 
-// Tipo estricto para los datos del perfil
-export type UserProfile = {
-  phone: string;
-  user_pic: string;
-  street: string;
-  house_number: string;
-  city: string;
-  state: string;
-  zip_code: string;
+// Obtener perfil actual
+export const getProfile = async (): Promise<UserProfile> => {
+  const res = await axios.get<UserProfile>("/api/profile");
+  return res.data;
 };
 
-// Función para actualizar el perfil del usuario
+// Actualizar perfil
 export const updateProfile = async (data: UserProfile): Promise<void> => {
-  await axios.put('/api/profile', data); // Reemplazá esta URL por la real si cambia
+  await axios.put("/api/profile", data);
 };

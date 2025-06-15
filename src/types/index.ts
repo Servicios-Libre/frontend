@@ -44,3 +44,14 @@ export interface Categoria {
   name: string;
   icon: IconName;
 }
+
+
+export type UserProfile = {
+  phone: string;
+  user_pic: string;
+  street: string;
+  house_number: string;
+  city: string;
+  state: string;
+  zip_code: string;
+};

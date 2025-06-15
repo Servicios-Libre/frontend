@@ -1,22 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ProfilePhoto from "@/components/profile/ProfilePhoto";
 import ProfileInput from "@/components/profile/ProfileInput";
-import { updateProfile } from "@/services/profileService";
+import { getProfile, updateProfile } from "@/services/profileService";
+import { UserProfile } from "@/types";
 import Link from "next/link";
 
 const ProfilePage = () => {
   const [editMode, setEditMode] = useState(false);
-  const [formData, setFormData] = useState({
-    phone: "123456789",
-    user_pic: "https://example.com/profile.jpg",
-    street: "Main Street",
-    house_number: "123",
-    city: "New York",
-    state: "NY",
-    zip_code: "10001",
+  const [formData, setFormData] = useState<UserProfile>({
+    phone: "",
+    user_pic: "",
+    street: "",
+    house_number: "",
+    city: "",
+    state: "",
+    zip_code: "",
   });
+  const [originalData, setOriginalData] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const data = await getProfile();
+        setFormData(data);
+        setOriginalData(data);
+      } catch (error) {
+        console.error("Error al obtener perfil:", error);
+      }
+    };
+    fetchProfile();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -30,10 +45,18 @@ const ProfilePage = () => {
   const handleSave = async () => {
     try {
       await updateProfile(formData);
+      setOriginalData(formData);
       setEditMode(false);
     } catch (error) {
       console.error("Error al actualizar perfil:", error);
     }
+  };
+
+  const handleCancel = () => {
+    if (originalData) {
+      setFormData(originalData);
+    }
+    setEditMode(false);
   };
 
   const calculateCompletion = () => {
@@ -44,12 +67,13 @@ const ProfilePage = () => {
 
   const completion = calculateCompletion();
   const isComplete = completion === 100;
+  const hasUnsavedChanges = JSON.stringify(formData) !== JSON.stringify(originalData);
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="h-24 bg-gradient-to-r from-blue-100 via-purple-100 to-yellow-100 rounded-b-xl shadow-sm" />
 
-      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md -mt-16 p-8">
+      <div className="text-black max-w-4xl mx-auto bg-white rounded-lg shadow-md -mt-16 p-8">
         <div className="flex items-center gap-4 relative">
           <ProfilePhoto
             userPic={formData.user_pic}
@@ -58,28 +82,52 @@ const ProfilePage = () => {
           />
           <div>
             <p className="text-lg font-semibold">Tu perfil</p>
-            <p className="text-gray-500 text-sm">
-              Puedes editar tu información
-            </p>
+            <p className="text-gray-500 text-sm">Puedes editar tu información</p>
           </div>
           <div className="ml-auto flex items-center gap-4">
             <div className="text-sm text-gray-600">{completion}% completo</div>
-            <button
-              className={`px-4 py-2 rounded-md text-white ${
-                isComplete
-                  ? "bg-green-500 hover:bg-green-600"
-                  : "bg-gray-300 cursor-not-allowed"
-              }`}
-              disabled={!isComplete}
-            >
-              Solicitar ser trabajador
-            </button>
-            <button
-              onClick={editMode ? handleSave : () => setEditMode(true)}
-              className="bg-blue-500 text-white px-5 py-2 rounded-md hover:bg-blue-600"
-            >
-              {editMode ? "Guardar" : "Editar"}
-            </button>
+
+            <div className="relative group">
+              <button
+                className={`px-4 py-2 rounded-md text-white ${
+                  isComplete && !editMode && !hasUnsavedChanges
+                    ? "bg-green-500 hover:bg-green-600"
+                    : "bg-gray-300 cursor-not-allowed"
+                }`}
+                disabled={!isComplete || editMode || hasUnsavedChanges}
+              >
+                Solicitar ser trabajador
+              </button>
+              {(!isComplete || editMode || hasUnsavedChanges) && (
+                <div className="absolute top-full left-0 mt-1 w-56 text-xs text-gray-500 bg-white border rounded p-2 shadow-sm hidden group-hover:block z-10">
+                  Completa tu perfil y guarda los cambios para habilitar esta opción.
+                </div>
+              )}
+            </div>
+
+            {editMode ? (
+              <>
+                <button
+                  onClick={handleSave}
+                  className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+                >
+                  Guardar
+                </button>
+                <button
+                  onClick={handleCancel}
+                  className="bg-gray-300 text-black px-4 py-2 rounded-md hover:bg-gray-400"
+                >
+                  Cancelar
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => setEditMode(true)}
+                className="bg-blue-500 text-white px-5 py-2 rounded-md hover:bg-blue-600"
+              >
+                Editar
+              </button>
+            )}
           </div>
         </div>
 
@@ -91,7 +139,7 @@ const ProfilePage = () => {
                 key={field}
                 label={field.replace("_", " ").toUpperCase()}
                 name={field}
-                value={formData[field as keyof typeof formData]}
+                value={formData[field as keyof UserProfile]}
                 onChange={handleChange}
                 disabled={!editMode}
               />
