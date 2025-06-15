@@ -1,38 +1,68 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { getProfile, updateProfile } from "@/services/profileService";
 import ProfilePhoto from "@/components/profile/ProfilePhoto";
 import ProfileInput from "@/components/profile/ProfileInput";
-import { getProfile, updateProfile } from "@/services/profileService";
-import { UserProfile } from "@/types";
 import Link from "next/link";
 import { locationOptions, countries } from "@/databauti/locations";
 
+const requiredFields = [
+  { key: "phone", label: "Teléfono" },
+  { key: "street", label: "Calle" },
+  { key: "house_number", label: "Número de casa" },
+  { key: "city", label: "Ciudad" },
+  { key: "state", label: "Estado" }, // Ahora "state" es el país
+  { key: "zip_code", label: "Código postal" },
+];
+
+type ProfileForm = {
+  phone: string;
+  street: string;
+  house_number: string;
+  city: string;
+  state: string; // Aquí se guarda el país seleccionado
+  zip_code: string;
+  user_pic?: string;
+};
+
 const ProfilePage = () => {
   const [editMode, setEditMode] = useState(false);
-  const [formData, setFormData] = useState<UserProfile>({
-    name: "",
+  const [formData, setFormData] = useState<ProfileForm>({
     phone: "",
+    street: "",
+    house_number: "",
+    city: "",
+    state: "",
+    zip_code: "",
     user_pic: "",
-    address_id: {
-      street: "",
-      house_number: "",
-      city: "",
-      state: "",
-      zip_code: "",
-      country: "",
-    },
   });
-  const [originalData, setOriginalData] = useState<UserProfile | null>(null);
-
+  const [originalData, setOriginalData] = useState<ProfileForm | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const data = await getProfile();
-        console.log(data)
-        setFormData(data); // ✅ Usar directamente los datos del backend
-        setOriginalData(data);
+        console.log("Datos recibidos del backend:", data);
+        setFormData({
+          phone: data.phone?.toString() ?? "",
+          street: data.address_id?.street ?? "",
+          house_number: data.address_id?.house_number?.toString() ?? "",
+          city: data.address_id?.city ?? "",
+          state: data.address_id?.country ?? "", // Guardar país en state
+          zip_code: data.address_id?.zip_code?.toString() ?? "",
+          user_pic: data.user_pic ?? "",
+        });
+        setOriginalData({
+          phone: data.phone?.toString() ?? "",
+          street: data.address_id?.street ?? "",
+          house_number: data.address_id?.house_number?.toString() ?? "",
+          city: data.address_id?.city ?? "",
+          state: data.address_id?.country ?? "",
+          zip_code: data.address_id?.zip_code?.toString() ?? "",
+          user_pic: data.user_pic ?? "",
+        });
       } catch (error) {
         console.error("Error al obtener perfil:", error);
       }
@@ -42,16 +72,19 @@ const ProfilePage = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
-    if (name === "country") {
-      setFormData((prev) => ({ ...prev, country: value, city: "" }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+      ...(name === "state" ? { city: "" } : {}),
+    }));
   };
 
   const setUserPic = (url: string) => {
@@ -60,7 +93,17 @@ const ProfilePage = () => {
 
   const handleSave = async () => {
     try {
-      await updateProfile(formData);
+      const dataToSend: any = {
+        phone: formData.phone ? Number(formData.phone) : undefined,
+        street: formData.street,
+        house_number: formData.house_number ? Number(formData.house_number) : undefined,
+        city: formData.city,
+        state: formData.state,
+        zip_code: formData.zip_code ? String(formData.zip_code) : undefined, // <-- ahora string
+        // No enviar user_pic
+      };
+      console.log("Datos enviados al backend:", dataToSend);
+      await updateProfile(dataToSend);
       setOriginalData(formData);
       setEditMode(false);
     } catch (error) {
@@ -75,16 +118,29 @@ const ProfilePage = () => {
     setEditMode(false);
   };
 
+  const getMissingFields = () => {
+    return requiredFields.filter((field) => {
+      return !formData[field.key as keyof ProfileForm] || formData[field.key as keyof ProfileForm] === "";
+    });
+  };
+
   const calculateCompletion = () => {
-    const values = Object.values(formData);
-    const filled = values.filter((v) => v && v !== "").length;
-    return Math.floor((filled / values.length) * 100);
+    const total = requiredFields.length;
+    const filled = total - getMissingFields().length;
+    return Math.floor((filled / total) * 100);
   };
 
   const completion = calculateCompletion();
   const isComplete = completion === 100;
   const hasUnsavedChanges =
     JSON.stringify(formData) !== JSON.stringify(originalData);
+  const missingFields = getMissingFields();
+
+  // Opciones de ciudad según país seleccionado
+  const countryCities =
+    formData.state && locationOptions[formData.state]
+      ? locationOptions[formData.state]
+      : [];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -99,7 +155,7 @@ const ProfilePage = () => {
           />
           <div>
             <p className="text-lg font-semibold">
-              Perfil de {formData.name || "usuario"}
+              Perfil de usuario
             </p>
             <p className="text-gray-500 text-sm">
               Puedes editar tu información
@@ -107,6 +163,12 @@ const ProfilePage = () => {
           </div>
           <div className="ml-auto flex items-center gap-4">
             <div className="text-sm text-gray-600">{completion}% completo</div>
+            {missingFields.length > 0 && (
+              <div className="text-xs text-red-500 mt-1">
+                Faltan completar:{" "}
+                {missingFields.map((f) => f.label).join(", ")}
+              </div>
+            )}
 
             <div className="relative group">
               <button
@@ -119,33 +181,27 @@ const ProfilePage = () => {
               >
                 Solicitar ser trabajador
               </button>
-              {(!isComplete || editMode || hasUnsavedChanges) && (
-                <div className="absolute top-full left-0 mt-1 w-56 text-xs text-gray-500 bg-white border rounded p-2 shadow-sm hidden group-hover:block z-10">
-                  Completa tu perfil y guarda los cambios para habilitar esta
-                  opción.
-                </div>
-              )}
             </div>
 
             {editMode ? (
               <>
                 <button
+                  className="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600"
                   onClick={handleSave}
-                  className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
                 >
                   Guardar
                 </button>
                 <button
+                  className="px-4 py-2 rounded-md bg-gray-300 text-gray-700 hover:bg-gray-400"
                   onClick={handleCancel}
-                  className="bg-gray-300 text-black px-4 py-2 rounded-md hover:bg-gray-400"
                 >
                   Cancelar
                 </button>
               </>
             ) : (
               <button
+                className="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600"
                 onClick={() => setEditMode(true)}
-                className="bg-blue-500 text-white px-5 py-2 rounded-md hover:bg-blue-600"
               >
                 Editar
               </button>
@@ -166,7 +222,7 @@ const ProfilePage = () => {
           <ProfileInput
             label="STREET"
             name="street"
-            value={formData.address_id.street ?? ""}
+            value={formData.street ?? ""}
             onChange={handleChange}
             disabled={!editMode}
             placeholder="Ingresa tu calle"
@@ -174,26 +230,26 @@ const ProfilePage = () => {
           <ProfileInput
             label="HOUSE NUMBER"
             name="house_number"
-            value={formData.address_id.house_number ?? ""}
+            value={formData.house_number ?? ""}
             onChange={handleChange}
             disabled={!editMode}
             placeholder="Número de casa"
           />
 
-          {/* SELECT COUNTRY */}
+          {/* SELECT STATE (país) */}
           <div>
-            <label className="text-sm font-medium text-gray-600">COUNTRY</label>
+            <label className="text-sm font-medium text-gray-600">STATE</label>
             <select
-              name="country"
-              value={formData.address_id.country ?? ""}
+              name="state"
+              value={formData.state ?? ""}
               onChange={handleSelectChange}
               disabled={!editMode}
               className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md"
             >
-              <option value="">Selecciona un país</option>
-              {countries.map((country) => (
-                <option key={country} value={country}>
-                  {country}
+              <option value="">Selecciona un país primero</option>
+              {countries.map((c) => (
+                <option key={c} value={c}>
+                  {c}
                 </option>
               ))}
             </select>
@@ -204,15 +260,13 @@ const ProfilePage = () => {
             <label className="text-sm font-medium text-gray-600">CITY</label>
             <select
               name="city"
-              value={formData.address_id.city ?? ""}
+              value={formData.city ?? ""}
               onChange={handleSelectChange}
-              disabled={!editMode || !formData.address_id.city}
+              disabled={!editMode || !formData.state}
               className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md"
             >
-              <option value="">
-                {formData.address_id.city ? "Selecciona una ciudad" : "Selecciona un país primero"}
-              </option>
-              {(locationOptions[formData.address_id.city] || []).map((city) => (
+              <option value="">Selecciona un país primero</option>
+              {countryCities.map((city: string) => (
                 <option key={city} value={city}>
                   {city}
                 </option>
@@ -220,18 +274,11 @@ const ProfilePage = () => {
             </select>
           </div>
 
-          <ProfileInput
-            label="STATE"
-            name="state"
-            value={formData.address_id.state ?? ""}
-            onChange={handleChange}
-            disabled={!editMode}
-            placeholder="Provincia o estado"
-          />
+          {/* Elimina el input de provincia o estado */}
           <ProfileInput
             label="ZIP CODE"
             name="zip_code"
-            value={formData.address_id.zip_code ?? ""}
+            value={formData.zip_code ?? ""}
             onChange={handleChange}
             disabled={!editMode}
             placeholder="Código postal"

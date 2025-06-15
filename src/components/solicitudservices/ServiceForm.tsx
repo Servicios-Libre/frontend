@@ -4,12 +4,15 @@ import { useState } from 'react';
 import { categories } from '@/data/categories';
 import { sendServiceRequest } from '@/services/serviceRequest';
 import Link from 'next/link';
+import { jwtDecode } from 'jwt-decode';
 
-type Props = {
-  workerId: string;
+
+type JwtPayload = {
+  id: string; // Ajusta el nombre del campo según tu JWT (puede ser "user_id" o "id")
+  // ...otros campos si es necesario...
 };
 
-export const ServiceForm = ({ workerId }: Props) => {
+export const ServiceForm = () => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -28,7 +31,25 @@ export const ServiceForm = ({ workerId }: Props) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await sendServiceRequest({ ...formData, worker_id: workerId });
+      // Obtener el JWT del localStorage
+      const token = localStorage.getItem('token');
+      console.log(token);
+      if (!token) {
+        alert('No se encontró el token de usuario.');
+        return;
+      }
+      // Decodificar el JWT para obtener el user_id
+      const decoded = jwtDecode<JwtPayload>(token);
+
+      // Enviar la solicitud con los datos requeridos
+      await sendServiceRequest({
+        worker_id: decoded.id,
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        // Si tu backend espera también el user_id, agrégalo aquí:
+        // user_id: decoded.id,
+      });
       alert('Solicitud enviada correctamente.');
     } catch (err) {
       alert('Error al enviar la solicitud.');
