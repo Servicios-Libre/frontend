@@ -29,8 +29,8 @@ const icons = {
 } satisfies Record<string, typeof faFaceSmile>;
 
 type Props = {
-    selectedCategories: number[];
-    onFilterChange: (ids: number[]) => void;
+    selectedCategories: string[];
+    onFilterChange: (ids: string[]) => void;
 };
 
 export default function CategoryFilter({ selectedCategories, onFilterChange }: Props) {
@@ -49,7 +49,7 @@ export default function CategoryFilter({ selectedCategories, onFilterChange }: P
         fetchCategorias();
     }, []);
 
-    const toggleCategory = (id: number) => {
+    const toggleCategory = (id: string) => {
         const updated = selectedCategories.includes(id)
             ? selectedCategories.filter((catId) => catId !== id)
             : [...selectedCategories, id];

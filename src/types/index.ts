@@ -1,18 +1,18 @@
 export interface Category {
-  id: number;
+  id: string;
   name: string;
   icon: string;
 }
 
 export interface Service {
-  id: number;
+  id: string;
   title: string;
   image: string;
-  categoryId: number;
+  categoryId: string;
 }
 
 export interface Perfil {
-  id: number;
+  id: string;
   nombre: string;
   profesion: string;
   imagen: string;
@@ -20,11 +20,11 @@ export interface Perfil {
 }
 
 export interface Servicio {
-  id: number;
+  id: string;
   title: string;
   description: string;
   image: string;
-  categoryId: number;
+  categoryId: string;
   user: string;
 }
 
@@ -40,7 +40,7 @@ export type IconName =
   | "face-smile";
 
 export interface Categoria {
-  id: number;
+  id: string;
   name: string;
   icon: IconName;
 }
