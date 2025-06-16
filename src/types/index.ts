@@ -1,14 +1,20 @@
+export interface Service {
+  id: string;
+  title: string;
+  work_photos: [{
+    id: string,
+    photo_url: string
+  }];
+  worker: {
+    name: string;
+  };
+  categoryId: string;
+}
+
 export interface Category {
   id: string;
   name: string;
   icon: string;
-}
-
-export interface Service {
-  id: string;
-  title: string;
-  image: string;
-  categoryId: string;
 }
 
 export interface Perfil {
@@ -23,8 +29,12 @@ export interface Servicio {
   id: string;
   title: string;
   description: string;
-  image: string;
-  categoryId: string;
+  work_photos: object[];
+  category: {
+    id: string,
+    name: string,
+    icon: string
+  };
   user: string;
 }
 
@@ -69,3 +79,4 @@ export interface ProfileForm {
   country: string;
   user_pic?: string; // Solo para mostrar, no se envía al backend
 }
+
