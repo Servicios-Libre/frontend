@@ -12,8 +12,12 @@ import { obtenerServicios } from "@/services/serviciosService";
 import ServiciosSkeleton from "@/components/ui/serviciosSkeleton/ServiciosSkeleton";
 
 export default function ServiciosPage() {
+
+    const getServiciosPorPagina = () =>
+        typeof window !== "undefined" && window.innerWidth >= 640 ? 8 : 4;
+
     const [paginaActual, setPaginaActual] = useState(1);
-    const [serviciosPorPagina, setServiciosPorPagina] = useState(4);
+    const [serviciosPorPagina, setServiciosPorPagina] = useState(getServiciosPorPagina);
     const [mostrarFiltro, setMostrarFiltro] = useState(false);
     const [enfocado, setEnfocado] = useState(false);
     const [categoriasSeleccionadas, setCategoriasSeleccionadas] = useState<string[]>([]);
@@ -22,14 +26,16 @@ export default function ServiciosPage() {
     const [totalServicios, setTotalServicios] = useState(0);
     const [loading, setLoading] = useState(false);
 
+    // Efecto para actualizar la cantidad al redimensionar la ventana
     useEffect(() => {
         const actualizarCantidad = () => {
-            const ancho = window.innerWidth;
-            setServiciosPorPagina(ancho >= 640 ? 8 : 4);
+            setServiciosPorPagina(window.innerWidth >= 640 ? 8 : 4);
         };
 
-        actualizarCantidad();
         window.addEventListener("resize", actualizarCantidad);
+        // Llamar una vez al montar para asegurar el valor correcto
+        actualizarCantidad();
+
         return () => window.removeEventListener("resize", actualizarCantidad);
     }, []);
 
@@ -56,7 +62,6 @@ export default function ServiciosPage() {
     }, [busqueda, categoriasSeleccionadas, paginaActual, serviciosPorPagina]);
 
     const totalPaginas = Math.ceil(totalServicios / serviciosPorPagina);
-
     const serviciosVisibles = servicios;
 
     useEffect(() => {
