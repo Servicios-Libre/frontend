@@ -1,26 +1,24 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
-import { UserProfile } from "@/types";
 
-export const getProfile = async (): Promise<UserProfile> => {
+export const getProfile = async (): Promise<any> => {
   const token = localStorage.getItem("token");
-
   if (!token) throw new Error("No se encontró el token");
-
-  const res = await axios.get<UserProfile>("http://localhost:8080/users/byId", {
+  const res = await axios.get("http://localhost:8080/users/byId", {
     headers: {
-      Authorization: `Bearer ${token}`, // importante el Bearer
+      Authorization: `Bearer ${token}`,
     },
   });
-
   return res.data;
 };
 
-export const updateProfile = async (data: UserProfile): Promise<void> => {
+export const updateProfile = async (data: any): Promise<void> => {
   const token = localStorage.getItem("token");
-
   if (!token) throw new Error("No se encontró el token");
-
-  await axios.put("http://localhost:8080/users/update", data, {
+  // No enviar user_pic
+  const { user_pic, ...dataToSend } = data;
+  await axios.post("http://localhost:8080/users/update", dataToSend, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

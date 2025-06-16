@@ -8,5 +8,5 @@ export type ServiceRequestBody = {
 };
 
 export const sendServiceRequest = async (data: ServiceRequestBody): Promise<void> => {
-  await axios.post('/api/servicios', data); // Cambiá la ruta si tu backend usa otra
+  await axios.post('http://localhost:8080/services/new', data); // Cambiá la ruta si tu backend usa otra
 };
