@@ -1,7 +1,22 @@
 import Image from 'next/image'
 import React from 'react'
+import { useRouter } from 'next/navigation'
+// Si tienes un contexto de auth, importa aquí:
+// import { useAuth } from '@/context/AuthContext'
 
 const BannerServicios = () => {
+    const router = useRouter();
+    // Simulación: reemplaza esto por tu lógica real de autenticación
+    const isLoggedIn = typeof window !== "undefined" && !!localStorage.getItem("token");
+
+    const handleClick = () => {
+        if (isLoggedIn) {
+            router.push('/profile');
+        } else {
+            router.push('/auth');
+        }
+    };
+
     return (
         <>
             <div className="relative w-full h-[400px]">
@@ -20,8 +35,11 @@ const BannerServicios = () => {
                     <p className="text-base md:text-lg mb-6 hidden md:flex">
                         Filtrá por rubro, zona o reputación y encontrá a la persona ideal.
                     </p>
-                    <button className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-md font-semibold">
-                        Publicar un trabajo
+                    <button
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-md font-semibold"
+                        onClick={handleClick}
+                    >
+                        ¿Sos trabajador?
                     </button>
                 </div>
             </div>

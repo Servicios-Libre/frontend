@@ -342,7 +342,7 @@ const ProfilePage = () => {
       <div className="max-w-4xl mx-auto mt-8 bg-white rounded-lg shadow-md p-6 flex flex-col items-start md:items-center md:flex-row justify-between gap-4">
         <div>
           <h2 className="text-black text-lg font-semibold">
-            ¿Quieres ofrecer o solicitar un servicio?
+            ¿Quieres ofrecer un servicio?
           </h2>
           <p className="text-gray-500 text-sm">
             Ingresa para completar el formulario correspondiente
@@ -350,7 +350,7 @@ const ProfilePage = () => {
         </div>
         <Link href="/solicitud">
           <button className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-md transition-colors">
-            Solicitar / Implementar Servicio
+            Publicar un Servicio
           </button>
         </Link>
       </div>
