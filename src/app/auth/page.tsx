@@ -98,7 +98,7 @@ export default function AuthForm() {
           email,
           password,
           confirmPassword,
-          phone: Number(phone),
+          phone, // <-- ahora como string
           street,
           house_number: Number(house_number), // Enviar a backend
           city,
