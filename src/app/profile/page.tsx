@@ -39,18 +39,21 @@ const ProfilePage = () => {
     user_pic: "",
   });
   const [originalData, setOriginalData] = useState<ProfileForm | null>(null);
+  const [userName, setUserName] = useState<string>("");
+  const [showMissing, setShowMissing] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const data = await getProfile();
-        console.log("Datos recibidos del backend:", data);
         setFormData({
           phone: data.phone?.toString() ?? "",
           street: data.address_id?.street ?? "",
           house_number: data.address_id?.house_number?.toString() ?? "",
           city: data.address_id?.city ?? "",
-          state: data.address_id?.country ?? "", // Guardar país en state
+          state: data.address_id?.state
+            ? data.address_id.state.trim().charAt(0).toUpperCase() + data.address_id.state.trim().slice(1).toLowerCase()
+            : "",
           zip_code: data.address_id?.zip_code?.toString() ?? "",
           user_pic: data.user_pic ?? "",
         });
@@ -59,10 +62,13 @@ const ProfilePage = () => {
           street: data.address_id?.street ?? "",
           house_number: data.address_id?.house_number?.toString() ?? "",
           city: data.address_id?.city ?? "",
-          state: data.address_id?.country ?? "",
+          state: data.address_id?.state
+            ? data.address_id.state.trim().charAt(0).toUpperCase() + data.address_id.state.trim().slice(1).toLowerCase()
+            : "",
           zip_code: data.address_id?.zip_code?.toString() ?? "",
           user_pic: data.user_pic ?? "",
         });
+        setUserName(data.name || data.username || "Usuario");
       } catch (error) {
         console.error("Error al obtener perfil:", error);
       }
@@ -99,10 +105,8 @@ const ProfilePage = () => {
         house_number: formData.house_number ? Number(formData.house_number) : undefined,
         city: formData.city,
         state: formData.state,
-        zip_code: formData.zip_code ? String(formData.zip_code) : undefined, // <-- ahora string
-        // No enviar user_pic
+        zip_code: formData.zip_code ? String(formData.zip_code) : undefined,
       };
-      console.log("Datos enviados al backend:", dataToSend);
       await updateProfile(dataToSend);
       setOriginalData(formData);
       setEditMode(false);
@@ -144,6 +148,42 @@ const ProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Modal de campos faltantes */}
+      {showMissing && !isComplete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full text-gray-800 relative">
+            <button
+              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-xl"
+              onClick={() => setShowMissing(false)}
+              aria-label="Cerrar"
+            >
+              ×
+            </button>
+            <div className="mb-2 font-semibold text-lg">Debes completar tu perfil:</div>
+            <ul className="list-disc pl-5 mb-4">
+              {missingFields.map((f) => (
+                <li key={f.key}>{f.label}</li>
+              ))}
+            </ul>
+            <button
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-full"
+              onClick={() => setShowMissing(false)}
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Botón para volver a la landing */}
+      <div className="max-w-4xl mx-auto pt-6 pb-2 flex">
+        <Link href="/">
+          <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md">
+             Volver a la landing
+          </button>
+        </Link>
+      </div>
+
       <div className="h-24 bg-gradient-to-r from-blue-100 via-purple-100 to-yellow-100 rounded-b-xl shadow-sm" />
 
       <div className="text-black max-w-4xl mx-auto bg-white rounded-lg shadow-md -mt-16 p-8">
@@ -155,7 +195,7 @@ const ProfilePage = () => {
           />
           <div>
             <p className="text-lg font-semibold">
-              Perfil de usuario
+              Perfil de usuario: <span className="font-normal">{userName}</span>
             </p>
             <p className="text-gray-500 text-sm">
               Puedes editar tu información
@@ -163,21 +203,22 @@ const ProfilePage = () => {
           </div>
           <div className="ml-auto flex items-center gap-4">
             <div className="text-sm text-gray-600">{completion}% completo</div>
-            {missingFields.length > 0 && (
-              <div className="text-xs text-red-500 mt-1">
-                Faltan completar:{" "}
-                {missingFields.map((f) => f.label).join(", ")}
-              </div>
-            )}
 
+            {/* Botón "Solicitar ser trabajador" */}
             <div className="relative group">
               <button
                 className={`px-4 py-2 rounded-md text-white ${
-                  isComplete && !editMode && !hasUnsavedChanges
-                    ? "bg-green-500 hover:bg-green-600"
+                  !editMode && !hasUnsavedChanges
+                    ? isComplete
+                      ? "bg-green-500 hover:bg-green-600"
+                      : "bg-gray-300 hover:bg-gray-400"
                     : "bg-gray-300 cursor-not-allowed"
                 }`}
-                disabled={!isComplete || editMode || hasUnsavedChanges}
+                disabled={editMode || hasUnsavedChanges}
+                onClick={() => {
+                  if (!isComplete) setShowMissing(true);
+                  // Aquí puedes agregar la acción normal si el perfil está completo
+                }}
               >
                 Solicitar ser trabajador
               </button>
@@ -246,7 +287,13 @@ const ProfilePage = () => {
               disabled={!editMode}
               className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md"
             >
-              <option value="">Selecciona un país primero</option>
+              {!formData.state && (
+                <option value="">Selecciona un país primero</option>
+              )}
+              {/* Si el valor guardado no está en countries, lo agregamos como opción */}
+              {formData.state && !countries.includes(formData.state) && (
+                <option value={formData.state}>{formData.state}</option>
+              )}
               {countries.map((c) => (
                 <option key={c} value={c}>
                   {c}
@@ -265,7 +312,13 @@ const ProfilePage = () => {
               disabled={!editMode || !formData.state}
               className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-md"
             >
-              <option value="">Selecciona un país primero</option>
+              {!formData.city && (
+                <option value="">Selecciona una ciudad</option>
+              )}
+              {/* Si el valor guardado no está en countryCities, lo agregamos como opción */}
+              {formData.city && !countryCities.includes(formData.city) && (
+                <option value={formData.city}>{formData.city}</option>
+              )}
               {countryCities.map((city: string) => (
                 <option key={city} value={city}>
                   {city}

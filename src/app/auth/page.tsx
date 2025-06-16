@@ -45,7 +45,7 @@ export default function AuthForm() {
         setMessage("Inicio de sesión exitoso.");
         localStorage.setItem("token", res.token);
         setTimeout(() => {
-          router.push("/landing");
+          router.push("/servicios");
         }, 1000);
       } catch (err) {
         if (axios.isAxiosError(err)) {
