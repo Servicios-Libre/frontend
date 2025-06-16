@@ -104,7 +104,7 @@ export default function ServiciosPage() {
                     </>
                 )}
 
-                {!loading && servicios.length > 0 && serviciosVisibles.length === 0 && (
+                {!loading && servicios.length === 0 && serviciosVisibles.length === 0 && (
                     <NoResults mensaje="No hay servicios que coincidan con los filtros seleccionados." />
                 )}
 
