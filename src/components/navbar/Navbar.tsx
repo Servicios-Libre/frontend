@@ -26,15 +26,15 @@ export default function Navbar() {
 
                     {/* Menú Desktop */}
                     <div className="hidden md:flex items-center">
-                        <a href="/inicio" className="text-white font-medium hover:underline-offset-0">Inicio</a>
+                        <a href="/landing" className="text-white font-medium hover:underline-offset-0">Inicio</a>
                         <a href="/servicios" className="text-white font-medium hover:underline-offset-0 ml-6">Servicios</a>
-                        <a href="/publicar-trabajo" className="text-white font-medium hover:underline-offset-0 ml-6">Publicar trabajo</a>
-                        <a href="/dashboard" className="text-white font-medium hover:underline-offset-0 ml-6">Ayuda</a>
+                        <a href="/profile" className="text-white font-medium hover:underline-offset-0 ml-6">Publicar trabajo</a>
+                        <a href="/ayuda" className="text-white font-medium hover:underline-offset-0 ml-6">Ayuda</a>
                         <a
                             href="/auth"
                             className="ml-6 bg-blue-300 hover:bg-blue-400 text-white font-normal px-4 py-2 rounded transition"
                         >
-                            Iniciar Sesión
+                            Ingresá
                         </a>
                     </div>
 
