@@ -3,7 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
-import ClientLayoutWrapper from "@/components/layoutapp/ClientLayoutWrapper"; 
+import ClientLayoutWrapper from "@/components/layoutapp/ClientLayoutWrapper";
+import { AuthProvider } from "@/context/AuthContext";
 
 config.autoAddCss = false;
 
@@ -30,9 +31,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <ClientLayoutWrapper>
-          {children}
-        </ClientLayoutWrapper>
+        <AuthProvider>
+          <ClientLayoutWrapper>
+
+            {children}
+
+          </ClientLayoutWrapper>
+        </AuthProvider>
       </body>
     </html>
   );
