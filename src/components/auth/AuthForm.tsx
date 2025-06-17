@@ -6,6 +6,7 @@ import RegisterForm from "./RegisterForm";
 import AlertMessage from "./AlertMessage";
 import Image from "next/image";
 import Link from "next/link"; // Agregado
+import { signIn } from "next-auth/react"; // Agrega este import
 
 export default function AuthForm() {
   const [isLogin, setIsLogin] = useState(true);
@@ -38,10 +39,11 @@ export default function AuthForm() {
                 setMessage("");
                 setError("");
               }}
-              className={`w-1/2 py-2 text-sm font-semibold transition-all duration-200 cursor-pointer ${!isLogin
-                ? "bg-blue-500 text-white"
-                : "text-gray-700 hover:bg-gray-200"
-                }`}
+              className={`w-1/2 py-2 text-sm font-semibold transition-all duration-200 cursor-pointer ${
+                !isLogin
+                  ? "bg-blue-500 text-white"
+                  : "text-gray-700 hover:bg-gray-200"
+              }`}
             >
               Sign up
             </button>
@@ -51,14 +53,32 @@ export default function AuthForm() {
                 setMessage("");
                 setError("");
               }}
-              className={`w-1/2 py-2 text-sm font-semibold transition-all duration-200 cursor-pointer ${isLogin
-                ? "bg-blue-500 text-white"
-                : "text-gray-700 hover:bg-gray-200"
-                }`}
+              className={`w-1/2 py-2 text-sm font-semibold transition-all duration-200 cursor-pointer ${
+                isLogin
+                  ? "bg-blue-500 text-white"
+                  : "text-gray-700 hover:bg-gray-200"
+              }`}
             >
               Log in
             </button>
           </div>
+
+          <div className="mt-4">
+            <button
+              type="button"
+              className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 rounded-lg py-2 shadow-sm hover:shadow-md transition-all duration-150 hover:bg-gray-50 font-semibold text-gray-700"
+              onClick={() => signIn("google", { callbackUrl: "/servicios" })}
+            >
+              <Image src="/img/GoogleLogo.png" alt="Google" width={20} height={20} className="w-5 h-5" />
+              Continuar con Google
+            </button>
+          </div>
+          <div className="flex items-center my-4">
+            <div className="flex-grow border-t border-gray-200"></div>
+            <span className="mx-2 text-gray-400 text-xs">o</span>
+            <div className="flex-grow border-t border-gray-200"></div>
+          </div>
+
           <h2 className="text-blue-500 text-center text-lg font-normal mb-4">
             {isLogin ? "Iniciar Sesión" : "Registrar"}
           </h2>
@@ -66,7 +86,10 @@ export default function AuthForm() {
           {isLogin ? (
             <LoginForm setMessage={setMessage} setError={setError} />
           ) : (
-            <RegisterForm setMessage={setMessage} setError={setError} setIsLogin={setIsLogin} />
+            <RegisterForm
+              setMessage={setMessage}
+              setError={setError}
+            />
           )}
         </div>
       </div>

@@ -1,17 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { registerUser } from "@/services/authService";
+import { registerUser, loginUser } from "@/services/authService"; // Asegúrate de importar loginUser
 import axios, { AxiosError } from "axios";
 import CountryCitySelect from "./CountryCitySelect";
+import { useRouter } from "next/navigation"; // Importa useRouter
 
 type Props = {
   setMessage: (msg: string) => void;
   setError: (msg: string) => void;
-  setIsLogin: (val: boolean) => void;
 };
 
-export default function RegisterForm({ setMessage, setError, setIsLogin }: Props) {
+export default function RegisterForm({ setMessage, setError }: Props) {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -25,6 +25,8 @@ export default function RegisterForm({ setMessage, setError, setIsLogin }: Props
     state: "",
     zip_code: "",
   });
+
+  const router = useRouter(); // Inicializa router
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -66,8 +68,13 @@ export default function RegisterForm({ setMessage, setError, setIsLogin }: Props
         state,
         zip_code,
       });
-      setMessage("¡Registro exitoso!");
-      setIsLogin(true);
+      // Login automático después del registro
+      const res = await loginUser(email, password);
+      localStorage.setItem("token", res.token);
+      setMessage("¡Registro y login exitosos!");
+      setTimeout(() => {
+        router.push("/servicios");
+      }, 1000);
     } catch (err) {
       if (axios.isAxiosError(err)) {
         const axiosError = err as AxiosError<{ message?: string }>;
