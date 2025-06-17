@@ -15,7 +15,7 @@ export const registerUser = async (data: {
   email: string;
   password: string;
   confirmPassword: string;
-  phone: number;
+  phone: string;
   street: string;
   house_number: number; // Nuevo campo
   city: string;
