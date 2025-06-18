@@ -15,7 +15,8 @@ const handler = NextAuth({
     async jwt({ token, account, user }: any) {
       if (account && user) {
         try {
-          const res = await axios.post("http://localhost:8080/auth/google", {
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL; // <-- Agregado
+          const res = await axios.post(`${apiUrl}/auth/google`, {
             name: user.name,
             email: user.email,
             image: user.image,
