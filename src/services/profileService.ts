@@ -6,11 +6,12 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL as string;
 export const getProfile = async (): Promise<any> => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No se encontró el token");
-  const res = await axios.get(`${API_URL}/users/byId`, {
+  const res = await axios.get(`${API_URL}/users/ById`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
+  console.log(res.data);
   return res.data;
 };
 
