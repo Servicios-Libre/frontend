@@ -80,3 +80,12 @@ export interface ProfileForm {
   user_pic?: string; // Solo para mostrar, no se envía al backend
 }
 
+export interface ServicioGrid {
+  id: string | number;
+  title: string;
+  worker: {
+    name: string;
+  };
+  work_photos: { photo_url: string }[];
+}
+

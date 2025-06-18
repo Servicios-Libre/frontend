@@ -7,7 +7,7 @@ import Pagination from "@/components/ui/pagination-services/PaginationServices";
 import NoResults from "@/components/ui/no-results/NoResults";
 import InformacionServicios from "@/components/ui/sections/informacio-servicios/InformacioServicios";
 import PerfilesDestacados from "@/components/servicios/perfiles-destacados/PerfilesDestacados";
-import { Servicio } from "@/types";
+import { Servicio, ServicioGrid } from "@/types";
 import { obtenerServicios } from "@/services/serviciosService";
 import ServiciosSkeleton from "@/components/ui/serviciosSkeleton/ServiciosSkeleton";
 
@@ -22,7 +22,7 @@ export default function ServiciosPage() {
     const [enfocado, setEnfocado] = useState(false);
     const [categoriasSeleccionadas, setCategoriasSeleccionadas] = useState<string[]>([]);
     const [busqueda, setBusqueda] = useState("");
-    const [servicios, setServicios] = useState<Servicio[]>([]);
+    const [servicios, setServicios] = useState<ServicioGrid[]>([]);
     const [totalServicios, setTotalServicios] = useState(0);
     const [loading, setLoading] = useState(false);
 
@@ -49,7 +49,17 @@ export default function ServiciosPage() {
                     paginaActual,
                     serviciosPorPagina
                 );
-                setServicios(data.servicios);
+                // Mapear Servicio[] a ServicioGrid[]
+                const serviciosGrid: ServicioGrid[] = data.servicios.map((servicio: Servicio) => ({
+                    id: servicio.id,
+                    title: servicio.title,
+                    worker: { name: servicio.user }, // Asume que 'user' es el nombre
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    work_photos: (servicio.work_photos as any[]).map((foto: any) => ({
+                        photo_url: foto.photo_url
+                    }))
+                }));
+                setServicios(serviciosGrid);
                 setTotalServicios(data.total);
             } catch (error) {
                 console.error("Error al obtener servicios:", error);
