@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Servicio } from "@/types";
 
-const API_URL = 'http://localhost:8080';
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // <-- Cambiado
 
 export const obtenerServicios = async (
   busqueda: string,
