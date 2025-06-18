@@ -1,18 +1,8 @@
 import ServiceCard from "@/components/serviceCard/ServiceCard";
-
-
-// Define la interfaz mínima para un servicio
-interface ServiceGridItem {
-  id: string | number;
-  title: string;
-  worker: {
-    name: string;
-  };
-  work_photos: { photo_url: string }[];
-}
+import { ServicioGrid } from "@/types";
 
 interface ServicesGridProps {
-  servicios: ServiceGridItem[];
+  servicios: ServicioGrid[];
 }
 
 export default function ServicesGrid({ servicios }: ServicesGridProps) {
