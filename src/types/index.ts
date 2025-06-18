@@ -47,7 +47,8 @@ export type IconName =
   | "handshake"
   | "screwdriver-wrench"
   | "chalkboard-teacher"
-  | "face-smile";
+  | "face-smile"
+  | "user-astronaut"; // <-- Agregado
 
 export interface Categoria {
   id: string;

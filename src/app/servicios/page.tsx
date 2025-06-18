@@ -72,7 +72,8 @@ export default function ServiciosPage() {
     }, [busqueda, categoriasSeleccionadas, paginaActual, serviciosPorPagina]);
 
     const totalPaginas = Math.ceil(totalServicios / serviciosPorPagina);
-    const serviciosVisibles = servicios;
+    // servicios ya es ServicioGrid[], así que serviciosVisibles también lo es:
+    const serviciosVisibles: ServicioGrid[] = servicios;
 
     useEffect(() => {
         if (paginaActual > totalPaginas) {
