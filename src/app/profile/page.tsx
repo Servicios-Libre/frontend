@@ -7,7 +7,6 @@ import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileForm from "@/components/profile/ProfileForm";
 import ProfileMissingModal from "@/components/profile/ProfileMissingModal";
 import ProfileActions from "@/components/profile/ProfileActions";
-import Link from "next/link";
 import { locationOptions, countries } from "@/databauti/locations";
 
 const requiredFields = [
@@ -17,6 +16,7 @@ const requiredFields = [
   { key: "city", label: "Ciudad" },
   { key: "state", label: "Estado" },
   { key: "zip_code", label: "Código postal" },
+  { key: "user_pic", label: "Foto de perfil" },
 ];
 
 type ProfileFormType = {
@@ -149,24 +149,14 @@ export default function ProfilePage() {
       : [];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100 py-10">
       <ProfileMissingModal
         show={showMissing && !isComplete}
         missingFields={missingFields}
         onClose={() => setShowMissing(false)}
       />
 
-      <div className="max-w-4xl mx-auto pt-6 pb-2 flex">
-        <Link href="/">
-          <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md">
-            Volver a la landing
-          </button>
-        </Link>
-      </div>
-
-      <div className="h-24 bg-gradient-to-r from-blue-100 via-purple-100 to-yellow-100 rounded-b-xl shadow-sm" />
-
-      <div className="text-black max-w-4xl mx-auto bg-white rounded-lg shadow-md -mt-16 p-8">
+      <div className="text-black max-w-4xl mx-auto bg-white rounded-lg shadow-md mt-20 p-8">
         <ProfileHeader
           userName={userName}
           userPic={formData.user_pic ?? ""}
@@ -191,7 +181,9 @@ export default function ProfilePage() {
         />
       </div>
 
-      <ProfileActions />
+      <div className="px-8">
+        <ProfileActions />
+      </div>
     </div>
   );
 }
