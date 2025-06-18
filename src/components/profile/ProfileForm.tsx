@@ -29,7 +29,7 @@ export default function ProfileForm({
     countryCities,
 }: Props) {
     return (
-        <form className="flex flex-col gap-4 bg-white rounded-xl shadow-sm p-8 border border-blue-100 mt-4">
+        <form className="flex flex-col gap-4 bg-white rounded-xl shadow-sm p-8 border border-blue-100">
             <div className="flex flex-col sm:flex-row gap-2">
                 <div className="w-full">
                     <label htmlFor="phone" className="block text-blue-700 font-normal mb-1">
@@ -40,7 +40,7 @@ export default function ProfileForm({
                         name="phone"
                         type="tel"
                         placeholder="Ej: 1123456789"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:bg-gray-100"
+                        className="w-full rounded-md border border-gray-300 px-4 py-2 text-base focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:bg-gray-100"
                         value={formData.phone}
                         onChange={handleChange}
                         disabled={!editMode}
@@ -57,7 +57,7 @@ export default function ProfileForm({
                         name="street"
                         type="text"
                         placeholder="Ej: Av. Siempre Viva"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:bg-gray-100"
+                        className="w-full rounded-md border border-gray-300 px-4 py-2 text-base focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:bg-gray-100"
                         value={formData.street}
                         onChange={handleChange}
                         disabled={!editMode}
@@ -72,7 +72,7 @@ export default function ProfileForm({
                         name="house_number"
                         type="text"
                         placeholder="Ej: 742"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:bg-gray-100"
+                        className="w-full rounded-md border border-gray-300 px-4 py-2 text-base focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:bg-gray-100"
                         value={formData.house_number}
                         onChange={handleChange}
                         disabled={!editMode}
@@ -90,7 +90,7 @@ export default function ProfileForm({
                         value={formData.state}
                         onChange={handleSelectChange}
                         disabled={!editMode}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:bg-gray-100"
+                        className="w-full rounded-md border border-gray-300 px-4 py-2 text-base focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:bg-gray-100"
                     >
                         <option value="">Selecciona un estado</option>
                         {countries.map((country) => (
@@ -108,7 +108,7 @@ export default function ProfileForm({
                         value={formData.city}
                         onChange={handleSelectChange}
                         disabled={!editMode}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:bg-gray-100"
+                        className="w-full rounded-md border border-gray-300 px-4 py-2 text-base focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:bg-gray-100"
                     >
                         <option value="">Selecciona una ciudad</option>
                         {countryCities.map((city) => (
@@ -127,7 +127,7 @@ export default function ProfileForm({
                         name="zip_code"
                         type="text"
                         placeholder="Ej: 1000"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:bg-gray-100"
+                        className="w-full rounded-md border border-gray-300 px-4 py-2 text-base focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:bg-gray-100"
                         value={formData.zip_code}
                         onChange={handleChange}
                         disabled={!editMode}
