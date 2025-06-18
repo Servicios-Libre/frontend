@@ -11,6 +11,7 @@ import {
     faHandshake,
     faScrewdriverWrench,
     faChalkboardTeacher,
+    faUserAstronaut,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { Categoria } from "@/types";
@@ -26,6 +27,7 @@ const icons = {
     "screwdriver-wrench": faScrewdriverWrench,
     "chalkboard-teacher": faChalkboardTeacher,
     "face-smile": faFaceSmile,
+    "user-astronaut": faUserAstronaut,
 } satisfies Record<string, typeof faFaceSmile>;
 
 type Props = {
