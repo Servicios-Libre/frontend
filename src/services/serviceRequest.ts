@@ -1,4 +1,5 @@
 import axios from 'axios';
+const API_URL = process.env.NEXT_PUBLIC_API_URL as string;
 
 export type ServiceRequestBody = {
   worker_id: string;
@@ -8,5 +9,5 @@ export type ServiceRequestBody = {
 };
 
 export const sendServiceRequest = async (data: ServiceRequestBody): Promise<void> => {
-  await axios.post('http://localhost:8080/services/new', data); // Cambiá la ruta si tu backend usa otra
+  await axios.post(`${API_URL}/services/new`, data);
 };

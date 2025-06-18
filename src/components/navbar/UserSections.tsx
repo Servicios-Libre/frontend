@@ -48,7 +48,7 @@ export function UserDropdown({ user, logout }: { user: User | null, logout: () =
                 {dropdownOpen && (
                     <div className="absolute right-0 mt-2 w-40 bg-white text-gray-800 rounded shadow-lg z-50 border border-blue-100 animate-fade-in">
                         <Link
-                            href="/perfil"
+                            href="/profile"
                             className="block px-4 py-2 hover:bg-blue-100 hover:text-blue-700 rounded-t transition-colors duration-150 cursor-pointer"
                             onClick={() => setDropdownOpen(false)}
                         >
@@ -99,7 +99,7 @@ export function MobileUserSection({ user, logout, setIsOpen }: { user: User | nu
                     <span className="font-semibold text-blue-700">{user.name}</span>
                 </div>
                 <Link
-                    href="/perfil"
+                    href="/profile"
                     className="w-full px-4 py-2 rounded-t hover:bg-blue-100 hover:text-blue-700 text-sm flex items-center gap-2 transition-colors duration-150 cursor-pointer"
                 >
                     <FontAwesomeIcon icon={faUser} className="text-blue-400" />

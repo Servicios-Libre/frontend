@@ -29,7 +29,7 @@ export default function Navbar() {
                     <div className="hidden md:flex items-center">
                         <Link href="/landing" className="text-white font-medium hover:underline-offset-0">Inicio</Link>
                         <Link href="/servicios" className="text-white font-medium hover:underline-offset-0 ml-6">Servicios</Link>
-                        <Link href="/profile" className="text-white font-medium hover:underline-offset-0 ml-6">Publicar trabajo</Link>
+                        <Link href="/sobre-nosotros" className="text-white font-medium hover:underline-offset-0 ml-6">Sobre nosotros</Link>
                         <Link href="/ayuda" className="text-white font-medium hover:underline-offset-0 ml-6">Ayuda</Link>
                         <UserDropdown user={user} logout={logout} />
                     </div>
@@ -51,8 +51,9 @@ export default function Navbar() {
                     } bg-white text-gray-900 px-8 pb-6 shadow-md`}
             >
                 <div className="mt-4 mb-2">
+                    <Link href="/landing" className="block py-2 hover:underline">Inicio</Link>
                     <Link href="/servicios" className="block py-2 hover:underline">Servicios</Link>
-                    <Link href="/buscar-trabajadores" className="block py-2 hover:underline">Buscar Trabajadores</Link>
+                    <Link href="/sobre-nosotros" className="block py-2 hover:underline">Sobre nosotros</Link>
                     <Link href="/ayuda" className="block py-2 hover:underline">Ayuda</Link>
                 </div>
                 <hr className="mb-6 border-gray-200 sm:mx-auto" />
