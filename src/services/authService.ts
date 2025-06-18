@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL; // Cambiado
+const API_URL = process.env.NEXT_PUBLIC_API_URL as string;
 
 export const loginUser = async (email: string, password: string) => {
-  const response = await axios.post(`${API_BASE_URL}/auth/signin`, {
+  const response = await axios.post(`${API_URL}/auth/signin`, {
     email,
     password,
   });
@@ -22,6 +22,6 @@ export const registerUser = async (data: {
   state: string;
   zip_code: string;
 }) => {
-  const response = await axios.post(`${API_BASE_URL}/auth/signup`, data);
+  const response = await axios.post(`${API_URL}/auth/signup`, data);
   return response.data;
 };

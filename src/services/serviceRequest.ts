@@ -10,5 +10,5 @@ export type ServiceRequestBody = {
 };
 
 export const sendServiceRequest = async (data: ServiceRequestBody): Promise<void> => {
-  await axios.post(`${API_URL}/services/new`, data); // <-- Cambiado
+  await axios.post(`${API_URL}/services/new`, data);
 };
