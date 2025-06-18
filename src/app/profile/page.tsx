@@ -17,6 +17,7 @@ const requiredFields = [
   { key: "city", label: "Ciudad" },
   { key: "state", label: "Estado" },
   { key: "zip_code", label: "Código postal" },
+  { key: "user_pic", label: "Foto de perfil" },
 ];
 
 type ProfileFormType = {
@@ -149,7 +150,7 @@ export default function ProfilePage() {
       : [];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 py-10">
       <ProfileMissingModal
         show={showMissing && !isComplete}
         missingFields={missingFields}
@@ -163,8 +164,6 @@ export default function ProfilePage() {
           </button>
         </Link>
       </div>
-
-      <div className="h-24 bg-gradient-to-r from-blue-100 via-purple-100 to-yellow-100 rounded-b-xl shadow-sm" />
 
       <div className="text-black max-w-4xl mx-auto bg-white rounded-lg shadow-md -mt-16 p-8">
         <ProfileHeader
@@ -191,7 +190,9 @@ export default function ProfilePage() {
         />
       </div>
 
-      <ProfileActions />
+      <div className="px-8">
+        <ProfileActions />
+      </div>
     </div>
   );
 }
