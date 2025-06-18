@@ -1,6 +1,7 @@
 import { FaCamera } from "react-icons/fa";
 import Image from "next/image";
 import axios from "axios";
+import { RefObject } from "react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL as string;
 
