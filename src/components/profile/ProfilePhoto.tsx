@@ -1,5 +1,4 @@
 import { FaCamera } from "react-icons/fa";
-import { useRef } from "react";
 import Image from "next/image";
 import axios from "axios";
 
@@ -9,10 +8,10 @@ type Props = {
   userPic: string;
   setUserPic: (url: string) => void;
   editable: boolean;
+  fileInputRef: RefObject<HTMLInputElement | null>;
 };
 
-const ProfilePhoto = ({ userPic, setUserPic, editable }: Props) => {
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+const ProfilePhoto = ({ userPic, setUserPic, editable, fileInputRef }: Props) => {
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -45,20 +44,21 @@ const ProfilePhoto = ({ userPic, setUserPic, editable }: Props) => {
   };
 
   return (
-    <div className="relative w-20 h-20">
+    <div className="relative w-32 h-32 sm:w-24 sm:h-24">
       <Image
-        width={150}
-        height={150}
+        width={128}
+        height={128}
         src={userPic || "/img/avatar.jpg"}
         alt="Avatar"
-        className="w-20 h-20 rounded-full object-cover border-2 border-white shadow"
+        priority
+        className="w-32 h-32 sm:w-24 sm:h-24 rounded-full object-cover border-2 border-white shadow"
       />
       {editable && (
         <div
           onClick={() => fileInputRef.current?.click()}
-          className="absolute bottom-0 right-0 bg-white p-1.5 rounded-full cursor-pointer shadow"
+          className="absolute bottom-1 right-1 bg-white p-2 rounded-full cursor-pointer shadow hover:bg-blue-100 transition"
         >
-          <FaCamera className="text-gray-600" />
+          <FaCamera className="text-gray-600 text-lg" />
         </div>
       )}
       <input
