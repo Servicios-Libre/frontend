@@ -90,3 +90,12 @@ export interface ServicioGrid {
   work_photos: { photo_url: string }[];
 }
 
+export interface Ticket {
+  id: string;
+  type: "worker" | "service";
+  status: string;
+  created_at: string;
+  userId: string;
+  serviceId?: string; // solo para type: "service"
+}
+
