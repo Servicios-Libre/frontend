@@ -6,10 +6,10 @@ import { FaUserPlus, FaTools, FaUserCog, FaUsers, FaUserShield, FaUserTie, FaArr
 import Link from 'next/link';
 import { getAllUsers } from "@/services/dashboard-admin/userService";
 import { getAllTickets } from "@/services/dashboard-admin/ticketsService";
-import { Perfil, Ticket } from "@/types"; // Importa Perfil en vez de User
+import { Perfil, User, Ticket } from "@/types";
 
 export default function DashboardPage() {
-  const [users, setUsers] = useState<Perfil[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -17,7 +17,15 @@ export default function DashboardPage() {
     setLoading(true);
     Promise.all([getAllUsers(), getAllTickets()])
       .then(([usersData, ticketsData]) => {
-        setUsers(usersData as Perfil[]);
+        // Mapea Perfil a User según los campos que necesites
+        const mappedUsers = (usersData as Perfil[]).map((perfil) => ({
+          id: perfil.id,
+          username: perfil.nombre,
+          email: perfil.email ?? "",
+          phone: perfil.telefono ?? "",
+          role: perfil.rol ?? "user",
+        }));
+        setUsers(mappedUsers);
         setTickets(ticketsData as Ticket[]);
       })
       .finally(() => setLoading(false));
