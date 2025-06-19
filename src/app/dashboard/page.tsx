@@ -6,10 +6,10 @@ import { FaUserPlus, FaTools, FaUserCog, FaUsers, FaUserShield, FaUserTie, FaArr
 import Link from 'next/link';
 import { getAllUsers } from "@/services/dashboard-admin/userService";
 import { getAllTickets } from "@/services/dashboard-admin/ticketsService";
-import { Perfil, User, Ticket } from "@/types";
+import { Perfil, Ticket } from "@/types";
 
 export default function DashboardPage() {
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<Perfil[]>([]);
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -17,29 +17,19 @@ export default function DashboardPage() {
     setLoading(true);
     Promise.all([getAllUsers(), getAllTickets()])
       .then(([usersData, ticketsData]) => {
-        // Mapea Perfil a User según los campos que necesites
-        const mappedUsers = (usersData as Perfil[]).map((perfil) => ({
-          id: perfil.id,
-          username: perfil.nombre,
-          email: perfil.email ?? "",
-          phone: perfil.telefono ?? "",
-          role: perfil.rol ?? "user",
-        }));
-        setUsers(mappedUsers);
+        setUsers(usersData as Perfil[]);
         setTickets(ticketsData as Ticket[]);
       })
       .finally(() => setLoading(false));
   }, []);
 
-  // Resúmenes
+  // Resúmenes (solo cuenta usuarios, ya que no hay roles en Perfil)
   const totalUsers = users.length;
-  const totalAdmins = users.filter(u => u.role === 'admin').length;
-  const totalWorkers = users.filter(u => u.role === 'worker').length;
   const totalServices = tickets.filter(t => t.type === "service").length;
   const pendingServices = tickets.filter(t => t.type === "service" && t.status === "pendiente").length;
   const workerRequests = tickets.filter(t => t.type === "to-worker" && t.status === "pendiente").length;
 
-  // Simulación de últimas actividades (puedes reemplazar por datos reales)
+  // Simulación de últimas actividades
   const activities = [
     { id: 1, text: 'Usuario 3 fue dado de alta como trabajador.' },
     { id: 2, text: 'Usuario 2 actualizó su perfil.' },
@@ -65,12 +55,12 @@ export default function DashboardPage() {
           </div>
           <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center">
             <FaUserShield className="text-3xl text-green-600 mb-2" />
-            <span className="text-3xl font-bold text-green-700">{totalAdmins}</span>
+            <span className="text-3xl font-bold text-green-700">-</span>
             <span className="text-gray-600 mt-2">Administradores</span>
           </div>
           <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center">
             <FaUserTie className="text-3xl text-yellow-600 mb-2" />
-            <span className="text-3xl font-bold text-yellow-700">{totalWorkers}</span>
+            <span className="text-3xl font-bold text-yellow-700">-</span>
             <span className="text-gray-600 mt-2">Trabajadores</span>
           </div>
           <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center">
@@ -112,6 +102,39 @@ export default function DashboardPage() {
             </div>
             <FaArrowRight className="text-green-400 text-2xl" />
           </Link>
+        </div>
+
+        {/* Tabla de usuarios (Perfil) */}
+        <div className="bg-white rounded-lg shadow p-6 mb-8">
+          <h2 className="text-lg font-semibold text-gray-700 mb-4">Usuarios</h2>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-left">
+              <thead>
+                <tr>
+                  <th className="py-2 px-4">ID</th>
+                  <th className="py-2 px-4">Nombre</th>
+                  <th className="py-2 px-4">Profesión</th>
+                  <th className="py-2 px-4">Imagen</th>
+                  <th className="py-2 px-4">Descripción</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((perfil) => (
+                  <tr key={perfil.id}>
+                    <td className="py-2 px-4">{perfil.id}</td>
+                    <td className="py-2 px-4">{perfil.nombre}</td>
+                    <td className="py-2 px-4">{perfil.profesion}</td>
+                    <td className="py-2 px-4">
+                      {perfil.imagen && (
+                        <img src={perfil.imagen} alt={perfil.nombre} width={40} />
+                      )}
+                    </td>
+                    <td className="py-2 px-4">{perfil.descripcion}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* Últimas actividades */}
