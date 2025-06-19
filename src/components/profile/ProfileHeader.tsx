@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { useToast } from "@/context/ToastContext";
 import ProfilePhoto from "./ProfilePhoto";
 
 interface Props {
@@ -12,7 +13,6 @@ interface Props {
   hasUnsavedChanges: boolean;
   handleSave: () => void;
   handleCancel: () => void;
-  setShowMissing: (show: boolean) => void;
 }
 
 export default function ProfileHeader({
@@ -25,9 +25,9 @@ export default function ProfileHeader({
   isComplete,
   hasUnsavedChanges,
   handleSave,
-  handleCancel,
-  setShowMissing,
+  handleCancel
 }: Props) {
+  const { showToast } = useToast();
   // Referencia para el input file en ProfileForm
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -83,7 +83,9 @@ export default function ProfileHeader({
               }`}
             disabled={editMode || hasUnsavedChanges}
             onClick={() => {
-              if (!isComplete) setShowMissing(true);
+              if (!isComplete) {
+                showToast("Completa tu perfil antes de solicitar ser trabajador.", "error");
+              }
             }}
           >
             Solicitar ser trabajador

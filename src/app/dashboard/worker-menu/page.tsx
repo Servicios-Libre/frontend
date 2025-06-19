@@ -11,6 +11,7 @@ import {
   rejectWorkerRequest,
   removeWorker,
 } from '@/services/dashboard-admin/workerService';
+import { useToast } from '@/context/ToastContext';
 
 export default function WorkerMenuPage() {
   const [activeWorkers, setActiveWorkers] = useState<Perfil[]>([]);
@@ -20,6 +21,7 @@ export default function WorkerMenuPage() {
   const [selectedUser, setSelectedUser] = useState<Perfil | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { showToast } = useToast();
 
   // Cargar datos al montar
   useEffect(() => {
@@ -43,14 +45,15 @@ export default function WorkerMenuPage() {
   const handleApprove = async (id: string) => {
     await approveWorkerRequest(id);
     setWorkerRequests((prev) => prev.filter((u) => u.id !== id));
-    // Opcional: recargar trabajadores activos
     const updatedWorkers = await getActiveWorkers();
     setActiveWorkers(updatedWorkers);
+    showToast('Trabajador aprobado correctamente.', 'success');
   };
 
   const handleReject = async (id: string) => {
     await rejectWorkerRequest(id);
     setWorkerRequests((prev) => prev.filter((u) => u.id !== id));
+    showToast('Solicitud rechazada.', 'error');
   };
 
   const handleViewProfile = (user: Perfil) => setSelectedUser(user);

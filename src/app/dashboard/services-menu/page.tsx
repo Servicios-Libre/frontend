@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useToast } from "@/context/ToastContext";
 import Sidebar from '@/components/dashboard/Sidebar';
 import ServiceTable from '@/components/dashboard/ServiceTable';
 import Toast from '@/components/dashboard/Toast';
@@ -26,6 +27,7 @@ export default function ServicesPage() {
   const [search, setSearch] = useState('');
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const { showToast } = useToast();
 
   const filteredServices = services.filter(
     (s) =>
@@ -52,8 +54,7 @@ export default function ServicesPage() {
         s.id === id ? { ...s, status: 'rechazado' } : s
       )
     );
-    setToast({ message: 'Servicio rechazado.', type: 'error' });
-    setTimeout(() => setToast(null), 2500);
+    showToast('Servicio rechazado.', 'error');
   };
 
   const handleViewDetails = (service: Service) => {

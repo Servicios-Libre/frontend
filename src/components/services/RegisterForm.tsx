@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useToast } from "@/context/ToastContext";
 
 const categories = [
   { name: "Carpintero" },
@@ -22,6 +23,7 @@ export default function RegisterForm() {
   const [images, setImages] = useState<File[]>([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [error, setError] = useState("");
+  const { showToast } = useToast();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -34,7 +36,7 @@ export default function RegisterForm() {
     e.preventDefault();
 
     if (images.length === 0) {
-      setError("Debes subir al menos una imagen.");
+      showToast("Debes subir al menos una imagen.", "error");
       return;
     }
 
@@ -54,6 +56,7 @@ export default function RegisterForm() {
     setError("");
     setSuccessMessage("Servicio registrado correctamente.");
     setTimeout(() => setSuccessMessage(""), 3000);
+    showToast("Servicio registrado correctamente.", "success");
   };
 
   return (
