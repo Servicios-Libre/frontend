@@ -6,10 +6,10 @@ import { FaUserPlus, FaTools, FaUserCog, FaUsers, FaUserShield, FaUserTie, FaArr
 import Link from 'next/link';
 import { getAllUsers } from "@/services/dashboard-admin/userService";
 import { getAllTickets } from "@/services/dashboard-admin/ticketsService";
-import { User, Ticket } from "@/types";
+import { Perfil, Ticket } from "@/types"; // Importa Perfil en vez de User
 
 export default function DashboardPage() {
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<Perfil[]>([]);
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -17,7 +17,7 @@ export default function DashboardPage() {
     setLoading(true);
     Promise.all([getAllUsers(), getAllTickets()])
       .then(([usersData, ticketsData]) => {
-        setUsers(usersData as User[]);
+        setUsers(usersData as Perfil[]);
         setTickets(ticketsData as Ticket[]);
       })
       .finally(() => setLoading(false));
