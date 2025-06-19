@@ -7,7 +7,7 @@ export const getAllTickets = async (params?: { type?: string; status?: string })
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No se encontró el token");
   const query = params
-    ? '?' + Object.entries(params).filter(([_, v]) => v !== undefined).map(([k, v]) => `${k}=${v}`).join('&')
+    ? '?' + Object.entries(params).filter(([, v]) => v !== undefined).map(([k, v]) => `${k}=${v}`).join('&')
     : '';
   const res = await axios.get(`${API_URL}/tickets${query}`, {
     headers: { Authorization: `Bearer ${token}` },

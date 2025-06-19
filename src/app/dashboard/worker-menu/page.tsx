@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getActiveWorkers, getWorkerRequests, acceptTicket, changeUserToWorker } from '@/services/dashboard-admin/workerService';
+import { getActiveWorkers, getWorkerRequests } from '@/services/dashboard-admin/workerService';
+import { acceptTicket } from '@/services/dashboard-admin/ticketsService';
+import { changeUserToWorker } from '@/services/dashboard-admin/userService';
 import { Perfil, Ticket } from '@/types';
 import Sidebar from '@/components/dashboard/Sidebar';
 import WorkerTable from '@/components/dashboard/WorkerTable';
