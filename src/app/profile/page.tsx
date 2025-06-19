@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getProfile, updateProfile } from "@/services/profileService";
+import { getProfile, updateProfile, updateProfileImage } from "@/services/profileService";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileForm from "@/components/profile/ProfileForm";
 import ProfileMissingModal from "@/components/profile/ProfileMissingModal";
@@ -43,6 +43,8 @@ export default function ProfilePage() {
   const [originalData, setOriginalData] = useState<ProfileFormType | null>(null);
   const [userName, setUserName] = useState<string>("");
   const [showMissing, setShowMissing] = useState(false);
+
+  const [userImageFile, setUserImageFile] = useState<File | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -100,6 +102,7 @@ export default function ProfilePage() {
   };
 
   const handleSave = async () => {
+    
     try {
       const dataToSend: any = {
         phone: formData.phone ? Number(formData.phone) : undefined,
@@ -109,7 +112,8 @@ export default function ProfilePage() {
         state: formData.state,
         zip_code: formData.zip_code ? String(formData.zip_code) : undefined,
       };
-      await updateProfile(dataToSend);
+      // if (dataToSend){ await updateProfile(dataToSend);}
+      if (userImageFile){ await updateProfileImage(userImageFile);}
       setOriginalData(formData);
       setEditMode(false);
     } catch (error) {
@@ -169,6 +173,7 @@ export default function ProfilePage() {
           handleSave={handleSave}
           handleCancel={handleCancel}
           setShowMissing={setShowMissing}
+          setUserImageFile={setUserImageFile}
         />
         <ProfileForm
           formData={formData}
