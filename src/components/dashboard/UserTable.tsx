@@ -1,12 +1,6 @@
 'use client';
 
-export interface User {
-  id: string;
-  username: string;
-  role: string;
-  email: string;
-  phone: string;
-}
+import { User } from "@/types";
 
 export default function UserTable({ users }: { users: User[] }) {
   return (
@@ -34,9 +28,7 @@ export default function UserTable({ users }: { users: User[] }) {
             ))
           ) : (
             <tr>
-              <td colSpan={5} className="text-center py-6 text-gray-400">
-                No se encontraron usuarios
-              </td>
+              <td colSpan={5} className="py-4 text-center text-gray-400">No hay usuarios.</td>
             </tr>
           )}
         </tbody>

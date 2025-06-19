@@ -1,39 +1,50 @@
 'use client';
 
+import { useEffect, useState } from "react";
 import Sidebar from '@/components/dashboard/Sidebar';
 import { FaUserPlus, FaTools, FaUserCog, FaUsers, FaUserShield, FaUserTie, FaArrowRight } from 'react-icons/fa';
 import Link from 'next/link';
-
-const initialUsers = [
-  { id: 'YY-853581', username: 'Usuario 1', role: 'admin', email: 'user@gmail.com', phone: '2342' },
-  { id: 'YY-853599', username: 'Usuario 2', role: 'user', email: 'user@gmail.com', phone: '23432432' },
-  { id: 'YY-853322', username: 'Usuario 3', role: 'worker', email: 'user@gmail.com', phone: '234' },
-];
-
-const initialServices = [
-  { id: '1', title: 'Plomería básica', worker: 'Juan Pérez', status: 'pendiente', date: '2025-06-18' },
-  { id: '2', title: 'Electricidad avanzada', worker: 'Ana Gómez', status: 'aprobado', date: '2025-06-15' },
-  { id: '3', title: 'Pintura de interiores', worker: 'Carlos Ruiz', status: 'rechazado', date: '2025-06-10' },
-];
+import { getAllUsers } from "@/services/dashboard-admin/userService";
+import { getAllTickets } from "@/services/dashboard-admin/ticketsService";
+import { User, Ticket } from "@/types";
 
 export default function DashboardPage() {
-  // Resúmenes
-  const totalUsers = initialUsers.length;
-  const totalAdmins = initialUsers.filter(u => u.role === 'admin').length;
-  const totalWorkers = initialUsers.filter(u => u.role === 'worker').length;
-  const totalServices = initialServices.length;
-  const pendingServices = initialServices.filter(s => s.status === 'pendiente').length;
+  const [users, setUsers] = useState<User[]>([]);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Simulación de últimas actividades
+  useEffect(() => {
+    setLoading(true);
+    Promise.all([getAllUsers(), getAllTickets()])
+      .then(([usersData, ticketsData]) => {
+        setUsers(usersData as User[]);
+        setTickets(ticketsData as Ticket[]);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Resúmenes
+  const totalUsers = users.length;
+  const totalAdmins = users.filter(u => u.role === 'admin').length;
+  const totalWorkers = users.filter(u => u.role === 'worker').length;
+  const totalServices = tickets.filter(t => t.type === "service").length;
+  const pendingServices = tickets.filter(t => t.type === "service" && t.status === "pendiente").length;
+  const workerRequests = tickets.filter(t => t.type === "to-worker" && t.status === "pendiente").length;
+
+  // Simulación de últimas actividades (puedes reemplazar por datos reales)
   const activities = [
     { id: 1, text: 'Usuario 3 fue dado de alta como trabajador.' },
     { id: 2, text: 'Usuario 2 actualizó su perfil.' },
     { id: 3, text: 'Usuario 1 aprobó un servicio.' },
   ];
 
+  if (loading) {
+    return <div className="flex min-h-screen items-center justify-center text-xl">Cargando...</div>;
+  }
+
   return (
     <div className="min-h-screen flex bg-gray-100">
-      <Sidebar pendingServices={pendingServices} />
+      <Sidebar pendingServices={pendingServices} workerRequests={workerRequests} />
       <main className="flex-1 p-6">
         <h1 className="text-2xl font-semibold text-gray-800 mb-6">Panel de Administración</h1>
 
@@ -73,7 +84,7 @@ export default function DashboardPage() {
             </div>
             <FaArrowRight className="text-indigo-400 text-2xl" />
           </Link>
-          <Link href="/dashboard/services" className="bg-blue-50 hover:bg-blue-100 rounded-lg shadow p-6 flex items-center justify-between transition">
+          <Link href="/dashboard/services-menu" className="bg-blue-50 hover:bg-blue-100 rounded-lg shadow p-6 flex items-center justify-between transition">
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <FaTools className="text-blue-600 text-xl" />

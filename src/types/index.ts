@@ -1,22 +1,41 @@
+// --- USUARIOS ---
+export interface User {
+  id: string;
+  username: string;
+  email: string;
+  phone: string;
+  role: string;
+}
+
+// --- WORKERS ---
+export interface WorkerUser {
+  id: string;
+  username: string;
+  email: string;
+  isWorker: boolean;
+  hasRequest: boolean;
+}
+
+// --- SERVICIOS ---
 export interface Service {
   id: string;
   title: string;
-  work_photos: [{
-    id: string,
-    photo_url: string
-  }];
-  worker: {
-    name: string;
-  };
-  categoryId: string;
+  worker: string; // nombre o id del worker
+  status: 'pendiente' | 'aprobado' | 'rechazado';
+  date: string;
 }
 
-export interface Category {
+// --- TICKETS ---
+export interface Ticket {
   id: string;
-  name: string;
-  icon: string;
+  type: "to-worker" | "service";
+  status: "pendiente" | "aprobado" | "rechazado";
+  created_at: string;
+  userId: string;
+  serviceId?: string; // solo para type: "service"
 }
 
+// --- Otros tipos existentes que uses en otros lados ---
 export interface Perfil {
   id: string;
   nombre: string;
@@ -25,17 +44,14 @@ export interface Perfil {
   descripcion: string;
 }
 
+export interface Category {
+  id: string;
+  name: string;
+  icon: string;
+}
+
 export interface Servicio {
   id: string;
-  title: string;
-  description: string;
-  work_photos: object[];
-  category: {
-    id: string,
-    name: string,
-    icon: string
-  };
-  user: string;
 }
 
 export type IconName =
@@ -48,7 +64,7 @@ export type IconName =
   | "screwdriver-wrench"
   | "chalkboard-teacher"
   | "face-smile"
-  | "user-astronaut"; // <-- Agregado
+  | "user-astronaut";
 
 export interface Categoria {
   id: string;
@@ -88,14 +104,5 @@ export interface ServicioGrid {
     name: string;
   };
   work_photos: { photo_url: string }[];
-}
-
-export interface Ticket {
-  id: string;
-  type: "worker" | "service";
-  status: string;
-  created_at: string;
-  userId: string;
-  serviceId?: string; // solo para type: "service"
 }
 

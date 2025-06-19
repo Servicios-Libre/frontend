@@ -1,12 +1,6 @@
 'use client';
 
-interface WorkerUser {
-  id: string;
-  username: string;
-  email: string;
-  isWorker: boolean;
-  hasRequest: boolean;
-}
+import { WorkerUser } from "@/types";
 
 interface WorkerTableProps {
   users: WorkerUser[];
@@ -33,43 +27,34 @@ export default function WorkerTable({ users, onApprove, onReject, onToggleWorker
             <tr key={user.id} className={user.hasRequest ? "bg-yellow-50" : ""}>
               <td className="py-2 px-4 text-center">{user.username}</td>
               <td className="py-2 px-4 text-center">{user.email}</td>
-              <td className="py-2 px-4 text-center">
-                {user.isWorker ? (
-                  <span className="text-green-600 font-semibold">Sí</span>
-                ) : (
-                  <span className="text-red-600 font-semibold">No</span>
-                )}
-              </td>
+              <td className="py-2 px-4 text-center">{user.isWorker ? "Sí" : "No"}</td>
+              <td className="py-2 px-4 text-center">{user.hasRequest ? "Pendiente" : "-"}</td>
               <td className="py-2 px-4 text-center">
                 {user.hasRequest ? (
-                  <span className="bg-yellow-200 text-yellow-800 px-2 py-1 rounded text-xs font-semibold">Pendiente</span>
-                ) : (
-                  <span className="text-gray-400 text-xs">-</span>
-                )}
-              </td>
-              <td className="py-2 px-4 text-center flex gap-2 justify-center">
-                {user.hasRequest && (
                   <>
                     <button
-                      className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 text-xs"
+                      className="bg-green-500 text-white px-2 py-1 rounded mr-2"
                       onClick={() => onApprove(user.id)}
                     >
                       Aprobar
                     </button>
                     <button
-                      className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs"
+                      className="bg-red-500 text-white px-2 py-1 rounded"
                       onClick={() => onReject(user.id)}
                     >
                       Rechazar
                     </button>
                   </>
+                ) : user.isWorker ? (
+                  <button
+                    className="bg-yellow-600 text-white px-2 py-1 rounded"
+                    onClick={() => onToggleWorker(user.id)}
+                  >
+                    Dar de baja
+                  </button>
+                ) : (
+                  "-"
                 )}
-                <button
-                  className={`px-2 py-1 rounded text-xs ${user.isWorker ? "bg-red-200 text-red-700 hover:bg-red-300" : "bg-blue-200 text-blue-700 hover:bg-blue-300"}`}
-                  onClick={() => onToggleWorker(user.id)}
-                >
-                  {user.isWorker ? "Dar de baja" : "Dar de alta"}
-                </button>
               </td>
             </tr>
           ))}
