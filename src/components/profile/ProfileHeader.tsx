@@ -126,7 +126,7 @@ export default function ProfileHeader({
           />
         </div>
         <div className="mt-2 w-full sm:w-auto">
-          {editMode ? (
+          {!editMode ? (
             <button
               className="text-white bg-blue-700 hover:bg-blue-600 px-3 py-1 rounded transition w-full sm:w-auto cursor-pointer"
               onClick={handleChangePhotoClick}
@@ -134,7 +134,7 @@ export default function ProfileHeader({
               Cambiar foto
             </button>
           ) : (
-            // Espacio reservado para que no se mueva el layout
+            // Espacio reservado para mantener el layout cuando está en modo edición
             <div className="px-3 py-1 rounded w-full sm:w-auto opacity-0 pointer-events-none select-none">
               Cambiar foto
             </div>
@@ -222,6 +222,6 @@ export default function ProfileHeader({
           </button>
         )}
       </div>
-    </div>
+    </div >
   );
 }

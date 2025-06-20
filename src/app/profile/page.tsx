@@ -144,7 +144,7 @@ export default function ProfilePage() {
         zip_code: formData.zip_code ? String(formData.zip_code) : undefined,
       };
       if (dataToSend) {
-        await updateProfile(user?.id, dataToSend);
+        await updateProfile(dataToSend);
       }
       if (userImageFile) {
         await updateProfileImage(userImageFile);
