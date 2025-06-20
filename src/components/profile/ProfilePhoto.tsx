@@ -8,15 +8,14 @@ type Props = {
   editable: boolean;
   fileInputRef: RefObject<HTMLInputElement | null>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setUserImageFile: any
+  setUserImageFile: any;
 };
 
 const ProfilePhoto = ({ userPic, setUserPic, editable, fileInputRef, setUserImageFile }: Props) => {
-
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setUserImageFile(file)
+      setUserImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setUserPic(reader.result as string);

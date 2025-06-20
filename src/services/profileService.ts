@@ -1,38 +1,35 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import axios from "axios";
-const API_URL = process.env.NEXT_PUBLIC_API_URL as string;
+import api from "./axiosConfig";
 
-export const getProfile = async (): Promise<any> => {
+export const getProfile = async () => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No se encontró el token");
-  const res = await axios.get(`${API_URL}/users/byId`, {
+  const response = await api.get(`/users/ById`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
-  return res.data;
+  return response.data;
 };
 
-export const updateProfile = async (data: any): Promise<void> => {
+export const updateProfile = async (userId: string | undefined, data: object): Promise<void> => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No se encontró el token");
-  // No enviar user_pic
-  const { user_pic, ...dataToSend } = data;
-  await axios.put(`${API_URL}/users/update`, dataToSend, {
+  console.log(userId, data);
+
+  await api.put(`/users/update/${userId}`, data, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
 };
 
-export const updateProfileImage = async (file: any) => {
+export const updateProfileImage = async (file: File) => {
   const token = localStorage.getItem("token");
 
   const formData = new FormData();
   formData.append("image", file);
   try {
-    const res = await axios.post(`${API_URL}/files/user`, formData, {
+    const res = await api.post(`/files/user`, formData, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

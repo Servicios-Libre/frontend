@@ -9,7 +9,14 @@ import { UserDropdown, MobileUserSection } from "./UserSections";
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
-    const { user, logout } = useAuth();
+    const auth = useAuth();
+
+    if (!auth) {
+        // Puedes mostrar un loader, un mensaje de error, o simplemente retornar null
+        return null;
+    }
+
+    const { user, logout } = auth;
 
     return (
         <>
