@@ -3,10 +3,9 @@
 
 import LoadingScreen from "@/components/loading-screen/LoadingScreen";
 import { useEffect, useState } from "react";
-import { getProfile, updateProfile } from "@/services/profileService";
+import { getProfile, updateProfile, updateProfileImage } from "@/services/profileService";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileForm from "@/components/profile/ProfileForm";
-import ProfileMissingModal from "@/components/profile/ProfileMissingModal";
 import ProfileActions from "@/components/profile/ProfileActions";
 import { locationOptions, countries } from "@/databauti/locations";
 import { useAuth } from "@/context/AuthContext";
@@ -47,6 +46,8 @@ export default function ProfilePage() {
   const [originalData, setOriginalData] = useState<ProfileFormType | null>(null);
   const [userName, setUserName] = useState<string>("");
   const [showMissing, setShowMissing] = useState(false);
+  const [userImageFile, setUserImageFile] = useState<File | null>(null);
+
   const auth = useAuth();
   const user = auth?.user;
   const loading = auth?.loading ?? false;
@@ -56,13 +57,14 @@ export default function ProfilePage() {
     setMounted(true);
   }, []);
 
-  // Cambia la ruta de redirección aquí:
+  // Redirección si no hay usuario autenticado
   useEffect(() => {
     if (!loading && !user) {
       router.replace("/landing");
     }
   }, [user, loading, router]);
-  
+
+  // Cargar perfil al montar o cuando cambia el usuario
   useEffect(() => {
     if (user) {
       const fetchProfile = async () => {
@@ -98,39 +100,6 @@ export default function ProfilePage() {
       fetchProfile();
     }
   }, [user]);
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const data = await getProfile();
-        setFormData({
-          phone: data.phone?.toString() ?? "",
-          street: data.address_id?.street ?? "",
-          house_number: data.address_id?.house_number?.toString() ?? "",
-          city: data.address_id?.city ?? "",
-          state: data.address_id?.state
-            ? data.address_id.state.trim().charAt(0).toUpperCase() + data.address_id.state.trim().slice(1).toLowerCase()
-            : "",
-          zip_code: data.address_id?.zip_code?.toString() ?? "",
-          user_pic: data.user_pic ?? "",
-        });
-        setOriginalData({
-          phone: data.phone?.toString() ?? "",
-          street: data.address_id?.street ?? "",
-          house_number: data.address_id?.house_number?.toString() ?? "",
-          city: data.address_id?.city ?? "",
-          state: data.address_id?.state
-            ? data.address_id.state.trim().charAt(0).toUpperCase() + data.address_id.state.trim().slice(1).toLowerCase()
-            : "",
-          zip_code: data.address_id?.zip_code?.toString() ?? "",
-          user_pic: data.user_pic ?? "",
-        });
-        setUserName(data.name || data.username || "Usuario");
-      } catch (error) {
-        console.error("Error al obtener perfil:", error);
-      }
-    };
-    fetchProfile();
-  }, []);
 
   // Loader pantalla completa mientras no está montado
   if (!mounted) {
@@ -173,10 +142,12 @@ export default function ProfilePage() {
         state: formData.state,
         zip_code: formData.zip_code ? String(formData.zip_code) : undefined,
       };
-      if (!user.id) {
-        throw new Error("El ID de usuario no está definido.");
+      if (dataToSend) {
+        await updateProfile(dataToSend);
       }
-      await updateProfile(user.id, dataToSend);
+      if (userImageFile) {
+        await updateProfileImage(userImageFile);
+      }
       setOriginalData(formData);
       setEditMode(false);
     } catch (error) {
@@ -207,7 +178,6 @@ export default function ProfilePage() {
   const isComplete = completion === 100;
   const hasUnsavedChanges =
     JSON.stringify(formData) !== JSON.stringify(originalData);
-  const missingFields = getMissingFields();
 
   // Opciones de ciudad según país seleccionado
   const countryCities =
@@ -217,12 +187,6 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-gray-100 py-10">
-      <ProfileMissingModal
-        show={showMissing && !isComplete}
-        missingFields={missingFields}
-        onClose={() => setShowMissing(false)}
-      />
-
       <div className="text-black max-w-4xl mx-auto bg-white rounded-lg shadow-md mt-20 p-8">
         <ProfileHeader
           userName={userName}
@@ -237,6 +201,7 @@ export default function ProfilePage() {
           handleCancel={handleCancel}
           setShowMissing={setShowMissing}
           userId={user.id ?? ""}
+          setUserImageFile={setUserImageFile}
         />
         <ProfileForm
           formData={formData}

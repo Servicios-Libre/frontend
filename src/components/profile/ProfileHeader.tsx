@@ -2,6 +2,7 @@ import { createTicket, getUserTickets } from "@/services/ticketService";
 import { useEffect, useRef, useState } from "react";
 import ProfilePhoto from "./ProfilePhoto";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 
 interface Props {
   userName: string;
@@ -16,6 +17,8 @@ interface Props {
   handleCancel: () => void;
   setShowMissing: (show: boolean) => void;
   userId: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setUserImageFile: any;
 }
 
 export default function ProfileHeader({
@@ -31,7 +34,9 @@ export default function ProfileHeader({
   handleCancel,
   setShowMissing,
   userId,
+  setUserImageFile,
 }: Props) {
+  const { showToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleChangePhotoClick = () => {
@@ -86,6 +91,11 @@ export default function ProfileHeader({
   }
 
   const handleRequestWorker = async () => {
+    if (!isComplete) {
+      showToast("Completa tu perfil antes de solicitar ser trabajador.", "error");
+      setShowMissing(true);
+      return;
+    }
     setLoadingTicket(true);
     setTicketError(null);
     try {
@@ -107,7 +117,13 @@ export default function ProfileHeader({
       {/* Foto y botón */}
       <div className="flex flex-col items-center sm:items-center w-full sm:w-auto">
         <div className="w-32 h-32 sm:w-24 sm:h-24 flex justify-center">
-          <ProfilePhoto userPic={userPic} setUserPic={setUserPic} editable={editMode} fileInputRef={fileInputRef} />
+          <ProfilePhoto
+            userPic={userPic}
+            setUserPic={setUserPic}
+            editable={editMode}
+            fileInputRef={fileInputRef}
+            setUserImageFile={setUserImageFile}
+          />
         </div>
         <div className="mt-2 w-full sm:w-auto">
           {editMode ? (
@@ -163,13 +179,7 @@ export default function ProfileHeader({
                   : "bg-gray-300 text-gray-400 cursor-not-allowed"
                 }`}
               disabled={!isComplete || editMode || hasUnsavedChanges || loadingTicket || hasPendingRequest}
-              onClick={() => {
-                if (!isComplete) {
-                  setShowMissing(true);
-                } else {
-                  handleRequestWorker();
-                }
-              }}
+              onClick={handleRequestWorker}
             >
               {loadingTicket
                 ? "Enviando..."

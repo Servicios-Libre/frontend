@@ -7,6 +7,7 @@ import { jwtDecode } from 'jwt-decode';
 import { HiOutlineInformationCircle, HiOutlineCheckCircle } from 'react-icons/hi';
 import { validarServiceForm } from '@/utils/validacionesServiceForm';
 import { sendServiceRequest } from '@/services/serviceRequest';
+import { useToast } from "@/context/ToastContext";
 
 type JwtPayload = {
   id: string;
@@ -44,6 +45,8 @@ export const ServiceForm = () => {
     fetchCategories();
   }, []);
 
+  const { showToast } = useToast();
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -66,7 +69,7 @@ export const ServiceForm = () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        alert('No se encontró el token de usuario.');
+        showToast('No se encontró el token de usuario.', "error");
         setLoading(false);
         return;
       }
@@ -80,11 +83,12 @@ export const ServiceForm = () => {
         category: formData.category,
       });
 
+      showToast('Solicitud enviada correctamente.', "success");
       setSuccess(true);
       setFormData({ title: '', description: '', category: '' });
       setErrors({});
     } catch (err) {
-      alert('Error al enviar la solicitud.');
+      showToast('Error al enviar la solicitud.', "error");
       console.error(err);
     } finally {
       setLoading(false);
