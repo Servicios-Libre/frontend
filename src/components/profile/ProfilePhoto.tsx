@@ -1,47 +1,28 @@
 import { FaCamera } from "react-icons/fa";
 import Image from "next/image";
-import axios from "axios";
 import { RefObject } from "react";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL as string;
 
 type Props = {
   userPic: string;
   setUserPic: (url: string) => void;
   editable: boolean;
   fileInputRef: RefObject<HTMLInputElement | null>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setUserImageFile: any
 };
 
-const ProfilePhoto = ({ userPic, setUserPic, editable, fileInputRef }: Props) => {
+const ProfilePhoto = ({ userPic, setUserPic, editable, fileInputRef, setUserImageFile }: Props) => {
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setUserImageFile(file)
       const reader = new FileReader();
       reader.onloadend = () => {
         setUserPic(reader.result as string);
       };
       reader.readAsDataURL(file);
-
-      const formData = new FormData();
-        formData.append("file", file);
-
-        console.log(formData);
-        
-      
-        try {
-          const res = await axios.post(`${API_URL}/files/user`,formData)
-      
-          if (!res.data) throw new Error("Error al subir la imagen");
-          console.log(res.data);
-          
-      
-        } catch (error) {
-          console.error("Error subiendo imagen:", error);
-        }
     }
-
-
   };
 
   return (
