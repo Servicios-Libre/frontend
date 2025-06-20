@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -34,7 +35,7 @@ export default function WorkerMenuPage() {
       showToast("Solicitud aprobada y usuario convertido en worker", "success");
       // Actualiza el estado local...
     } catch (err) {
-      showToast("Error al aprobar solicitud", "error", err);
+      showToast("Error al aprobar solicitud", "error");
     }
   };
 
