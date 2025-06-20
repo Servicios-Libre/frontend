@@ -11,7 +11,7 @@ export const getProfile = async () => {
   return response.data;
 };
 
-export const updateProfile = async (userId: string, data: object): Promise<void> => {
+export const updateProfile = async (userId: string | undefined, data: object): Promise<void> => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No se encontró el token");
   console.log(userId, data);
@@ -21,4 +21,21 @@ export const updateProfile = async (userId: string, data: object): Promise<void>
       Authorization: `Bearer ${token}`,
     },
   });
+};
+
+export const updateProfileImage = async (file: File) => {
+  const token = localStorage.getItem("token");
+
+  const formData = new FormData();
+  formData.append("image", file);
+  try {
+    const res = await api.post(`/files/user`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!res.data) throw new Error("Error al subir la imagen");
+  } catch (error) {
+    console.error("Error subiendo imagen:", error);
+  }
 };

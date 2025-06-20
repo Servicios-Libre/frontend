@@ -45,6 +45,7 @@ export default function ProfilePage() {
   });
   const [originalData, setOriginalData] = useState<ProfileFormType | null>(null);
   const [userName, setUserName] = useState<string>("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [showMissing, setShowMissing] = useState(false);
   const [userImageFile, setUserImageFile] = useState<File | null>(null);
 
@@ -143,7 +144,7 @@ export default function ProfilePage() {
         zip_code: formData.zip_code ? String(formData.zip_code) : undefined,
       };
       if (dataToSend) {
-        await updateProfile(dataToSend);
+        await updateProfile(user?.id, dataToSend);
       }
       if (userImageFile) {
         await updateProfileImage(userImageFile);
