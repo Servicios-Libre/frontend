@@ -1,82 +1,110 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { getActiveWorkers } from '@/services/dashboard-admin/workerService';
+import { getAllTickets } from '@/services/dashboard-admin/ticketsService';
+import { Perfil, Ticket } from '@/types';
 import Sidebar from '@/components/dashboard/Sidebar';
 import WorkerTable from '@/components/dashboard/WorkerTable';
-
-const initialUsers = [
-  { id: '1', username: 'Juan Pérez', email: 'juan@mail.com', isWorker: true, hasRequest: false },
-  { id: '2', username: 'Ana Gómez', email: 'ana@mail.com', isWorker: false, hasRequest: true },
-  { id: '3', username: 'Carlos Ruiz', email: 'carlos@mail.com', isWorker: false, hasRequest: false },
-];
+import { useToast } from "@/context/ToastContext"; // Solo esto
 
 export default function WorkerMenuPage() {
-  const [users, setUsers] = useState(initialUsers);
-  const [search, setSearch] = useState('');
+  const [activeWorkers, setActiveWorkers] = useState<Perfil[]>([]);
+  const [workerRequests, setWorkerRequests] = useState<Ticket[]>([]);
+  const [searchActive, setSearchActive] = useState('');
+  const [searchRequests, setSearchRequests] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { showToast } = useToast(); // Usar showToast para mostrar alertas
 
-  const filteredUsers = users.filter(
-    (u) =>
-      u.username.toLowerCase().includes(search.toLowerCase()) ||
-      u.email.toLowerCase().includes(search.toLowerCase())
-  );
+  // Cargar datos al montar
+  useEffect(() => {
+    setLoading(true);
+    Promise.all([getActiveWorkers(), getAllTickets()])
+      .then(([workers, tickets]) => {
+        setActiveWorkers(workers);
+        // Filtrar tickets de tipo worker y estado pendiente
+        const requests = tickets.filter(
+          (t: Ticket) => t.type === "worker" && t.status === "pendiente"
+        );
+        setWorkerRequests(requests);
+        setError(null);
+      })
+      .catch(() => setError('Error al cargar datos'))
+      .finally(() => setLoading(false));
+  }, []);
 
-  const workerRequests = users.filter(u => u.hasRequest).length;
+  // Aquí puedes agregar funciones para aprobar/rechazar solicitudes si tienes endpoints
 
-  const handleApprove = (id: string) => {
-    setUsers(users =>
-      users.map(u =>
-        u.id === id ? { ...u, isWorker: true, hasRequest: false } : u
-      )
-    );
-  };
+  if (loading) return <div className="p-8">Cargando...</div>;
+  if (error) return <div className="p-8 text-red-500">{error}</div>;
 
-  const handleReject = (id: string) => {
-    setUsers(users =>
-      users.map(u =>
-        u.id === id ? { ...u, hasRequest: false } : u
-      )
-    );
-  };
+  // Mapeo para solicitudes de worker
+  const workerRequestUsers = workerRequests
+    .filter(
+      (w) =>
+        (w.userId?.toLowerCase() ?? '').includes(searchRequests.toLowerCase()) ||
+        (w.status?.toLowerCase() ?? '').includes(searchRequests.toLowerCase())
+    )
+    .map(w => ({
+      id: w.userId,
+      username: w.userId, // Si tienes username real, reemplaza aquí
+      email: '',          // Si tienes email real, reemplaza aquí
+      isWorker: false,
+      hasRequest: true,
+    }));
 
-  const handleToggleWorker = (id: string) => {
-    setUsers(users =>
-      users.map(u =>
-        u.id === id ? { ...u, isWorker: !u.isWorker } : u
-      )
-    );
-  };
+  // Mapeo para workers activos
+  const activeWorkerUsers = activeWorkers
+    .filter(
+      (w) =>
+        (w.nombre?.toLowerCase() ?? '').includes(searchActive.toLowerCase())
+    )
+    .map(w => ({
+      id: w.id,
+      username: w.nombre,
+      email: '', // Si tienes email real, reemplaza aquí
+      isWorker: true,
+      hasRequest: false,
+    }));
+
+  // Ejemplo de uso de showToast:
+  // showToast('Mensaje de éxito', 'success');
+  // showToast('Mensaje de error', 'error');
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      <Sidebar workerRequests={workerRequests} />
+      <Sidebar workerRequests={workerRequests.length} />
       <main className="flex-1 p-8">
-        <h1 className="text-2xl font-bold mb-4 text-gray-800">Gestión de Trabajadores</h1>
+        <h1 className="text-2xl font-bold mb-4 text-gray-800">Gestión de Workers</h1>
+        <h2 className="text-xl font-semibold mb-2">Solicitudes de Workers</h2>
         <input
           type="text"
-          placeholder="Buscar por nombre o email..."
+          placeholder="Buscar por ID de usuario o estado..."
           className="mb-4 w-full p-2 border-2 border-indigo-500 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400 text-black font-semibold placeholder-gray-500"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          value={searchRequests}
+          onChange={(e) => setSearchRequests(e.target.value)}
         />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center">
-            <span className="text-3xl font-bold text-indigo-700">{users.length}</span>
-            <span className="text-gray-600 mt-2">Usuarios totales</span>
-          </div>
-          <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center">
-            <span className="text-3xl font-bold text-green-600">{users.filter(u => u.isWorker).length}</span>
-            <span className="text-gray-600 mt-2">Trabajadores activos</span>
-          </div>
-          <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center">
-            <span className="text-3xl font-bold text-yellow-600">{users.filter(u => u.hasRequest).length}</span>
-            <span className="text-gray-600 mt-2">Solicitudes pendientes</span>
-          </div>
-        </div>
         <WorkerTable
-          users={filteredUsers}
-          onApprove={handleApprove}
-          onReject={handleReject}
-          onToggleWorker={handleToggleWorker}
+          users={workerRequestUsers}
+          onApprove={() => { showToast('Solicitud aprobada', 'success'); }}
+          onReject={() => { showToast('Solicitud rechazada', 'error'); }}
+          onToggleWorker={() => {}}
+        />
+
+        <h2 className="text-xl font-semibold mt-8 mb-2">Workers Activos</h2>
+        <input
+          type="text"
+          placeholder="Buscar por nombre..."
+          className="mb-4 w-full p-2 border-2 border-indigo-500 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400 text-black font-semibold placeholder-gray-500"
+          value={searchActive}
+          onChange={(e) => setSearchActive(e.target.value)}
+        />
+        <WorkerTable
+          users={activeWorkerUsers}
+          onApprove={() => {}}
+          onReject={() => {}}
+          onToggleWorker={() => {}}
         />
       </main>
     </div>

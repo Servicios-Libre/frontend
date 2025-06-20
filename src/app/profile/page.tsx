@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { getProfile, updateProfile, updateProfileImage } from "@/services/profileService";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileForm from "@/components/profile/ProfileForm";
-import ProfileMissingModal from "@/components/profile/ProfileMissingModal";
 import ProfileActions from "@/components/profile/ProfileActions";
 import { locationOptions, countries } from "@/databauti/locations";
 
@@ -42,7 +41,6 @@ export default function ProfilePage() {
   });
   const [originalData, setOriginalData] = useState<ProfileFormType | null>(null);
   const [userName, setUserName] = useState<string>("");
-  const [showMissing, setShowMissing] = useState(false);
 
   const [userImageFile, setUserImageFile] = useState<File | null>(null);
 
@@ -146,7 +144,6 @@ export default function ProfilePage() {
   const isComplete = completion === 100;
   const hasUnsavedChanges =
     JSON.stringify(formData) !== JSON.stringify(originalData);
-  const missingFields = getMissingFields();
 
   // Opciones de ciudad según país seleccionado
   const countryCities =
@@ -156,12 +153,6 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-gray-100 py-10">
-      <ProfileMissingModal
-        show={showMissing && !isComplete}
-        missingFields={missingFields}
-        onClose={() => setShowMissing(false)}
-      />
-
       <div className="text-black max-w-4xl mx-auto bg-white rounded-lg shadow-md mt-20 p-8">
         <ProfileHeader
           userName={userName}

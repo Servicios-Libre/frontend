@@ -5,6 +5,7 @@ import { categories } from '@/data/categories';
 import { sendServiceRequest } from '@/services/serviceRequest';
 import Link from 'next/link';
 import { jwtDecode } from 'jwt-decode';
+import { useToast } from "@/context/ToastContext";
 
 
 type JwtPayload = {
@@ -18,6 +19,8 @@ export const ServiceForm = () => {
     description: '',
     category: '',
   });
+
+  const { showToast } = useToast();
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -35,7 +38,7 @@ export const ServiceForm = () => {
       const token = localStorage.getItem('token');
       console.log(token);
       if (!token) {
-        alert('No se encontró el token de usuario.');
+        showToast('No se encontró el token de usuario.', "error");
         return;
       }
       // Decodificar el JWT para obtener el user_id
@@ -50,9 +53,9 @@ export const ServiceForm = () => {
         // Si tu backend espera también el user_id, agrégalo aquí:
         // user_id: decoded.id,
       });
-      alert('Solicitud enviada correctamente.');
+      showToast('Solicitud enviada correctamente.', "success");
     } catch (err) {
-      alert('Error al enviar la solicitud.');
+      showToast('Error al enviar la solicitud.', "error");
       console.error(err);
     }
   };

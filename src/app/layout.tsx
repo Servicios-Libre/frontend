@@ -5,6 +5,7 @@ import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import ClientLayoutWrapper from "@/components/layoutapp/ClientLayoutWrapper";
 import { AuthProvider } from "@/context/AuthContext";
+import { ToastProvider } from "@/context/ToastContext";
 
 config.autoAddCss = false;
 
@@ -32,11 +33,13 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AuthProvider>
-          <ClientLayoutWrapper>
+          <ToastProvider>
+            <ClientLayoutWrapper>
 
-            {children}
+              {children}
 
-          </ClientLayoutWrapper>
+            </ClientLayoutWrapper>
+          </ToastProvider>
         </AuthProvider>
       </body>
     </html>
