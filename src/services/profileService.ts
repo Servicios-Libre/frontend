@@ -11,12 +11,12 @@ export const getProfile = async () => {
   return response.data;
 };
 
-export const updateProfile = async (userId: string | undefined, data: object): Promise<void> => {
+export const updateProfile = async (data: object): Promise<void> => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No se encontró el token");
-  console.log(userId, data);
+  console.log(data);
 
-  await api.put(`/users/update/${userId}`, data, {
+  await api.put(`/users/update/`, data, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
