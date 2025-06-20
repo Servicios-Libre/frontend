@@ -19,7 +19,7 @@ export const updateProfile = async (data: any): Promise<void> => {
   if (!token) throw new Error("No se encontró el token");
   // No enviar user_pic
   const { user_pic, ...dataToSend } = data;
-  await axios.post(`${API_URL}/users/update`, dataToSend, {
+  await axios.put(`${API_URL}/users/update`, dataToSend, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

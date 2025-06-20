@@ -112,7 +112,9 @@ export default function ProfilePage() {
         state: formData.state,
         zip_code: formData.zip_code ? String(formData.zip_code) : undefined,
       };
-      // if (dataToSend){ await updateProfile(dataToSend);}
+      console.log(dataToSend);
+      
+      if (dataToSend){ await updateProfile(dataToSend);}
       if (userImageFile){ await updateProfileImage(userImageFile);}
       setOriginalData(formData);
       setEditMode(false);
