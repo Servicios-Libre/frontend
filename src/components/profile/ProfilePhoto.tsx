@@ -7,6 +7,7 @@ type Props = {
   setUserPic: (url: string) => void;
   editable: boolean;
   fileInputRef: RefObject<HTMLInputElement | null>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setUserImageFile: any
 };
 
