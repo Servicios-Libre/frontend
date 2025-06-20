@@ -165,7 +165,7 @@ export default function ProfilePage() {
           hasUnsavedChanges={hasUnsavedChanges}
           handleSave={handleSave}
           handleCancel={handleCancel}
-          setShowMissing={setShowMissing}
+          setShowMissing={() => {}}
           setUserImageFile={setUserImageFile}
         />
         <ProfileForm

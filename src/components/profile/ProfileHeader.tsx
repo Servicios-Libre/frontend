@@ -14,6 +14,7 @@ interface Props {
   handleSave: () => void;
   handleCancel: () => void;
   setShowMissing: (show: boolean) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setUserImageFile: any
 }
 
@@ -28,7 +29,6 @@ export default function ProfileHeader({
   hasUnsavedChanges,
   handleSave,
   handleCancel,
-  setShowMissing,
   setUserImageFile
 }: Props) {
   const { showToast } = useToast();
@@ -48,7 +48,7 @@ export default function ProfileHeader({
       {/* Foto y botón */}
       <div className="flex flex-col items-center sm:items-center w-full sm:w-auto">
         <div className="w-32 h-32 sm:w-24 sm:h-24 flex justify-center">
-          <ProfilePhoto userPic={userPic} setUserPic={setUserPic} editable={editMode} fileInputRef={fileInputRef} setUserImageFile={setUserImageFile} />
+          <ProfilePhoto userPic={userPic} setUserPic={setUserPic} editable={editMode} fileInputRef={fileInputRef} setUserImageFile={setUserImageFile}/>
         </div>
         {!editMode && (
           <button
