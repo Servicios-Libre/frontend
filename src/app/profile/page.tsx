@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import LoadingScreen from "@/components/loading-screen/LoadingScreen";
 import { useEffect, useState } from "react";
 import { getProfile, updateProfile } from "@/services/profileService";
 import ProfileHeader from "@/components/profile/ProfileHeader";
@@ -8,6 +9,8 @@ import ProfileForm from "@/components/profile/ProfileForm";
 import ProfileMissingModal from "@/components/profile/ProfileMissingModal";
 import ProfileActions from "@/components/profile/ProfileActions";
 import { locationOptions, countries } from "@/databauti/locations";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 const requiredFields = [
   { key: "phone", label: "Teléfono" },
@@ -30,6 +33,7 @@ type ProfileFormType = {
 };
 
 export default function ProfilePage() {
+  const [mounted, setMounted] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState<ProfileFormType>({
     phone: "",
@@ -43,7 +47,57 @@ export default function ProfilePage() {
   const [originalData, setOriginalData] = useState<ProfileFormType | null>(null);
   const [userName, setUserName] = useState<string>("");
   const [showMissing, setShowMissing] = useState(false);
+  const auth = useAuth();
+  const user = auth?.user;
+  const loading = auth?.loading ?? false;
+  const router = useRouter();
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Cambia la ruta de redirección aquí:
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace("/landing");
+    }
+  }, [user, loading, router]);
+  
+  useEffect(() => {
+    if (user) {
+      const fetchProfile = async () => {
+        try {
+          const data = await getProfile();
+          setFormData({
+            phone: data.phone?.toString() ?? "",
+            street: data.address_id?.street ?? "",
+            house_number: data.address_id?.house_number?.toString() ?? "",
+            city: data.address_id?.city ?? "",
+            state: data.address_id?.state
+              ? data.address_id.state.trim().charAt(0).toUpperCase() + data.address_id.state.trim().slice(1).toLowerCase()
+              : "",
+            zip_code: data.address_id?.zip_code?.toString() ?? "",
+            user_pic: data.user_pic ?? "",
+          });
+          setOriginalData({
+            phone: data.phone?.toString() ?? "",
+            street: data.address_id?.street ?? "",
+            house_number: data.address_id?.house_number?.toString() ?? "",
+            city: data.address_id?.city ?? "",
+            state: data.address_id?.state
+              ? data.address_id.state.trim().charAt(0).toUpperCase() + data.address_id.state.trim().slice(1).toLowerCase()
+              : "",
+            zip_code: data.address_id?.zip_code?.toString() ?? "",
+            user_pic: data.user_pic ?? "",
+          });
+          setUserName(data.name || data.username || "Usuario");
+        } catch (error) {
+          console.error("Error al obtener perfil:", error);
+        }
+      };
+      fetchProfile();
+    }
+  }, [user]);
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -78,6 +132,16 @@ export default function ProfilePage() {
     fetchProfile();
   }, []);
 
+  // Loader pantalla completa mientras no está montado
+  if (!mounted) {
+    return <LoadingScreen />;
+  }
+
+  // Loader pantalla completa mientras carga el usuario
+  if (loading || !user) {
+    return <LoadingScreen />;
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -109,7 +173,10 @@ export default function ProfilePage() {
         state: formData.state,
         zip_code: formData.zip_code ? String(formData.zip_code) : undefined,
       };
-      await updateProfile(dataToSend);
+      if (!user.id) {
+        throw new Error("El ID de usuario no está definido.");
+      }
+      await updateProfile(user.id, dataToSend);
       setOriginalData(formData);
       setEditMode(false);
     } catch (error) {
@@ -169,6 +236,7 @@ export default function ProfilePage() {
           handleSave={handleSave}
           handleCancel={handleCancel}
           setShowMissing={setShowMissing}
+          userId={user.id ?? ""}
         />
         <ProfileForm
           formData={formData}

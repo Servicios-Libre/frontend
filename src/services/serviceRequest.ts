@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL; // <-- Agregado
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export type ServiceRequestBody = {
   worker_id: string;

@@ -24,24 +24,24 @@ const ProfilePhoto = ({ userPic, setUserPic, editable, fileInputRef }: Props) =>
       reader.readAsDataURL(file);
 
       const formData = new FormData();
-        formData.append("file", file);
+      formData.append("file", file);
 
-        console.log(formData);
-        
-      
-        try {
-          const res = await axios.post(`${API_URL}/files/user`,formData)
-      
-          if (!res.data) throw new Error("Error al subir la imagen");
-          console.log(res.data);
-          
-      
-        } catch (error) {
-          console.error("Error subiendo imagen:", error);
-        }
+      console.log(formData);
+
+
+      try {
+        const res = await axios.post(`${API_URL}/files/user`, formData)
+
+        if (!res.data) throw new Error("Error al subir la imagen");
+        console.log(res.data);
+
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (err: any) {
+        alert('Error al enviar la solicitud.');
+        console.error("Error detalle:", err.response?.data || err);
+      }
     }
-
-
   };
 
   return (
