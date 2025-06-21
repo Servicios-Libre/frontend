@@ -1,7 +1,4 @@
-import axios from "axios";
 import api from "./axiosConfig";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://back-servicio-libre.onrender.com";
 
 interface TicketPayload {
   type: "to-worker" | "service";
@@ -20,8 +17,8 @@ export const createTicket = async (userId: string, payload: TicketPayload) => {
     status: payload.status || "pending",
   };
   console.log(token);
-  const response = await axios.post(
-    `${API_URL}/tickets/new/${userId}`,
+  const response = await api.post(
+    `/tickets/new/${userId}`,
     data,
     {
       headers: {

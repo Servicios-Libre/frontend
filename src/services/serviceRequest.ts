@@ -1,14 +1,23 @@
-import axios from 'axios';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import api from './axiosConfig';
 
 export type ServiceRequestBody = {
-  worker_id: string;
+  worker_id: string,
   title: string;
   description: string;
   category: string;
 };
 
 export const sendServiceRequest = async (data: ServiceRequestBody): Promise<void> => {
-  await axios.post(`${API_URL}/services/new`, data);
+  const token = localStorage.getItem('token');
+  if (!token) throw new Error("Token no encontrado");
+
+  const response = await api.post('/services/new', data,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
 };
