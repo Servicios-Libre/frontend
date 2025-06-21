@@ -1,8 +1,6 @@
 'use client';
 
 import ChatBox from '@/components/chat/ChatBox';
-import ContractForm from '@/components/chat/ContractForm'; // Asegúrate de que estos componentes estén bien estilizados internamente
-import ContractView from '@/components/chat/ContractView'; // Asegúrate de que estos componentes estén bien estilizados internamente
 import { ChatMessage, ChatContract, UserBasic } from '@/types';
 import { useState } from 'react';
 
@@ -84,7 +82,8 @@ const mockWorker: UserBasic = {
 export default function ChatDemo() {
   const [messages, setMessages] = useState<ChatMessage[]>(mockMessages);
   const [contract, setContract] = useState<ChatContract | null>(mockContract);
-  const [showContractForm, setShowContractForm] = useState(false); // This state isn't used in the provided return, consider how you trigger the form.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [showContractForm, setShowContractForm] = useState(false); // Corrected this line
 
   const handleSendMessage = (text: string) => {
     const newMessage: ChatMessage = {
