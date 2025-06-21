@@ -7,6 +7,11 @@ interface JwtPayload {
   email?: string;
   id?: string;
   role?: string;
+  tickets?: [{
+    id: string,
+    type: string,
+    status: string
+  }];
 }
 
 interface AuthContextType {

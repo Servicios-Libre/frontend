@@ -31,6 +31,14 @@ type ProfileFormType = {
   user_pic?: string;
 };
 
+export type Ticket = {
+  id: string,
+  type: string,
+  status: string,
+  created_at: string, 
+  userId: string
+}
+
 export default function ProfilePage() {
   const [mounted, setMounted] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -48,6 +56,13 @@ export default function ProfilePage() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [showMissing, setShowMissing] = useState(false);
   const [userImageFile, setUserImageFile] = useState<File | null>(null);
+  const [ticket, setTicket] = useState<Ticket>({
+    id: "",
+    type: "",
+    status: "",
+    created_at: "", 
+    userId: ""
+  });
 
   const auth = useAuth();
   const user = auth?.user;
@@ -61,7 +76,7 @@ export default function ProfilePage() {
   // Redirección si no hay usuario autenticado
   useEffect(() => {
     if (!loading && !user) {
-      router.replace("/landing");
+      router.replace("/auth");
     }
   }, [user, loading, router]);
 
@@ -71,6 +86,9 @@ export default function ProfilePage() {
       const fetchProfile = async () => {
         try {
           const data = await getProfile();
+          const ticketData = data.tickets.find((ticket: Ticket) => ticket.status === "pending" && ticket.type === "to-worker");
+          console.log(ticketData);
+          setTicket(ticketData);
           setFormData({
             phone: data.phone?.toString() ?? "",
             street: data.address_id?.street ?? "",
@@ -203,6 +221,7 @@ export default function ProfilePage() {
           setShowMissing={setShowMissing}
           userId={user.id ?? ""}
           setUserImageFile={setUserImageFile}
+          ticket={ticket}
         />
         <ProfileForm
           formData={formData}
