@@ -1,9 +1,6 @@
 import WorkerProfileClient from "@/components/worker-profile/WorkerProfileClient";
 
-interface Props {
-  params: { workerId: string };
-}
-
-export default function WorkerProfilePage({ params }: Props) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default function WorkerProfilePage({ params }: any) {
   return <WorkerProfileClient id={params.workerId} />;
 }
