@@ -8,6 +8,16 @@ export interface Service {
   categoryId: string;
 }
 
+export interface ServicioGrid {
+  id: string | number;
+  title: string;
+  worker: {
+    name: string;
+  };
+  work_photos: { photo_url: string }[];
+}
+
+
 export interface Category {
   id: string;
   name: string;
