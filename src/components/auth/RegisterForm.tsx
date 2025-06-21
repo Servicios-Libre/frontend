@@ -5,6 +5,7 @@ import { registerUser, loginUser } from "@/services/authService"; // Asegúrate 
 import axios, { AxiosError } from "axios";
 import CountryCitySelect from "./CountryCitySelect";
 import { useRouter } from "next/navigation"; // Importa useRouter
+import { useAuth } from "@/context/AuthContext";
 
 type Props = {
   setMessage: (msg: string) => void;
@@ -12,6 +13,8 @@ type Props = {
 };
 
 export default function RegisterForm({ setMessage, setError }: Props) {
+  const auth = useAuth();
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -70,11 +73,12 @@ export default function RegisterForm({ setMessage, setError }: Props) {
       });
       // Login automático después del registro
       const res = await loginUser(email, password);
-      localStorage.setItem("token", res.token);
+      auth?.setToken(res.token); // Actualiza el contexto y el localStorage
       setMessage("¡Registro y login exitosos!");
       setTimeout(() => {
         router.push("/servicios");
       }, 1000);
+
     } catch (err) {
       if (axios.isAxiosError(err)) {
         const axiosError = err as AxiosError<{ message?: string }>;
