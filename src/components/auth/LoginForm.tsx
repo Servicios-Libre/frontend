@@ -14,7 +14,7 @@ type Props = {
 export default function LoginForm({ setMessage, setError }: Props) {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const router = useRouter();
-  const { setToken } = useAuth();
+  const auth = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -29,7 +29,9 @@ export default function LoginForm({ setMessage, setError }: Props) {
     try {
       const res = await loginUser(formData.email, formData.password);
       setMessage("Inicio de sesión exitoso.");
-      setToken(res.token, res.name);
+      if (auth && auth.setToken) {
+        auth.setToken(res.token, res.name);
+      }
       localStorage.setItem("token", res.token);
       setTimeout(() => {
         router.push("/servicios");

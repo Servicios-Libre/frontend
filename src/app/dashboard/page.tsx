@@ -3,6 +3,7 @@
 import Sidebar from '@/components/dashboard/Sidebar';
 import { FaUserPlus, FaTools, FaUserCog, FaUsers, FaUserShield, FaUserTie, FaArrowRight } from 'react-icons/fa';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 const initialUsers = [
   { id: 'YY-853581', username: 'Usuario 1', role: 'admin', email: 'user@gmail.com', phone: '2342' },
@@ -17,6 +18,10 @@ const initialServices = [
 ];
 
 export default function DashboardPage() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  if (!mounted) return null;
+
   // Resúmenes
   const totalUsers = initialUsers.length;
   const totalAdmins = initialUsers.filter(u => u.role === 'admin').length;

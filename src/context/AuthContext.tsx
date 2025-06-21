@@ -1,10 +1,12 @@
 "use client";
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { jwtDecode } from "jwt-decode";
 
 interface JwtPayload {
   name?: string;
   email?: string;
+  id?: string;
+  role?: string;
 }
 
 interface AuthContextType {
@@ -15,13 +17,7 @@ interface AuthContextType {
   logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType>({
-  token: null,
-  user: null,
-  loading: false,
-  setToken: () => { },
-  logout: () => { },
-});
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => useContext(AuthContext);
 
@@ -51,7 +47,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading] = useState(false);
 
   const setToken = (newToken: string | null, userData?: JwtPayload) => {
-    console.log()
     if (newToken) {
       localStorage.setItem('token', newToken);
       setTokenState(newToken);
@@ -67,7 +62,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const logout = () => setToken(null);
+  // Envolver logout en useCallback para referencia estable
+  const logout = useCallback(() => setToken(null), []);
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (window as any).globalLogout = logout;
+    return () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).globalLogout = undefined;
+    };
+  }, [logout]);
 
   return (
     <AuthContext.Provider value={{ token, user, loading, setToken, logout }}>
