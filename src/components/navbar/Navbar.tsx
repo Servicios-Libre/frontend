@@ -12,7 +12,6 @@ export default function Navbar() {
     const auth = useAuth();
 
     if (!auth) {
-        // Puedes mostrar un loader, un mensaje de error, o simplemente retornar null
         return null;
     }
 
@@ -30,6 +29,7 @@ export default function Navbar() {
                             src="/img/logosl.png"
                             alt="logo-servicio-libre"
                             className="h-10 w-auto"
+                            priority
                         />
                     </div>
                     {/* Menú Desktop */}
@@ -58,10 +58,10 @@ export default function Navbar() {
                     } bg-white text-gray-900 px-8 pb-6 shadow-md`}
             >
                 <div className="mt-4 mb-2">
-                    <Link href="/landing" className="block py-2 hover:underline">Inicio</Link>
-                    <Link href="/servicios" className="block py-2 hover:underline">Servicios</Link>
-                    <Link href="/sobre-nosotros" className="block py-2 hover:underline">Sobre nosotros</Link>
-                    <Link href="/ayuda" className="block py-2 hover:underline">Ayuda</Link>
+                    <Link href="/landing" className="block py-2 hover:underline" onClick={() => setIsOpen(!isOpen)}>Inicio</Link>
+                    <Link href="/servicios" className="block py-2 hover:underline" onClick={() => setIsOpen(!isOpen)}>Servicios</Link>
+                    <Link href="/sobre-nosotros" className="block py-2 hover:underline" onClick={() => setIsOpen(!isOpen)}>Sobre nosotros</Link>
+                    <Link href="/ayuda" className="block py-2 hover:underline" onClick={() => setIsOpen(!isOpen)}>Ayuda</Link>
                 </div>
                 <hr className="mb-6 border-gray-200 sm:mx-auto" />
                 <MobileUserSection user={user} logout={logout} setIsOpen={setIsOpen} />
