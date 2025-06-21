@@ -1,15 +1,29 @@
 export interface Service {
   id: string;
   title: string;
-  work_photos: [{
-    id: string,
-    photo_url: string
-  }];
+  work_photos: { id: string; photo_url: string }[];
   worker: {
     name: string;
   };
   categoryId: string;
 }
+
+export interface ServicioGrid {
+  id: string | number;
+  title: string;
+  worker: {
+    name: string;
+  };
+  work_photos: { photo_url: string }[];
+}
+
+export interface UserProfile {
+  address_id: Address;
+  name: string;
+  phone: string; // aunque sea number en backend, lo tratás como string
+  user_pic?: string; // opcional, ya que no existe aún
+}
+
 
 export interface Category {
   id: string;
@@ -31,9 +45,9 @@ export interface Servicio {
   description: string;
   work_photos: object[];
   category: {
-    id: string,
-    name: string,
-    icon: string
+    id: string;
+    name: string;
+    icon: string;
   };
   user: string;
 }
@@ -48,7 +62,7 @@ export type IconName =
   | "screwdriver-wrench"
   | "chalkboard-teacher"
   | "face-smile"
-  | "user-astronaut"; // <-- Agregado
+  | "user-astronaut";
 
 export interface Categoria {
   id: string;
@@ -56,46 +70,89 @@ export interface Categoria {
   icon: IconName;
 }
 
-interface Address {
+export interface Address {
   street: string;
-  house_number?: string; // opcional, no está en backend
+  house_number?: string;
   city: string;
   state: string;
-  zip_code?: string; // opcional
+  zip_code?: string;
 }
-export interface UserProfile {
-  address_id: Address;
+
+// User básico para evitar circularidad
+export interface UserBasic {
+  id: string;
   name: string;
-  phone: string; // aunque sea number en backend, lo tratás como string
-  user_pic?: string; // opcional, ya que no existe aún
+  email: string;
+  role: "user" | "worker" | "admin";
+  premium: boolean;
+  user_pic: string;
+  availability: boolean;
+  address: Address;
 }
 
-export interface ProfileForm {
-  phone: number;
-  street: string;
-  house_number: number;
-  city: string;
-  state: string;
-  zip_code: number;
-  country: string;
-  user_pic?: string; // Solo para mostrar, no se envía al backend
-}
-
-export interface ServicioGrid {
-  id: string | number;
+// Service con category como objeto y descripción (para perfil de worker)
+export interface WorkerService {
+  id: string;
   title: string;
-  worker: {
-    name: string;
-  };
-  work_photos: { photo_url: string }[];
+  description: string;
+  category: Category;
+  work_photos: { id: string; photo_url: string }[];
 }
 
+// Ticket normal (sin user embebido)
 export interface Ticket {
   id: string;
   type: "worker" | "service";
   status: string;
   created_at: string;
   userId: string;
-  serviceId?: string; // solo para type: "service"
+  serviceId?: string;
 }
 
+// Ticket para solicitudes de worker (con user embebido)
+export interface WorkerRequestTicket {
+  id: string;
+  type: "to-worker" | "service";
+  status: "pending" | "accepted" | "rejected";
+  created_at: string;
+  user: UserBasic;
+}
+
+// User completo para dashboard (con role, email, premium, etc)
+export interface User extends UserBasic {
+  services: WorkerService[];
+  tickets: Ticket[];
+}
+
+export interface ServiceContractFormValues {
+  clientName: string;
+  workerName: string;
+  serviceTitle: string;
+  serviceDescription: string;
+  startDate: string;
+  endDate: string;
+  address: string;
+  payment: string;
+  termsAccepted: boolean;
+}
+
+
+// Chats Worker y User
+export interface ChatMessage {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  message: string;
+  timestamp: string;
+}
+
+export interface ChatContract {
+  id: string;
+  workerId: string;
+  clientId: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  payment: number;
+  accepted: boolean;
+}

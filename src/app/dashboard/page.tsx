@@ -68,7 +68,7 @@ export default function DashboardPage() {
 
         {/* Accesos rápidos */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Link href="/dashboard/worker-menu" className="bg-indigo-50 hover:bg-indigo-100 rounded-lg shadow p-6 flex items-center justify-between transition">
+          <Link href="/dashboard/worker-management" className="bg-indigo-50 hover:bg-indigo-100 rounded-lg shadow p-6 flex items-center justify-between transition">
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <FaUserCog className="text-indigo-600 text-xl" />
