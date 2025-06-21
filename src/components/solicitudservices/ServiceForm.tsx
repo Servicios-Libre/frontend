@@ -3,15 +3,12 @@
 import { useState, useEffect } from 'react';
 import { obtenerCategorias } from '@/services/categoriasService';
 import Link from 'next/link';
-import { jwtDecode } from 'jwt-decode';
 import { HiOutlineInformationCircle, HiOutlineCheckCircle } from 'react-icons/hi';
 import { validarServiceForm } from '@/utils/validacionesServiceForm';
 import { sendServiceRequest } from '@/services/serviceRequest';
 import { useToast } from "@/context/ToastContext";
-
-type JwtPayload = {
-  id: string;
-};
+import axios from 'axios';
+import { useAuth } from "@/context/AuthContext";
 
 type Categoria = {
   id: string;
@@ -29,6 +26,13 @@ export const ServiceForm = () => {
   const [success, setSuccess] = useState(false);
   const [categories, setCategories] = useState<Categoria[]>([]);
   const [catLoading, setCatLoading] = useState(true);
+  const auth = useAuth();
+
+  // auth?.user?..forEach(service => {
+  //   console.log("Título del servicio:", service.title);
+  //   console.log("Categoría:", service.category?.name);
+  //   console.log("Descripción:", service.description);
+  // });
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -67,17 +71,15 @@ export const ServiceForm = () => {
 
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        showToast('No se encontró el token de usuario.', "error");
+
+      if (!auth?.user?.id) {
+        showToast("No se pudo obtener el ID del usuario.", "error");
         setLoading(false);
         return;
       }
-      const decoded = jwtDecode<JwtPayload>(token);
 
-      // Ahora creamos el servicio
       await sendServiceRequest({
-        worker_id: decoded.id,
+        worker_id: auth.user.id,
         title: formData.title,
         description: formData.description,
         category: formData.category,
@@ -88,11 +90,18 @@ export const ServiceForm = () => {
       setFormData({ title: '', description: '', category: '' });
       setErrors({});
     } catch (err) {
-      showToast('Error al enviar la solicitud.', "error");
-      console.error(err);
+      if (axios.isAxiosError(err)) {
+        const msg = err.response?.data?.message || "Error al enviar la solicitud.";
+        showToast(msg, "error");
+        console.error("Detalle del error:", err.response?.data);
+      } else {
+        showToast("Error inesperado", "error");
+        console.error(err);
+      }
     } finally {
       setLoading(false);
     }
+
   };
 
   return (

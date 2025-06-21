@@ -1,8 +1,10 @@
-import { createTicket, getUserTickets } from "@/services/ticketService";
+import { createTicket } from "@/services/ticketService";
 import { useEffect, useRef, useState } from "react";
 import ProfilePhoto from "./ProfilePhoto";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
+import Link from "next/link";
+import { Ticket } from "@/app/profile/page";
 
 interface Props {
   userName: string;
@@ -19,6 +21,7 @@ interface Props {
   userId: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setUserImageFile: any;
+  ticket: Ticket | null;
 }
 
 export default function ProfileHeader({
@@ -35,6 +38,7 @@ export default function ProfileHeader({
   setShowMissing,
   userId,
   setUserImageFile,
+  ticket
 }: Props) {
   const { showToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -55,24 +59,13 @@ export default function ProfileHeader({
   const user = auth?.user;
   const userRole = user?.role;
 
-  // Consultar si ya tiene ticket pendiente de tipo to-worker
   useEffect(() => {
-    const fetchTickets = async () => {
-      try {
-        const tickets = await getUserTickets(userId);
-        const pending = tickets.some(
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (t: any) => t.type === "to-worker" && t.status === "pending"
-        );
-        setHasPendingRequest(pending);
-      } catch {
-        setHasPendingRequest(false);
-      }
-    };
-    if (userId && userRole !== "worker") {
-      fetchTickets();
+    if (ticket) {
+      setHasPendingRequest(true);
+    } else {
+      setHasPendingRequest(false);
     }
-  }, [userId, userRole]);
+  }, [user, ticket]);
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
@@ -161,9 +154,11 @@ export default function ProfileHeader({
 
           {/* Tarjeta dorada si es worker */}
           {userRole === "worker" && (
-            <div className="bg-yellow-400 text-yellow-900 font-bold px-4 py-2 rounded-lg shadow mb-2 flex items-center gap-2">
-              <span>👑</span> Trabajador N°{userId.slice(-4)}
-            </div>
+            <Link href={`/workers/profile/${userId}`}>
+              <button className="bg-yellow-400 text-yellow-900 font-bold px-4 py-2 cursor-pointer rounded-lg shadow flex items-center gap-2 hover:bg-yellow-500 transition-colors">
+                <span>💼</span> Ver mi perfil de trabajador
+              </button>
+            </Link>
           )}
 
           {/* Botón de solicitar ser trabajador */}

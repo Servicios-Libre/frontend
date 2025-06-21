@@ -14,7 +14,6 @@ export const getProfile = async () => {
 export const updateProfile = async (data: object): Promise<void> => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No se encontró el token");
-  console.log(data);
 
   await api.put(`/users/update/`, data, {
     headers: {
