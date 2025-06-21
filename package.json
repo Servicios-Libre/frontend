@@ -16,6 +16,7 @@
     "axios": "^1.9.0",
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
+    "lucide-react": "^0.519.0",
     "next": "15.3.3",
     "next-auth": "^4.24.11",
     "react": "^19.0.0",
