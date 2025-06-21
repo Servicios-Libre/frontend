@@ -5,7 +5,7 @@ type Props = {
   requests: WorkerRequestTicket[];
   onAccept: (ticket: WorkerRequestTicket) => void;
   onReject: (ticket: WorkerRequestTicket) => void;
-  onViewProfile: (userId: string) => void;
+  onViewProfile: (userId: string) => void; // <-- Tipado aquí
   loadingId?: string;
 };
 
@@ -24,9 +24,10 @@ export default function WorkerRequestsTable({
   requests,
   onAccept,
   onReject,
-  onViewProfile,
+  onViewProfile, // <-- Desestructuración aquí
   loadingId,
 }: Props) {
+
   if (!requests || requests.length === 0)
     return <div className="text-gray-700 py-6">No hay solicitudes pendientes.</div>;
 
@@ -67,7 +68,7 @@ export default function WorkerRequestsTable({
               </button>
               <button
                 className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-                onClick={() => ticket.user?.id && onViewProfile(ticket.user.id)}
+                onClick={() => ticket.user?.id && onViewProfile(ticket.user.id)} // <-- Uso de la función aquí
                 disabled={!ticket.user?.id}
               >
                 Ver perfil

@@ -88,6 +88,8 @@ export interface UserBasic {
   user_pic: string;
   availability: boolean;
   address: Address;
+  rate?: number; // <-- Agregado
+  phone?: string; // <-- Agregado
 }
 
 // Service con category como objeto y descripción (para perfil de worker)
