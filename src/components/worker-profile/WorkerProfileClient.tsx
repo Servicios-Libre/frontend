@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { getWorkerById } from "@/services/worker-profile/workerServices";
-import { User } from "@/types";
+import { User, WorkerService } from "@/types";
 import Image from "next/image";
+import EditServiceModal from "./EditServiceModal";
 
 export default function WorkerProfileClient({ id }: { id: string }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [editingService, setEditingService] = useState<WorkerService | null>(null);
 
   useEffect(() => {
     getWorkerById(id)
@@ -21,6 +23,19 @@ export default function WorkerProfileClient({ id }: { id: string }) {
         setLoading(false);
       });
   }, [id]);
+
+  const handleSaveService = (updated: WorkerService) => {
+    setUser((prev) =>
+      prev
+        ? {
+            ...prev,
+            services: prev.services.map((s) =>
+              s.id === updated.id ? { ...s, ...updated } : s
+            ),
+          }
+        : prev
+    );
+  };
 
   if (loading) return <p className="text-center py-10">Cargando perfil...</p>;
   if (error) return <p className="text-center py-10 text-red-500">{error}</p>;
@@ -61,7 +76,13 @@ export default function WorkerProfileClient({ id }: { id: string }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
           {user.services && user.services.length > 0 ? (
             user.services.map((service) => (
-              <div key={service.id} className="bg-white rounded-xl shadow-md p-5 hover:shadow-xl transition border border-gray-100 flex flex-col">
+              <div key={service.id} className="bg-white rounded-xl shadow-md p-5 hover:shadow-xl transition border border-gray-100 flex flex-col relative">
+                <button
+                  className="absolute top-2 right-2 bg-blue-600 text-white px-3 py-1 rounded text-xs"
+                  onClick={() => setEditingService(service)}
+                >
+                  Editar
+                </button>
                 <div className="relative w-full h-40 mb-3">
                   <Image
                     src={service.work_photos[0]?.photo_url || "/img/placeholder.jpg"}
@@ -80,6 +101,14 @@ export default function WorkerProfileClient({ id }: { id: string }) {
             <p className="text-gray-500">Este trabajador aún no ha publicado servicios.</p>
           )}
         </div>
+        {editingService && (
+          <EditServiceModal
+            service={editingService}
+            isOpen={!!editingService}
+            onClose={() => setEditingService(null)}
+            onSave={handleSaveService}
+          />
+        )}
       </section>
     </main>
   );
