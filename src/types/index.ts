@@ -17,6 +17,13 @@ export interface ServicioGrid {
   work_photos: { photo_url: string }[];
 }
 
+export interface UserProfile {
+  address_id: Address;
+  name: string;
+  phone: string; // aunque sea number en backend, lo tratás como string
+  user_pic?: string; // opcional, ya que no existe aún
+}
+
 
 export interface Category {
   id: string;
