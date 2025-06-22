@@ -104,11 +104,18 @@ export interface WorkerService {
 // Ticket normal (sin user embebido)
 export interface Ticket {
   id: string;
-  type: "worker" | "service";
+  type: string;
   status: string;
   created_at: string;
-  userId: string;
-  serviceId?: string;
+  user?: {
+    email: string;
+    name: string;
+  };
+  service?: {
+    id: string;
+    title: string;
+    description: string;
+  };
 }
 
 // Ticket para solicitudes de worker (con user embebido)
