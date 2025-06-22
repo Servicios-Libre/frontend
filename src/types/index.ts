@@ -24,11 +24,10 @@ export interface UserProfile {
   user_pic?: string; // opcional, ya que no existe aún
 }
 
-
 export interface Category {
   id: string;
   name: string;
-  icon: string;
+  icon?: string;
 }
 
 export interface Perfil {
@@ -67,7 +66,7 @@ export type IconName =
 export interface Categoria {
   id: string;
   name: string;
-  icon: IconName;
+  icon?: IconName;
 }
 
 export interface Address {
@@ -97,8 +96,16 @@ export interface WorkerService {
   id: string;
   title: string;
   description: string;
-  category: Category;
-  work_photos: { id: string; photo_url: string }[];
+  category: {
+    id: string;
+    name: string;
+    icon?: string;
+  };
+  work_photos: {
+    id: string;
+    photo_url: string;
+  }[];
+  ticket?: { status: string } | null;
 }
 
 // Ticket normal (sin user embebido)

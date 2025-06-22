@@ -1,4 +1,6 @@
+// src/components/landing/JobCard.tsx
 import Image from "next/image";
+import Link from 'next/link';
 
 type JobCardProps = {
   image: string;
@@ -6,20 +8,45 @@ type JobCardProps = {
   description: string;
 };
 
+// Define el límite de caracteres para la descripción
+const DESCRIPTION_LIMIT = 70; // Puedes ajustar este valor a tu gusto
+
 export default function JobCard({ image, title, description }: JobCardProps) {
+  const slug = title.toLowerCase().replace(/á/g, 'a').replace(/é/g, 'e').replace(/í/g, 'i').replace(/ó/g, 'o').replace(/ú/g, 'u').replace(/\s+/g, '-');
+
+  // Recorta la descripción si es demasiado larga
+  const truncatedDescription =
+    description.length > DESCRIPTION_LIMIT
+      ? description.substring(0, DESCRIPTION_LIMIT) + '...'
+      : description;
+
+  // Determina si necesitamos aplicar el difuminado
+  const needsFade = description.length > DESCRIPTION_LIMIT;
+
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      <Image
-        width={300}
-        height={300}
-        src={image}
-        alt={title}
-        className="w-full h-40 object-cover"
-      />
-      <div className="p-4">
-        <h3 className="text-black font-semibold">{title}</h3>
-        <p className="text-gray-600 text-sm">{description}</p>
+    <Link href={`/servicios?q=${slug}`}>
+      <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer">
+        <div className="relative w-full h-44">
+          <Image
+            src={image}
+            alt={title}
+            fill
+            style={{ objectFit: 'cover' }}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="rounded-t-xl"
+          />
+        </div>
+        <div className="p-5 relative"> {/* Añadido 'relative' para posicionar el gradiente */}
+          <h3 className="text-lg font-bold text-gray-900 mb-1">{title}</h3>
+          <p className="text-sm text-gray-700 leading-normal">
+            {truncatedDescription}
+          </p>
+          {/* Capa de difuminado condicional */}
+          {needsFade && (
+            <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent"></div>
+          )}
+        </div>
       </div>
-    </div>
+    </Link>
   );
 }

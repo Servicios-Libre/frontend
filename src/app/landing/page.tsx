@@ -6,52 +6,78 @@ import JobCard from '../../components/landing/JobCard';
 import StoryCard from '../../components/landing/StoryCard';
 import ReviewCard from '../../components/landing/ReviewCard';
 
-
-/* Temporal */
+/* Temporal Data */
 const jobs = [
   {
     image: '/img/plomero.jpg',
-    title: 'Plomero',
-    description: 'Reparaciones, instalaciones y mantenimiento de cañerías.',
+    title: 'Plomería',
+    description: 'Reparaciones, instalaciones y mantenimiento de cañerías en el hogar y comercial.',
   },
   {
     image: '/img/jardinero.jpg',
-    title: 'Jardinero',
-    description: 'Corte de césped, poda y mantenimiento del jardín.',
+    title: 'Jardinería',
+    description: 'Corte de césped, poda de árboles y arbustos, paisajismo y mantenimiento integral.',
   },
   {
     image: '/img/albanil.jpg',
-    title: 'Albañil',
-    description: 'Construcción, reparaciones y trabajos de obra.',
+    title: 'Albañilería',
+    description: 'Construcción desde cero, reparaciones, remodelaciones y trabajos de obra fina.',
+  },
+  {
+    image: '/img/electro.jpg',
+    title: 'Electricidad',
+    description: 'Instalaciones eléctricas seguras, reparaciones urgentes y mantenimiento preventivo.',
+  },
+  {
+    image: '/img/limpieza.jpg',
+    title: 'Limpieza',
+    description: 'Servicios de limpieza para hogares y oficinas, garantizando espacios impecables.',
+  },
+  {
+    image: '/img/pintura.jpg',
+    title: 'Pintura',
+    description: 'Renovación de espacios con pintura interior y exterior de alta calidad.',
   },
 ];
+
 const historias = [
   {
     imageSrc: '/img/amadecasa.jpg',
-    alt: 'Paola limpiando',
-    text: 'Paola encontró en Servicio Libre la posibilidad de ampliar su clientela como trabajadora de limpieza. Ahora tiene ingresos estables y clientes fijos.',
+    alt: 'Paola, trabajadora de limpieza',
+    text: 'Paola encontró en Servicio Libre la plataforma ideal para conectar con nuevos clientes. Sus ingresos se estabilizaron y su negocio creció de forma inesperada.',
   },
   {
     imageSrc: '/img/plomero.jpg',
-    alt: 'Gonzalo y su historia',
-    text: 'Gonzalo necesitaba un plomero urgente. En minutos encontró uno en su zona, confiable y con reseñas. ¡Problema resuelto en el mismo día!',
+    alt: 'Gonzalo, usuario satisfecho',
+    text: 'Gonzalo necesitaba un plomero urgente para una fuga. En minutos, la aplicación le conectó con un profesional verificado y el problema se solucionó el mismo día.',
   },
 ];
+
 const opiniones = [
   {
     name: 'Lucía Gómez',
     rating: 5,
-    comment: 'Conseguí trabajo en mi barrio en menos de 24 horas. ¡Excelente app!',
+    comment: 'Conseguí trabajo en mi barrio en menos de 24 horas. ¡Servicio Libre es una excelente herramienta para trabajadores independientes!',
   },
   {
     name: 'Carlos Méndez',
     rating: 4,
-    comment: 'Fácil de usar y encontré a alguien muy confiable para arreglar mi baño.',
+    comment: 'Fácil de usar y encontré a alguien muy confiable para arreglar mi baño. Las reseñas me dieron mucha seguridad.',
   },
   {
     name: 'Sofía Ramírez',
     rating: 5,
-    comment: 'Gracias a esta plataforma, ahora tengo más clientes y trabajo estable.',
+    comment: 'Gracias a esta plataforma, ahora tengo más clientes y mi agenda está siempre llena. Ha cambiado mi forma de trabajar.',
+  },
+  {
+    name: 'Roberto Días',
+    rating: 5,
+    comment: '¡Increíble la rapidez para encontrar profesionales! Mi lavarropas volvió a la vida gracias a un técnico de Servicio Libre.',
+  },
+  {
+    name: 'Ana Laura Perez',
+    rating: 4,
+    comment: 'Al principio dudé, pero el proceso de contacto fue muy sencillo y la calidad del servicio superó mis expectativas.',
   },
 ];
 
@@ -59,126 +85,157 @@ export default function LandingPage() {
   const router = useRouter();
 
   return (
-    <main className="bg-gray-50 min-h-screen">
-      {/* HERO */}
-      <section className="max-w-7xl mx-auto px-4 py-20 flex flex-col lg:flex-row items-center gap-12">
-        <div className="flex-1 text-center lg:text-left">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
-            Encontrá trabajadores <br /> confiables cerca tuyo.
-          </h1>
-          <button
-            onClick={() => router.push('/servicios')}
-            className="mt-6 px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
-          >
-            Buscar ahora
-          </button>
-        </div>
-
-        {/* Imagen Hero */}
-        <div className="flex-1">
-          <Image
-            src="/img/hero-illustration.png"
-            alt="Ilustración de búsqueda de trabajos"
-            width={500}
-            height={500}
-            className="w-full max-w-md mx-auto"
-            quality={100}
-            priority
-          />
-        </div>
-      </section>
-
-      {/* Trabajos */}
-      <section className="max-w-7xl mx-auto px-4 py-16">
-        <h2 className="text-2xl font-bold text-gray-800 mb-8">Trabajos más buscados</h2>
-        <div className="grid md:grid-cols-3 gap-8">
-          {jobs.map((job, index) => (
-            <JobCard key={index} {...job} />
-          ))}
-        </div>
-      </section>
-
-      {/* Beneficios */}
-      <section className="max-w-7xl mx-auto px-4 py-20 flex flex-col lg:flex-row items-center gap-12">
-        <div className="flex-1">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">¿Por qué elegir Servicio Libre?</h2>
-          <ul className="space-y-4 text-gray-700 text-base list-disc list-inside">
-            <li>Trabajadores verificados y con reseñas reales</li>
-            <li>Conectate de forma rápida y segura</li>
-            <li>Gratis para usuarios y sin comisiones ocultas</li>
-          </ul>
-
-          <div className="mt-6 flex gap-4">
+    <main className="bg-gray-50 text-gray-800 min-h-screen">
+      {/* HERO SECTION */}
+      <section className="relative overflow-hidden bg-gradient-to-r from-blue-700 to-blue-900 text-white py-24 md:py-24 lg:py-28">
+        <div className="relative z-10 max-w-7xl mx-auto px-8 flex flex-col lg:flex-row items-center gap-10 text-center lg:text-left">
+          <div className="flex-1">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight tracking-tight mb-3">
+              Encontrá profesionales <br className="hidden md:inline"/> de confianza cerca tuyo.
+            </h1>
+            <p className="text-base md:text-lg mb-6 opacity-90">
+              Conectamos personas que buscan servicios con trabajadores verificados en tu zona.
+            </p>
             <button
-              onClick={() => router.push('/auth')}
-              className="px-5 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
+              onClick={() => router.push('/servicios')}
+              className="px-7 py-3 bg-white text-blue-700 rounded-full font-bold text-base shadow-lg hover:bg-gray-100 transform hover:scale-105 transition-all duration-300 ease-in-out"
             >
-              Registrate Gratis
+              Buscar ahora
             </button>
-            <button
-              onClick={() => router.push('/ayuda')}
-              className="px-5 py-2 border border-gray-400 text-gray-800 rounded-lg font-semibold hover:bg-gray-100 transition"
+          </div>
+
+          <div className="flex-1 mt-8 lg:mt-0">
+            <Image
+              src="/img/hero-illustration.png"
+              alt="Ilustración de búsqueda de trabajos"
+              width={550}
+              height={550}
+              className="w-full max-w-md ml-auto rounded-xl shadow-2xl"
+              quality={90}
+              priority
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION: Trabajos más buscados */}
+      <section className="py-16 bg-white"> {/* Reducido py */}
+        <div className="max-w-7xl mx-auto px-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-10"> {/* Reducido texto y mb */}
+            Servicios Populares
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6"> {/* Reducido gap */}
+            {jobs.map((job, index) => (
+              <JobCard key={index} {...job} />
+            ))}
+          </div>
+          <div className="text-center mt-10"> {/* Reducido mt */}
+             <button
+              onClick={() => router.push('/servicios')}
+              className="px-7 py-3 bg-blue-500 text-white rounded-full font-semibold hover:bg-blue-600 transition-colors duration-300 ease-in-out shadow-md"
             >
-              Cómo funciona
+              Ver todos los servicios
             </button>
           </div>
         </div>
+      </section>
 
-        {/* Logo grande */}
-        <div className="flex-1">
-          <Image
-            src="/img/logosl-dark.png"
-            alt="Servicio Libre"
-            width={400}
-            height={400}
-            className="w-full max-w-sm mx-auto"
-            quality={100}
-          />
+      {/* SECTION: ¿Por qué elegir Servicio Libre? - Beneficios */}
+      <section className="py-16 bg-gray-100"> {/* Reducido py */}
+        <div className="max-w-7xl mx-auto px-8 flex flex-col-reverse lg:flex-row items-center gap-10"> {/* Reducido gap */}
+          <div className="flex-1 mt-8 lg:mt-0"> {/* Reducido mt */}
+            <Image
+              src="/img/serviciolibre-landing.png"
+              alt="Logo Servicio Libre"
+              width={600} // Ligeramente más pequeño
+              height={600} // Ligeramente más pequeño
+              className="w-full max-w-xs mx-auto rounded-lg shadow-xl" // max-w-xs
+              quality={90}
+            />
+          </div>
+          <div className="flex-1 text-center lg:text-left">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-5 leading-tight"> {/* Reducido texto y mb */}
+              ¿Por qué elegir <br className="hidden md:inline"/> <span className="text-blue-600">Servicio Libre</span>?
+            </h2>
+            <ul className="space-y-3 text-gray-700 text-base md:text-lg"> {/* Reducido text-base/lg */}
+              <li className="flex items-start gap-2"> {/* Reducido gap */}
+                <span className="text-blue-500 text-xl">✔</span> {/* Reducido text-xl */}
+                <span>Trabajadores verificados: Contratá con confianza a profesionales con perfiles validados y reseñas.</span>
+              </li>
+              <li className="flex items-start gap-2"> {/* Reducido gap */}
+                <span className="text-blue-500 text-xl">⚡</span> {/* Reducido text-xl */}
+                <span>Conexión rápida y segura: Encontrá el servicio que necesitás en cuestión de minutos.</span>
+              </li>
+              <li className="flex items-start gap-2"> {/* Reducido gap */}
+                <span className="text-blue-500 text-xl">💰</span> {/* Reducido text-xl */}
+                <span>Sin costos ocultos: Gratis para usuarios, sin comisiones ni sorpresas.</span>
+              </li>
+            </ul>
+
+            <div className="mt-8 flex flex-col sm:flex-row justify-center lg:justify-start gap-3"> {/* Reducido mt y gap */}
+              <button
+                onClick={() => router.push('/auth')}
+                className="px-7 py-3 bg-blue-600 text-white rounded-full font-bold shadow-md hover:bg-blue-700 transform hover:scale-105 transition-all duration-300 ease-in-out"
+              >
+                Registrate Gratis
+              </button>
+              <button
+                onClick={() => router.push('/ayuda')}
+                className="px-7 py-3 border-2 border-gray-400 text-gray-700 rounded-full font-bold hover:bg-gray-200 transform hover:scale-105 transition-all duration-300 ease-in-out"
+              >
+                Cómo funciona
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Historias */}
-      <section className="max-w-7xl mx-auto px-4 py-20">
-        <h2 className="text-2xl font-bold text-gray-800 mb-10 text-center">
-          Historias reales
-        </h2>
-        <div className="grid gap-8 md:grid-cols-2">
-          {historias.map((historia, index) => (
-            <StoryCard key={index} {...historia} />
-          ))}
+      {/* SECTION: Historias reales */}
+      <section className="py-16 bg-white"> {/* Reducido py */}
+        <div className="max-w-7xl mx-auto px-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-10"> {/* Reducido texto y mb */}
+            Historias que inspiran
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8"> {/* Reducido gap */}
+            {historias.map((historia, index) => (
+              <StoryCard key={index} {...historia} />
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Opiniones */}
-      <section className="max-w-7xl mx-auto px-4 py-20">
-        <h2 className="text-2xl font-bold text-gray-800 mb-10 text-center">
-          Opiniones de nuestros usuarios
-        </h2>
-        <div className="grid md:grid-cols-3 gap-6">
-          {opiniones.map((opinion, index) => (
-            <ReviewCard key={index} {...opinion} />
-          ))}
+      {/* SECTION: Opiniones de nuestros usuarios */}
+      <section className="py-16 bg-gray-100"> {/* Reducido py */}
+        <div className="max-w-7xl mx-auto px-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-10"> {/* Reducido texto y mb */}
+            Lo que dicen nuestros usuarios
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"> {/* Reducido gap */}
+            {opiniones.map((opinion, index) => (
+              <ReviewCard key={index} {...opinion} />
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Call to action */}
-      <section className="bg-blue-600 text-white text-center py-20 px-4">
-        <h2 className="text-3xl md:text-4xl font-bold mb-6">
-          ¿Listo para encontrar o empezar tu próxima changa?
+      {/* SECTION: Call to action final */}
+      <section className="bg-blue-700 text-white text-center py-16 px-8"> {/* Reducido py */}
+        <h2 className="text-3xl md:text-4xl lg:text-4xl font-extrabold mb-5 leading-tight"> {/* Reducido texto y mb */}
+          ¿Listo para simplificar tu vida?
         </h2>
-        <p className="text-lg mb-8">
-          Unite gratis y conectá con personas reales cerca tuyo.
+        <p className="text-base md:text-lg mb-8 max-w-3xl mx-auto opacity-90"> {/* Reducido text-base/lg y mb */}
+          Unite a la comunidad de Servicio Libre y encontrá la solución perfecta para tus necesidades o nuevos clientes para tus habilidades.
         </p>
-        <div className="flex flex-col md:flex-row justify-center gap-4">
+        <div className="flex flex-col sm:flex-row justify-center gap-4">
           <button
             onClick={() => router.push('/servicios')}
-            className="px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-gray-100 transition"
+            className="px-7 py-3 bg-white text-blue-700 rounded-full font-bold shadow-lg hover:bg-gray-100 transform hover:scale-105 transition-all duration-300 ease-in-out"
           >
             Encontrar trabajadores
           </button>
           <button
-            onClick={() => router.push('/profile')}
-            className="px-6 py-3 border border-white text-white rounded-lg font-semibold hover:bg-blue-700 transition"
+            onClick={() => router.push('/registro-trabajador')}
+            className="px-7 py-3 border-2 border-white text-white rounded-full font-bold hover:bg-blue-600 transform hover:scale-105 transition-all duration-300 ease-in-out"
           >
             Ofrecer mis servicios
           </button>
