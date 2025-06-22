@@ -154,7 +154,7 @@ export default function ProfileHeader({
 
           {/* Tarjeta dorada si es worker */}
           {userRole === "worker" && (
-            <Link href={`/workers/profile/${userId}`}>
+            <Link href={`/worker-profile/${userId}`}>
               <button className="bg-yellow-400 text-yellow-900 font-bold px-4 py-2 cursor-pointer rounded-lg shadow flex items-center gap-2 hover:bg-yellow-500 transition-colors">
                 <span>💼</span> Ver mi perfil de trabajador
               </button>
