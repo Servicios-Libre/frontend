@@ -30,7 +30,7 @@ export default function LoginForm({ setMessage, setError }: Props) {
       const res = await loginUser(formData.email, formData.password);
       setMessage("Inicio de sesión exitoso.");
       if (auth && auth.setToken) {
-        auth.setToken(res.token, res.name);
+        auth.setToken(res.token); // <-- Solo pasa el token
       }
       setTimeout(() => {
         router.push("/servicios");
