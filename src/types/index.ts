@@ -48,7 +48,13 @@ export interface Servicio {
     name: string;
     icon: string;
   };
-  user: string;
+  worker: {
+    id: string;
+    name: string;
+    email: string;
+    // agrega más campos si tu backend los envía
+  };
+  user?: string; // opcional, para compatibilidad
 }
 
 export type IconName =

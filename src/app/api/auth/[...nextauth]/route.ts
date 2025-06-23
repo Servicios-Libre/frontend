@@ -15,13 +15,22 @@ const handler = NextAuth({
     async jwt({ token, account, user }: any) {
       if (account && user) {
         try {
-          const apiUrl = process.env.NEXT_PUBLIC_API_URL; // <-- Agregado
-          const res = await axios.post(`${apiUrl}/auth/google`, {
-            name: user.name,
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+          console.log({
             email: user.email,
-            image: user.image,
+            password: "Google@Auth",
+            Image: user.image,
+            name: user.name,
+          }); // <-- Agrega este log
+          const res = await axios.post(`${apiUrl}/auth/google`, {
+            email: user.email,
+            password: "Google@Auth", // Valor fijo para login social
+            Image: user.image,       // "Image" con mayúscula
+            name: user.name,         // <-- Agregado el nombre
           });
           token.backendJwt = res.data.token;
+          console.log(res.data.token);
+          // localStorage.setItem("token", res.data.token); // <-- Elimina o comenta esta línea
         } catch (e) {
           console.error("Error al registrar usuario con Google:", e);
           token.backendJwt = null;

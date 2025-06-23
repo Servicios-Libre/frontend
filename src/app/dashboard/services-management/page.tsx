@@ -139,9 +139,6 @@ export default function ServicesMenuPage() {
               services={services}
               onDeactivate={handleDeactivate}
               loadingId={loadingServiceId}
-              page={servicesPage}
-              total={totalServices}
-              onPageChange={setServicesPage}
             />
           </div>
         </section>

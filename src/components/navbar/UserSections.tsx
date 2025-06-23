@@ -141,7 +141,7 @@ export function MobileUserSection({
                 </Link>
                 <button
                     onClick={() => {
-                        logout();
+                        logout(); // Esto borra el token y cierra sesión NextAuth
                         setIsOpen(false);
                         router.push("/landing");
                     }}

@@ -32,7 +32,6 @@ export default function LoginForm({ setMessage, setError }: Props) {
       if (auth && auth.setToken) {
         auth.setToken(res.token, res.name);
       }
-      localStorage.setItem("token", res.token);
       setTimeout(() => {
         router.push("/servicios");
       }, 1000);

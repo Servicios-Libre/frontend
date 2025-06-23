@@ -1,4 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Servicio } from "@/types";
+import axios from "axios";
 const API = process.env.NEXT_PUBLIC_API_URL || "";
 
 function getToken() {
@@ -6,22 +9,42 @@ function getToken() {
   return localStorage.getItem("token") || "";
 }
 
+const axiosInstance = axios.create({
+  baseURL: API,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+axiosInstance.interceptors.request.use((config) => {
+  const token = getToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 export async function fetchActiveServices(page = 1, limit = 10, search = ""): Promise<{ services: Servicio[]; total: number }> {
-  const params = new URLSearchParams({ status: "active", page: String(page), limit: String(limit) });
-  if (search) params.append("search", search);
-  const res = await fetch(`${API}/services?${params.toString()}`, {
-    headers: { Authorization: `Bearer ${getToken()}` },
-    cache: "no-store",
-  });
-  if (!res.ok) throw new Error("Error al obtener servicios activos");
-  return res.json();
+  const params: any = { page, limit };
+  if (search) params.search = search;
+  try {
+    const res = await axiosInstance.get("/services", { params });
+    // Normaliza la respuesta para que siempre sea { services, total }
+    console.log(res.data.servicios, res.data.toal);
+    return {
+      services: res.data.servicios || [],
+      total: res.data.total || 0,
+    };
+  } catch (error) {
+    throw new Error("Error al obtener servicios activos");
+  }
 }
 
 export async function deactivateService(serviceId: string) {
-  const res = await fetch(`${API}/services/deactivate/${serviceId}`, {
-    method: "PUT",
-    headers: { Authorization: `Bearer ${getToken()}` },
-  });
-  if (!res.ok) throw new Error("Error al dar de baja el servicio");
-  return res.json();
+  try {
+    const res = await axiosInstance.put(`/services/deactivate/${serviceId}`);
+    return res.data;
+  } catch (error) {
+    throw new Error("Error al dar de baja el servicio");
+  }
 }
