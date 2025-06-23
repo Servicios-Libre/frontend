@@ -27,7 +27,6 @@ export default function DashboardPage() {
   const totalAdmins = initialUsers.filter(u => u.role === 'admin').length;
   const totalWorkers = initialUsers.filter(u => u.role === 'worker').length;
   const totalServices = initialServices.length;
-  const pendingServices = initialServices.filter(s => s.status === 'pendiente').length;
 
   // Simulación de últimas actividades
   const activities = [
@@ -38,7 +37,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen flex bg-gray-100">
-      <Sidebar pendingServices={pendingServices} />
+      <Sidebar />
       <main className="flex-1 p-6">
         <h1 className="text-2xl font-semibold text-gray-800 mb-6">Panel de Administración</h1>
 

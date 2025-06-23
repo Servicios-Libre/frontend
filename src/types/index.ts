@@ -48,7 +48,13 @@ export interface Servicio {
     name: string;
     icon: string;
   };
-  user: string;
+  worker: {
+    id: string;
+    name: string;
+    email: string;
+    // agrega más campos si tu backend los envía
+  };
+  user?: string; // opcional, para compatibilidad
 }
 
 export type IconName =
@@ -111,11 +117,18 @@ export interface WorkerService {
 // Ticket normal (sin user embebido)
 export interface Ticket {
   id: string;
-  type: "worker" | "service";
+  type: string;
   status: string;
   created_at: string;
-  userId: string;
-  serviceId?: string;
+  user?: {
+    email: string;
+    name: string;
+  };
+  service?: {
+    id: string;
+    title: string;
+    description: string;
+  };
 }
 
 // Ticket para solicitudes de worker (con user embebido)
