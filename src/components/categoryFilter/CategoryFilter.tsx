@@ -82,7 +82,7 @@ export default function CategoryFilter({ selectedCategories, onFilterChange }: P
                                     }`}
                             >
                                 <FontAwesomeIcon
-                                    icon={icons[cat.icon] || faFaceSmile}
+                                    icon={icons[cat.icon ?? "face-smile"]}
                                     className="text-blue-600 w-4"
                                 />
                                 <span className="text-sm font-medium">{cat.name}</span>
