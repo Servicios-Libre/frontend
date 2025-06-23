@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import NextAuth from "next-auth";
+import NextAuth from "next-auth/next"; // <-- Corrige el import
 import GoogleProvider from "next-auth/providers/google";
 import axios from "axios";
 
@@ -21,16 +21,15 @@ const handler = NextAuth({
             password: "Google@Auth",
             Image: user.image,
             name: user.name,
-          }); // <-- Agrega este log
+          });
           const res = await axios.post(`${apiUrl}/auth/google`, {
             email: user.email,
-            password: "Google@Auth", // Valor fijo para login social
-            Image: user.image,       // "Image" con mayúscula
-            name: user.name,         // <-- Agregado el nombre
+            password: "Google@Auth",
+            Image: user.image,
+            name: user.name,
           });
           token.backendJwt = res.data.token;
           console.log(res.data.token);
-          // localStorage.setItem("token", res.data.token); // <-- Elimina o comenta esta línea
         } catch (e) {
           console.error("Error al registrar usuario con Google:", e);
           token.backendJwt = null;
@@ -45,4 +44,4 @@ const handler = NextAuth({
   },
 });
 
-export { handler as GET, handler as POST };
+export { handler as GET, handler as POST }; // Puedes dejar esto si usas app router
