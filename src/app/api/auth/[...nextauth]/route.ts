@@ -21,6 +21,7 @@ const handler = NextAuth({
             email: user.email,
             image: user.image,
           });
+
           token.backendJwt = res.data.token;
         } catch (e) {
           console.error("Error al registrar usuario con Google:", e);
