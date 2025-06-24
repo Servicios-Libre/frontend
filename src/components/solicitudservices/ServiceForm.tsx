@@ -28,12 +28,6 @@ export const ServiceForm = () => {
   const [catLoading, setCatLoading] = useState(true);
   const auth = useAuth();
 
-  // auth?.user?..forEach(service => {
-  //   console.log("Título del servicio:", service.title);
-  //   console.log("Categoría:", service.category?.name);
-  //   console.log("Descripción:", service.description);
-  // });
-
   useEffect(() => {
     const fetchCategories = async () => {
       try {
