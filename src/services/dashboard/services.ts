@@ -29,8 +29,6 @@ export async function fetchActiveServices(page = 1, limit = 10, search = ""): Pr
   if (search) params.search = search;
   try {
     const res = await axiosInstance.get("/services", { params });
-    // Normaliza la respuesta para que siempre sea { services, total }
-    console.log(res.data.servicios, res.data.toal);
     return {
       services: res.data.servicios || [],
       total: res.data.total || 0,

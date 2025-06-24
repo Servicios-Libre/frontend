@@ -16,7 +16,6 @@ export const createTicket = async (userId: string, payload: TicketPayload) => {
     ...payload,
     status: payload.status || "pending",
   };
-  console.log(token);
   const response = await api.post(
     `/tickets/new/${userId}`,
     data,

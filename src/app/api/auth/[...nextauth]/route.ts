@@ -16,12 +16,6 @@ const handler = NextAuth({
       if (account && user) {
         try {
           const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-          console.log({
-            email: user.email,
-            password: "Google@Auth",
-            Image: user.image,
-            name: user.name,
-          });
           const res = await axios.post(`${apiUrl}/auth/google`, {
             email: user.email,
             password: "Google@Auth",
@@ -29,7 +23,6 @@ const handler = NextAuth({
             name: user.name,
           });
           token.backendJwt = res.data.token;
-          console.log(res.data.token);
         } catch (e) {
           console.error("Error al registrar usuario con Google:", e);
           token.backendJwt = null;
