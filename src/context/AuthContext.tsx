@@ -56,14 +56,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const setToken = (newToken: string | null) => {
-    console.log('setToken llamado con token:', newToken); // Log para debug
     if (newToken) {
-      console.log('Guardando token en localStorage'); // Log para debug
       localStorage.setItem('token', newToken);
       setTokenState(newToken);
       try {
         const decoded = jwtDecode<JwtPayload>(newToken);
-        console.log('Token decodificado:', decoded); // Log para debug
         setUser(decoded);
       } catch (error) {
         console.error('Error al decodificar token:', error);
@@ -72,7 +69,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } else {
       // Solo actualizamos el estado si hay cambios
       if (token !== null) {
-        console.log('Borrando token del localStorage'); // Log para debug
         localStorage.removeItem('token');
         setTokenState(null);
         setUser(null);

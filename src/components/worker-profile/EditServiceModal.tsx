@@ -129,7 +129,8 @@ export default function EditServiceModal({ service, isOpen, onClose, onSave }: P
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 mb-4 max-h-40 overflow-y-auto custom-scrollbar p-1">
               {previewImages.map((img, i) => (
                 <div key={`${img.id ?? `new-${i}`}`} className="w-full h-24 relative rounded-lg overflow-hidden border border-gray-200 group">
-                  <Image src={img.photo_url} alt={`Foto ${i + 1}`} fill style={{ objectFit: "cover" }} className="transition-transform duration-300 group-hover:scale-105" />
+                  <p>URL:</p>
+                  <Image src={img.photo_url} alt={`Foto ${i + 1}`} fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" style={{ objectFit: "cover" }} className="transition-transform duration-300 group-hover:scale-105" />
                   <button
                     onClick={() => handleDeleteImage(i)}
                     className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200"

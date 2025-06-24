@@ -87,7 +87,6 @@ export default function ProfilePage() {
         try {
           const data = await getProfile();
           const ticketData = data.tickets.find((ticket: Ticket) => ticket.status === "pending" && ticket.type === "to-worker");
-          console.log(ticketData);
           setTicket(ticketData);
           setFormData({
             phone: data.phone?.toString() ?? "",
