@@ -12,7 +12,7 @@ export default function ClientLayoutWrapper({
   const pathname = usePathname();
 
   const noNavbarRoutes = ['/dashboard'];
-  const noFooterRoutes = ['/profile']; 
+  const noFooterRoutes = ['/profile', '/worker-profile']; 
 
   const shouldShowNavbar = !noNavbarRoutes.some((path) => pathname.startsWith(path));
   const shouldShowFooter = !noFooterRoutes.some((path) => pathname.startsWith(path));

@@ -57,6 +57,12 @@ export interface Servicio {
   user?: string; // opcional, para compatibilidad
 }
 
+export enum TicketStatus {
+  PENDING = 'pending',
+  ACCEPTED = 'accepted',
+  REJECTED = 'rejected',
+}
+
 export type IconName =
   | "tractor"
   | "laptop-code"

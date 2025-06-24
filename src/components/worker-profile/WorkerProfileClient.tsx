@@ -1,4 +1,3 @@
-// components/worker-profile/WorkerProfileClient.tsx
 "use client";
 import { useEffect, useState } from "react";
 import { getWorkerById, addPhotosToService } from "@/services/worker-profile/workerServices";
@@ -10,7 +9,7 @@ export default function WorkerProfileClient({ id }: { id: string }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false); // Nuevo estado para indicar que se está guardando
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     getWorkerById(id)
@@ -25,20 +24,17 @@ export default function WorkerProfileClient({ id }: { id: string }) {
   }, [id]);
 
   const handleSaveService = async (updatedService: WorkerService, newFiles: FileList | null) => {
-    setIsSaving(true); // Activar estado de guardado
-    setError(null); // Limpiar errores previos
+    setIsSaving(true);
+    setError(null);
 
     if (!user) {
-      console.error("No se pudo guardar: usuario no cargado.");
       setError("No se pudo guardar. Intenta recargar la página.");
       setIsSaving(false);
       return;
     }
 
     try {
-      // 1. Solo sube las nuevas imágenes
       const uploadedPhotos = await addPhotosToService(updatedService.id, newFiles);
-      
       setUser((prev) =>
         prev
           ? {
@@ -47,11 +43,11 @@ export default function WorkerProfileClient({ id }: { id: string }) {
               s.id === updatedService.id
                 ? {
                   ...s,
-                  title: updatedService.title,       // Actualiza título localmente (si se modificó en el modal)
-                  description: updatedService.description, // Actualiza descripción localmente (si se modificó en el modal)
+                  title: updatedService.title,
+                  description: updatedService.description,
                   work_photos: [
-                    ...s.work_photos.filter((img) => typeof img.id === "string"), // Mantiene las fotos existentes que no se "eliminaron" (filtro del modal)
-                    ...uploadedPhotos, // Añade las fotos recién subidas
+                    ...s.work_photos.filter((img) => typeof img.id === "string"),
+                    ...uploadedPhotos,
                   ],
                 }
                 : s
@@ -59,28 +55,35 @@ export default function WorkerProfileClient({ id }: { id: string }) {
           }
           : prev
       );
-
-      // toast.success("¡Fotos añadidas con éxito!"); // Notificación de éxito
-
     } catch (err) {
-      console.error("Error al añadir fotos al servicio:", err);
+      console.error("Error al añadir fotos:", err);
       setError("Error al guardar las nuevas fotos.");
-      // toast.error("Error al añadir fotos al servicio.");
     } finally {
-      setIsSaving(false); // Desactivar estado de guardado
+      setIsSaving(false);
     }
   };
 
-  // Mensaje de carga mejorado
   if (loading) return <p className="text-center py-10">Cargando perfil...</p>;
-  if (isSaving) return <p className="text-center py-10">Guardando fotos...</p>; // Mensaje específico para subir fotos
+  if (isSaving) return <p className="text-center py-10">Guardando fotos...</p>;
   if (error) return <p className="text-center py-10 text-red-500">{error}</p>;
   if (!user) return <p className="text-center py-10">Trabajador no encontrado.</p>;
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-[#f4f8fb] to-[#e8ecf1] pt-32 pb-16 flex flex-col items-center">
-      <WorkerHeader user={user} />
-      <WorkerServiceList services={user.services} onSave={handleSaveService} />
+    <main className="min-h-screen bg-[#f6f8fa] pt-20">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-12 gap-6 px-4 sm:px-8">
+        {/* Sidebar fijo a la izquierda */}
+        <aside className="sm:col-span-4 lg:col-span-3">
+          <div className="bg-gradient-to-b from-blue-800 via-blue-700 to-blue-600 shadow-md rounded-b-lg p-6 sticky top-20">
+            <WorkerHeader user={user} />
+          </div>
+        </aside>
+
+
+        {/* Contenido: Servicios */}
+        <section className="sm:col-span-8 lg:col-span-9">
+          <WorkerServiceList services={user.services} onSave={handleSaveService} />
+        </section>
+      </div>
     </main>
   );
 }

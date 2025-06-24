@@ -32,7 +32,6 @@ export default function ImageCarousel({ images }: { images: ImageData[] }) {
                     fill
                     style={{ objectFit: "cover" }}
                     sizes="(max-width: 768px) 100vw, 33vw"
-                    priority={true}
                 />
             </div>
 
@@ -44,19 +43,18 @@ export default function ImageCarousel({ images }: { images: ImageData[] }) {
                             e.stopPropagation();
                             prevImage();
                         }}
-                        className="absolute top-1/2 left-4 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white backdrop-blur-md rounded-full w-9 h-9 flex items-center justify-center transition duration-200 shadow-md"
+                        className="cursor-pointer absolute top-1/2 left-4 -translate-y-1/2 bg-blue-500/20 hover:bg-blue-500/40 text-white backdrop-blur-md rounded-full w-9 h-9 flex items-center justify-center transition duration-200 shadow-md"
                         aria-label="Anterior"
                     >
                         <span className="text-2xl">‹</span>
                     </button>
 
-                    {/* Botón siguiente */}
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
                             nextImage();
                         }}
-                        className="absolute top-1/2 right-4 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white backdrop-blur-md rounded-full w-9 h-9 flex items-center justify-center transition duration-200 shadow-md"
+                        className="cursor-pointer absolute top-1/2 right-4 -translate-y-1/2 bg-blue-500/20 hover:bg-blue-500/40 text-white backdrop-blur-md rounded-full w-9 h-9 flex items-center justify-center transition duration-200 shadow-md"
                         aria-label="Siguiente"
                     >
                         <span className="text-2xl">›</span>

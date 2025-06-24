@@ -18,6 +18,16 @@ export default function EditServiceModal({ service, isOpen, onClose, onSave }: P
   const [newFilesArray, setNewFilesArray] = useState<File[]>([]); // Usar un array de File para una mejor gestión
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  useEffect(() => {
+    return () => {
+      previewImages.forEach((img) => {
+        if (!img.id) {
+          URL.revokeObjectURL(img.photo_url);
+        }
+      });
+    };
+  }, []);
+
   // Sincronizar estado local con las props del servicio cuando cambian
   useEffect(() => {
     if (isOpen) { // Solo resetear si el modal está abriendo
