@@ -53,24 +53,11 @@ const ChatBox = ({
     };
   }, [chatId]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newMessage.trim() === '') return;
-
-    const msg: ChatMessage = {
-      id: Date.now().toString(),
-      senderId: currentUserId,
-      receiverId: "", // puedes setear el otro usuario si lo necesitas
-      message: newMessage,
-      timestamp: new Date().toISOString(),
-    };
-
-    // Envía el mensaje por socket
-    getSocket().emit("sendMessage", { room: chatId, message: msg });
-
-    setLocalMessages(prev => [...prev, msg]);
+    await onSend(newMessage.trim());
     setNewMessage('');
-    onSend(newMessage.trim()); // Si quieres mantener la lógica anterior
   };
 
   return (
