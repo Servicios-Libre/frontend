@@ -4,6 +4,7 @@ import { ChatMessage, ChatContract } from '@/types';
 import { useState, useRef, useEffect } from 'react';
 import ContractForm from './ContractForm';
 import ContractView from './ContractView';
+import { getSocket } from '@/services/chat/socket';
 
 interface ChatBoxProps {
   messages: ChatMessage[];
@@ -12,6 +13,7 @@ interface ChatBoxProps {
   contract: ChatContract | null;
   onContractCreate: (contract: ChatContract) => void;
   onContractAccept: () => void;
+  chatId: string;
 }
 
 const ChatBox = ({ 
@@ -20,27 +22,61 @@ const ChatBox = ({
   currentUserId, 
   contract,
   onContractCreate,
-  onContractAccept 
+  onContractAccept,
+  chatId
 }: ChatBoxProps) => {
   const [newMessage, setNewMessage] = useState('');
+  const [localMessages, setLocalMessages] = useState<ChatMessage[]>(messages);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const [showContractForm, setShowContractForm] = useState(false);
+
+  useEffect(() => {
+    setLocalMessages(messages);
+  }, [messages]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [localMessages]);
+
+  useEffect(() => {
+    const socket = getSocket();
+    socket.emit("joinRoom", chatId);
+
+    const handleReceive = (msg: ChatMessage) => {
+      setLocalMessages(prev => [...prev, msg]);
+    };
+
+    socket.on("receiveMessage", handleReceive);
+
+    return () => {
+      socket.off("receiveMessage", handleReceive);
+    };
+  }, [chatId]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (newMessage.trim() === '') return;
-    onSend(newMessage.trim());
-    setNewMessage('');
-  };
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    const msg: ChatMessage = {
+      id: Date.now().toString(),
+      senderId: currentUserId,
+      receiverId: "", // puedes setear el otro usuario si lo necesitas
+      message: newMessage,
+      timestamp: new Date().toISOString(),
+    };
+
+    // Envía el mensaje por socket
+    getSocket().emit("sendMessage", { room: chatId, message: msg });
+
+    setLocalMessages(prev => [...prev, msg]);
+    setNewMessage('');
+    onSend(newMessage.trim()); // Si quieres mantener la lógica anterior
+  };
 
   return (
     <div className="bg-white shadow rounded-lg p-4">
       <div className="h-64 overflow-y-auto border-b mb-4 space-y-2">
-        {messages.map((msg) => (
+        {localMessages.map((msg) => (
           <div
             key={msg.id}
             className={`max-w-[70%] px-4 py-2 rounded-lg text-sm ${
