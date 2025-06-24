@@ -1,6 +1,6 @@
 import { io, Socket } from "socket.io-client";
 
-const URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3000"; // Cambia por tu backend
+const URL = process.env.NEXT_PUBLIC_API_URL; // Debe ser la URL de tu backend
 
 let socket: Socket | null = null;
 
