@@ -1,4 +1,5 @@
 import { User } from "@/types";
+import Link from "next/link";
 import React from "react";
 
 type Props = {
@@ -8,7 +9,7 @@ type Props = {
   loadingId?: string;
 };
 
-export default function WorkerListTable({ workers, onViewProfile, onDowngrade, loadingId }: Props) {
+export default function WorkerListTable({ workers, onDowngrade, loadingId }: Props) {
   if (!workers.length) return <div className="text-gray-700 py-6">No hay trabajadores activos.</div>;
 
   return (
@@ -28,12 +29,13 @@ export default function WorkerListTable({ workers, onViewProfile, onDowngrade, l
             <td className="p-2 text-black">{worker.email}</td>
             <td className="p-2 text-black">{worker.premium ? "Sí" : "No"}</td>
             <td className="p-2 flex gap-2">
-              <button
-                className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-                onClick={() => onViewProfile(worker.id)}
-              >
-                Ver perfil
-              </button>
+              <Link href={`/worker-profile/${worker.id}`} passHref>
+                <button
+                  className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                >
+                  Ver perfil
+                </button>
+              </Link>
               <button
                 className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600 disabled:opacity-50"
                 onClick={() => onDowngrade(worker)}
