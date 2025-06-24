@@ -170,6 +170,7 @@ export default function ChatDemo() {
                 contract={contract}
                 onContractCreate={handleContractCreate}
                 onContractAccept={handleContractAccept}
+                chatId={`${mockCurrentUser.id}_${mockWorker.id}`}
               />
               {/* You might want to conditionally render ContractForm/ContractView here */}
               {/* For example: */}
