@@ -4,6 +4,7 @@ import { getWorkerById, addPhotosToService } from "@/services/worker-profile/wor
 import { User, WorkerService } from "@/types";
 import WorkerHeader from "./WorkerHeader";
 import WorkerServiceList from "./WorkerServiceList";
+import StartChatButton from "./StartChatButton"; // <-- Agrega esta línea
 
 export default function WorkerProfileClient({ id }: { id: string }) {
   const [user, setUser] = useState<User | null>(null);
@@ -75,9 +76,12 @@ export default function WorkerProfileClient({ id }: { id: string }) {
         <aside className="sm:col-span-4 lg:col-span-3">
           <div className="bg-gradient-to-b from-blue-800 via-blue-700 to-blue-600 shadow-md rounded-b-lg p-6 sticky top-20">
             <WorkerHeader user={user} />
+            {/* Botón para iniciar chat */}
+            <div className="flex justify-center mt-6">
+              <StartChatButton otherUserId={user.id} />
+            </div>
           </div>
         </aside>
-
 
         {/* Contenido: Servicios */}
         <section className="sm:col-span-8 lg:col-span-9">
