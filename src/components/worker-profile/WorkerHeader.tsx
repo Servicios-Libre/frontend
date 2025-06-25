@@ -50,7 +50,7 @@ export default function WorkerHeader({ user }: Props) {
           aria-label={online ? 'En línea' : 'Inactivo'}
           role="status"
         />
-        <span className="hidden sm:inline">{online ? 'En línea' : 'Inactivo'}</span>
+        <span className="sm:inline">{online ? 'En línea' : 'Inactivo'}</span>
       </div>
 
       {/* Nombre y correo */}

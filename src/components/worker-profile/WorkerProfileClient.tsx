@@ -4,25 +4,53 @@ import { getWorkerById, addPhotosToService } from "@/services/worker-profile/wor
 import { User, WorkerService } from "@/types";
 import WorkerHeader from "./WorkerHeader";
 import WorkerServiceList from "./WorkerServiceList";
-import StartChatButton from "./StartChatButton"; // <-- Agrega esta línea
+import { jwtDecode } from "jwt-decode";
+import { useSearchParams } from "next/navigation";
 
 export default function WorkerProfileClient({ id }: { id: string }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
+  const [initialService, setInitialService] = useState<WorkerService | null>(null);
+
+  const searchParams = useSearchParams();
+  const serviceIdFromQuery = searchParams.get("serviceId");
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = jwtDecode<{ id: string }>(token);
+        if (decoded.id === id) {
+          setIsOwner(true);
+        }
+      } catch (e) {
+        console.error("Error decoding token", e);
+      }
+    }
+  }, [id]);
 
   useEffect(() => {
     getWorkerById(id)
       .then((data) => {
         setUser(data);
         setLoading(false);
+
+        // Buscar el servicio si hay serviceId en la URL
+        if (serviceIdFromQuery) {
+          const found = data.services.find((s) => s.id === serviceIdFromQuery);
+          if (found) {
+            setInitialService(found);
+          }
+        }
       })
       .catch((e) => {
         setError(e.message || "Error al cargar el perfil");
         setLoading(false);
       });
-  }, [id]);
+  }, [id, serviceIdFromQuery]);
 
   const handleSaveService = async (updatedService: WorkerService, newFiles: FileList | null) => {
     setIsSaving(true);
@@ -72,20 +100,19 @@ export default function WorkerProfileClient({ id }: { id: string }) {
   return (
     <main className="min-h-screen bg-[#f6f8fa] pt-20">
       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-12 gap-6 px-4 sm:px-8">
-        {/* Sidebar fijo a la izquierda */}
         <aside className="sm:col-span-4 lg:col-span-3">
           <div className="bg-gradient-to-b from-blue-800 via-blue-700 to-blue-600 shadow-md rounded-b-lg p-6 sticky top-20">
             <WorkerHeader user={user} />
-            {/* Botón para iniciar chat */}
-            <div className="flex justify-center mt-6">
-              <StartChatButton otherUserId={user.id} />
-            </div>
           </div>
         </aside>
 
-        {/* Contenido: Servicios */}
         <section className="sm:col-span-8 lg:col-span-9">
-          <WorkerServiceList services={user.services} onSave={handleSaveService} />
+          <WorkerServiceList
+            services={user.services}
+            onSave={handleSaveService}
+            isOwner={isOwner}
+            openDetailInitially={initialService}
+          />
         </section>
       </div>
     </main>

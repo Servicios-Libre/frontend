@@ -9,9 +9,10 @@ export interface Service {
 }
 
 export interface ServicioGrid {
-  id: string | number;
+  id: string;
   title: string;
   worker: {
+    id: string;
     name: string;
   };
   work_photos: { photo_url: string }[];

@@ -11,8 +11,10 @@ export default function ServicesGrid({ servicios }: ServicesGridProps) {
       {servicios.map((service) => (
         <ServiceCard
           key={service.id}
+          id={service.id}
           title={service.title}
-          user={service.worker.name}
+          name={service.worker.name}
+          workerId={service.worker.id}
           image={service.work_photos[0]?.photo_url}
         />
       ))}

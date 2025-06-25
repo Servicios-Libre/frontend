@@ -4,7 +4,7 @@ import WorkerProfileClient from "@/components/worker-profile/WorkerProfileClient
 export default function WorkerProfilePage({ params }: any) {
   return (
     <div className="bg-white min-h-screen">
-      <WorkerProfileClient id={params.workerId} />
+      <WorkerProfileClient id={params.workerId}  />
     </div>
   );
 }

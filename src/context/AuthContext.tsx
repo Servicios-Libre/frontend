@@ -3,16 +3,18 @@ import { createContext, useContext, useEffect, useState, useCallback } from 'rea
 import { jwtDecode } from "jwt-decode";
 import { signOut } from "next-auth/react";
 
+type UserRole = "user" | "worker" | "admin" | null;
+
 interface JwtPayload {
   name?: string;
   email?: string;
   id?: string;
-  role?: string;
-  tickets?: [{
-    id: string,
-    type: string,
-    status: string
-  }];
+  role?: UserRole;
+  tickets?: Array<{
+    id: string;
+    type: string;
+    status: string;
+  }>;
 }
 
 interface AuthContextType {
