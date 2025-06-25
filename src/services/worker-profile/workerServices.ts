@@ -26,7 +26,6 @@ export const getWorkerById = async (id: string): Promise<User> => {
     // Lógica para usuarios no logueados
     try {
       const response = await api.get(`/services/worker/${id}`);
-      console.log("Usario no logeado", response.data);
       return response.data;
     } catch (error) {
       console.error("Error no autenticado:", error);
