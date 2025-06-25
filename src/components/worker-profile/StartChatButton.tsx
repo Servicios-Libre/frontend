@@ -15,13 +15,13 @@ export default function StartChatButton({ otherUserId }: StartChatButtonProps) {
   const handleStartChat = async () => {
     if (!user?.id || !token) return alert("Debes estar logueado");
     try {
+      console.log("userID ", user.id, " ", "WorkerID: ", otherUserId);
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/api/chat/start`,
         { userId: user.id, otherUserId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       console.log(res);
-      console.log("userID ", user.id, " ", "WorkerID: ", otherUserId);
       const chatId = res.data.chatId;
       if (chatId) router.push(`/chat/${chatId}`);
       else alert("No se pudo iniciar el chat");
