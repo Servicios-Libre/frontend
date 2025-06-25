@@ -20,6 +20,8 @@ export default function StartChatButton({ otherUserId }: StartChatButtonProps) {
         { userId: user.id, otherUserId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      console.log(res);
+      console.log("userID ", user.id, " ", "WorkerID: ", otherUserId);
       const chatId = res.data.chatId;
       if (chatId) router.push(`/chat/${chatId}`);
       else alert("No se pudo iniciar el chat");
