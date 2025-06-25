@@ -16,7 +16,7 @@ export default function StartChatButton({ otherUserId }: StartChatButtonProps) {
     if (!user?.id || !token) return alert("Debes estar logueado");
     try {
       const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/chat/start`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/chat/start`,
         { userId: user.id, otherUserId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
