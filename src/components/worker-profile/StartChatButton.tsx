@@ -6,22 +6,21 @@ import { useAuthUser } from "@/hooks/useAuthUser";
 
 interface StartChatButtonProps {
   otherUserId: string; // ID del trabajador
+  label?: string;      // Texto opcional del botón
 }
 
-export default function StartChatButton({ otherUserId }: StartChatButtonProps) {
+export default function StartChatButton({ otherUserId, label = "Contratar servicio" }: StartChatButtonProps) {
   const router = useRouter();
   const { user, token } = useAuthUser();
 
   const handleStartChat = async () => {
     if (!user?.id || !token) return alert("Debes estar logueado");
     try {
-      console.log("userID ", user.id, " ", "WorkerID: ", otherUserId);
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/api/chat/start`,
         { userId: user.id, otherUserId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      console.log(res);
       const chatId = res.data.chatId;
       if (chatId) router.push(`/chat/${chatId}`);
       else alert("No se pudo iniciar el chat");
@@ -33,9 +32,10 @@ export default function StartChatButton({ otherUserId }: StartChatButtonProps) {
   return (
     <button
       onClick={handleStartChat}
-      className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mt-4"
+      className="cursor-pointer bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-semibold py-2.5 px-6 rounded-full shadow transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-amber-300"
+      aria-label={label}
     >
-      Iniciar chat
+      {label}
     </button>
   );
 }
