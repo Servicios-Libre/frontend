@@ -22,7 +22,7 @@ export default function StartChatButton({ otherUserId, label = "Contratar servic
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const chatId = res.data.chatId;
-      if (chatId) router.push(`/api/chat/${chatId}`);
+      if (chatId) router.push(`/chat/${chatId}`);
       else alert("No se pudo iniciar el chat");
     } catch (err) {
       alert("No se pudo iniciar el chat");
