@@ -59,6 +59,7 @@ const ChatBox = ({
     };
 
     socket.on("receiveMessage", handleReceive);
+    console.log(handleReceive);
 
     return () => {
       socket.off("receiveMessage", handleReceive);
