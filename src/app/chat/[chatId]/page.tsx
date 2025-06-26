@@ -85,8 +85,8 @@ export default function ChatDemo() {
   if (loading || !user?.id) return <div>Cargando...</div>;
 
   return (
-    <div className="flex flex-col bg-gray-50 min-h-[calc(100vh-120px)]"> {/* min-h ajustado */}
-      <main className="flex-1 flex flex-col p-4 sm:p-6 lg:p-8 pt-24 pb-8"> {/* pt-24 para navbar, pb-8 para footer */}
+    <div className="flex flex-col bg-gray-50 min-h-screen">
+      <main className="flex-1 flex flex-col p-4 sm:p-6 lg:p-8 pt-32 pb-8"> {/* pt-32 para navbar alta */}
         <div className="max-w-4xl mx-auto w-full flex flex-col space-y-6">
           {/* Chat Section */}
           <div className="bg-white rounded-lg shadow-md flex-1 min-h-[50vh] overflow-hidden border border-gray-200">

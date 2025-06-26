@@ -85,7 +85,7 @@ const ChatBox = ({
       </div>
 
       {/* Mensajes */}
-      <div className="flex-1 h-64 overflow-y-auto border-b mb-4 space-y-2 pr-2">
+      <div className="flex-1 h-64 overflow-y-auto border-b mb-4 space-y-2 pr-2" style={{ maxHeight: '50vh' }}>
         {localMessages.map((msg) => (
           <div
             key={msg.id}
@@ -141,7 +141,7 @@ const ChatBox = ({
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Escribe un mensaje..."
-          className="flex-1 px-4 py-2 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow"
+          className="flex-1 px-4 py-2 rounded-2xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow text-gray-800 bg-white placeholder-gray-400"
         />
         <button
           type="submit"
