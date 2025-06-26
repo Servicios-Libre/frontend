@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import axios from 'axios';
 import { useAuthUser } from '@/hooks/useAuthUser';
+import { getSocket } from "@/services/chat/socket";
 
 export default function ChatDemo() {
   const params = useParams();
@@ -49,15 +50,32 @@ export default function ChatDemo() {
     if (contract) setContract(prev => prev && { ...prev, accepted: true });
   };
 
+  useEffect(() => {
+    if (!chatId || !user?.id) return;
+
+    const socket = getSocket();
+
+    socket.emit("joinChat", { chatId });
+
+    socket.on("newMessage", (msg) => {
+      setMessages(prev => [...prev, msg]);
+    });
+
+    return () => {
+      socket.emit("leaveChat", { chatId });
+      socket.off("newMessage");
+    };
+  }, [chatId, user?.id]);
+
   if (loading || !user?.id) return <div>Cargando...</div>;
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50 overflow-hidden">
-      <main className="flex-1 flex flex-col p-4 sm:p-6 lg:p-8 overflow-y-auto pt-20"> {/* <-- pt-20 agregado */}
+    <div className="flex flex-col bg-gray-50 min-h-[calc(100vh-120px)]"> {/* min-h ajustado */}
+      <main className="flex-1 flex flex-col p-4 sm:p-6 lg:p-8 pt-24 pb-8"> {/* pt-24 para navbar, pb-8 para footer */}
         <div className="max-w-4xl mx-auto w-full flex flex-col space-y-6">
           {/* Chat Section */}
           <div className="bg-white rounded-lg shadow-md flex-1 min-h-[50vh] overflow-hidden border border-gray-200">
-            <div className="p-4 flex flex-col h-full">
+            <div className="p-4 flex flex-col h-full max-h-[70vh] overflow-y-auto"> {/* max-h y scroll */}
               <ChatBox
                 messages={messages}
                 onSend={handleSendMessage}
