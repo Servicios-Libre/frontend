@@ -17,6 +17,10 @@ export default function ChatDemo() {
   const [contract, setContract] = useState<ChatContract | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Mientras el backend no devuelve info de usuarios, usa valores por defecto
+  const clienteName = "Cliente";
+  const trabajadorName = "Trabajador";
+
   // Carga mensajes reales
   useEffect(() => {
     if (!chatId || !token) return;
@@ -98,6 +102,8 @@ export default function ChatDemo() {
               contract={contract}
               onContractCreate={handleContractCreate}
               onContractAccept={handleContractAccept}
+              clienteName={clienteName}
+              trabajadorName={trabajadorName}
             />
           </div>
         </div>

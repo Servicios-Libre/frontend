@@ -17,6 +17,8 @@ interface ChatBoxProps {
   onContractAccept: () => void;
   chatId: string;
   otherUserName?: string;
+  clienteName: string;
+  trabajadorName: string;
 }
 
 const ChatBox = ({ 
@@ -27,7 +29,9 @@ const ChatBox = ({
   onContractCreate,
   onContractAccept,
   chatId,
-  otherUserName = "Usuario"
+  otherUserName = "Usuario",
+  clienteName,
+  trabajadorName
 }: ChatBoxProps) => {
   const [newMessage, setNewMessage] = useState('');
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>(messages);
@@ -78,10 +82,28 @@ const ChatBox = ({
     <div className="bg-white shadow rounded-lg p-4 flex flex-col h-full">
       {/* Cabecera del chat */}
       <div className="flex items-center gap-3 mb-4 border-b pb-2">
-        <div className="w-10 h-10 rounded-full bg-blue-200 flex items-center justify-center text-blue-800 font-bold text-lg">
+        <div className="w-10 h-10 rounded-full bg-blue-200 flex items-center justify-center text-blue-800 font-bold">
           {otherUserName.charAt(0).toUpperCase()}
         </div>
         <span className="font-semibold text-gray-700">{otherUserName}</span>
+      </div>
+
+      {/* Nueva sección para mostrar cliente y trabajador */}
+      <div className="flex items-center justify-between bg-gray-100 rounded-lg px-4 py-2 mb-2">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-blue-200 flex items-center justify-center text-blue-800 font-bold">
+            {clienteName.charAt(0).toUpperCase()}
+          </div>
+          <span className="font-semibold text-gray-700">{clienteName}</span>
+          <span className="text-xs text-gray-500 ml-2 bg-blue-100 px-2 py-0.5 rounded">Cliente</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-green-200 flex items-center justify-center text-green-800 font-bold">
+            {trabajadorName.charAt(0).toUpperCase()}
+          </div>
+          <span className="font-semibold text-gray-700">{trabajadorName}</span>
+          <span className="text-xs text-gray-500 ml-2 bg-green-100 px-2 py-0.5 rounded">Trabajador</span>
+        </div>
       </div>
 
       {/* Mensajes */}
