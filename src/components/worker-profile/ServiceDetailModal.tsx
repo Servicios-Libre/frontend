@@ -3,12 +3,15 @@
 import { WorkerService } from "@/types";
 import { X } from "lucide-react";
 import ImageCarousel from "./ImageCarousel";
+import StartChatButton from "./StartChatButton";
 
 export default function ServiceDetailModal({
     service,
+    workerId,
     onClose,
 }: {
     service: WorkerService;
+    workerId: string;
     onClose: () => void;
 }) {
     const imagesToShow =
@@ -58,14 +61,9 @@ export default function ServiceDetailModal({
 
                     {/* Botón ambar abajo a la derecha */}
                     <div className="flex justify-end mt-4">
-                        <button
-                            className="cursor-pointer bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-semibold py-2.5 px-6 rounded-full shadow transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-amber-300"
-                            onClick={() => alert("¡Servicio contratado!")}
-                            aria-label="Contratar servicio"
-                        >
-                            Contratar servicio
-                        </button>
+                        <StartChatButton otherUserId={workerId} label="Contratar servicio" />
                     </div>
+                    
                 </div>
             </div>
         </div>

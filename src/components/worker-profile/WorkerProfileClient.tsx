@@ -6,6 +6,7 @@ import WorkerHeader from "./WorkerHeader";
 import WorkerServiceList from "./WorkerServiceList";
 import { jwtDecode } from "jwt-decode";
 import { useSearchParams } from "next/navigation";
+import ServiceDetailModal from "./ServiceDetailModal";
 
 export default function WorkerProfileClient({ id }: { id: string }) {
   const [user, setUser] = useState<User | null>(null);
@@ -115,6 +116,13 @@ export default function WorkerProfileClient({ id }: { id: string }) {
           />
         </section>
       </div>
+      {initialService && (
+        <ServiceDetailModal
+          service={initialService}
+          workerId={user.id}
+          onClose={() => setInitialService(null)}
+        />
+      )}
     </main>
   );
 }
