@@ -20,7 +20,7 @@ export default function ChatDemo() {
   useEffect(() => {
     if (!chatId || !token) return;
     setLoading(true);
-    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/chat/${chatId}/messages`, {
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/${chatId}/messages`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => setMessages(res.data))
@@ -35,7 +35,7 @@ export default function ChatDemo() {
       message: text,
       timestamp: new Date().toISOString(),
     };
-    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/chat/${chatId}/messages`, newMessage, {
+    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/${chatId}/messages`, newMessage, {
       headers: { Authorization: `Bearer ${token}` }
     });
     // El backend debe emitir el mensaje por socket
