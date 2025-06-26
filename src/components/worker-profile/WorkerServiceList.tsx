@@ -10,11 +10,13 @@ export default function WorkerServiceList({
   onSave,
   isOwner,
   openDetailInitially,
+  workerId, // <-- NUEVO: recibe el workerId como prop
 }: {
   services: WorkerService[];
   onSave: (updated: WorkerService, newFiles: FileList | null) => void;
   isOwner: boolean;
   openDetailInitially?: WorkerService | null;
+  workerId: string; // <-- NUEVO: tipado
 }) {
   const [editingService, setEditingService] = useState<WorkerService | null>(null);
   const [detailedService, setDetailedService] = useState<WorkerService | null>(openDetailInitially ?? null);
@@ -66,6 +68,7 @@ export default function WorkerServiceList({
       {detailedService && !isOwner && (
         <ServiceDetailModal
           service={detailedService}
+          workerId={workerId} // <-- PASA EL workerId AQUÍ
           onClose={() => setDetailedService(null)}
         />
       )}

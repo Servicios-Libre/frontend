@@ -112,6 +112,7 @@ export default function WorkerProfileClient({ id }: { id: string }) {
             services={user.services}
             onSave={handleSaveService}
             isOwner={isOwner}
+            workerId={user.id}
             openDetailInitially={initialService}
           />
         </section>
