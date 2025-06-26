@@ -54,6 +54,9 @@ export default function ChatDemo() {
     if (!chatId || !user?.id) return;
 
     const socket = getSocket();
+    socket.on("connect", () => {
+      console.log("Socket conectado:", socket.id);
+    });
 
     // Unirse a la sala con el nombre correcto
     socket.emit("joinChat", { chatRoom: `chat_${chatId}` });
