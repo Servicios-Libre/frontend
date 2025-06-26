@@ -31,17 +31,10 @@ export default function ChatDemo() {
   // Envía mensaje real
   const handleSendMessage = async (text: string) => {
     if (!user?.id || !token) return;
-    const newMessage = {
-      id: Math.random().toString(36), // temporal, el backend dará el real
-      senderId: user.id,
-      message: text,
-      timestamp: new Date().toISOString(),
-    };
-    setMessages(prev => [...prev, newMessage]);
     await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/${chatId}/messages`, {
       senderId: user.id,
       message: text,
-      timestamp: newMessage.timestamp,
+      timestamp: new Date().toISOString(),
     }, {
       headers: { Authorization: `Bearer ${token}` }
     });
