@@ -59,6 +59,7 @@ export default function ChatDemo() {
     socket.emit("joinChat", { chatRoom: `chat_${chatId}` });
 
     socket.on("newMessage", (msg) => {
+      console.log("Nuevo mensaje recibido por socket:", msg);
       setMessages(prev => [...prev, msg]);
     });
 
