@@ -55,14 +55,15 @@ export default function ChatDemo() {
 
     const socket = getSocket();
 
-    socket.emit("joinChat", { chatId });
+    // Unirse a la sala con el nombre correcto
+    socket.emit("joinChat", { chatRoom: `chat_${chatId}` });
 
     socket.on("newMessage", (msg) => {
       setMessages(prev => [...prev, msg]);
     });
 
     return () => {
-      socket.emit("leaveChat", { chatId });
+      socket.emit("leaveChat", { chatRoom: `chat_${chatId}` });
       socket.off("newMessage");
     };
   }, [chatId, user?.id]);
