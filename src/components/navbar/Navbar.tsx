@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from "@/context/AuthContext";
 import { UserDropdown, MobileUserSection } from "./UserSections";
-import { FaRegComments } from "react-icons/fa"; // o FaBell
+import { FaRegComments } from "react-icons/fa";
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
@@ -17,6 +17,9 @@ export default function Navbar() {
     }
 
     const { user, logout } = auth;
+
+    // Simulación de mensajes sin leer (reemplaza por tu lógica real)
+    const unreadCount = 2; // <-- Cambia esto por tu estado real
 
     return (
         <>
@@ -41,11 +44,18 @@ export default function Navbar() {
                         <Link href="/servicios" className="text-white font-medium hover:underline-offset-0 ml-6">Servicios</Link>
                         <Link href="/sobre-nosotros" className="text-white font-medium hover:underline-offset-0 ml-6">Sobre nosotros</Link>
                         <Link href="/ayuda" className="text-white font-medium hover:underline-offset-0 ml-6">Ayuda</Link>
-                        <Link href="/chat" className="relative ml-6 group">
-                            <FaRegComments className="text-2xl hover:text-amber-400 transition" />
-                            {/* Badge de notificaciones (opcional) */}
-                            {/* <span className="absolute -top-2 -right-2 bg-amber-500 text-xs rounded-full px-1.5 py-0.5 text-white font-bold">2</span> */}
-                        </Link>
+                        {/* Icono de chat solo si está logueado */}
+                        {user && (
+                            <Link href="/chat" className="relative ml-6 group">
+                                <FaRegComments className="text-2xl hover:text-amber-400 transition" />
+                                {/* Badge de notificaciones */}
+                                {unreadCount > 0 && (
+                                    <span className="absolute -top-2 -right-2 bg-amber-500 text-xs rounded-full px-1.5 py-0.5 text-white font-bold shadow">
+                                        {unreadCount}
+                                    </span>
+                                )}
+                            </Link>
+                        )}
                         <UserDropdown user={user} logout={logout} />
                     </div>
                     {/* Botón Hamburguesa */}
@@ -70,11 +80,19 @@ export default function Navbar() {
                     <Link href="/servicios" className="block py-2 hover:underline" onClick={() => setIsOpen(!isOpen)}>Servicios</Link>
                     <Link href="/sobre-nosotros" className="block py-2 hover:underline" onClick={() => setIsOpen(!isOpen)}>Sobre nosotros</Link>
                     <Link href="/ayuda" className="block py-2 hover:underline" onClick={() => setIsOpen(!isOpen)}>Ayuda</Link>
-                    <Link href="/chat" className="block py-2 hover:underline" onClick={() => setIsOpen(!isOpen)}>
-                        <span className="inline-flex items-center gap-2">
-                            <FaRegComments className="inline" /> Chats
-                        </span>
-                    </Link>
+                    {/* Icono de chat solo si está logueado */}
+                    {user && (
+                        <Link href="/chat" className="block py-2 hover:underline" onClick={() => setIsOpen(!isOpen)}>
+                            <span className="inline-flex items-center gap-2 relative">
+                                <FaRegComments className="inline" /> Chats
+                                {unreadCount > 0 && (
+                                    <span className="absolute -top-2 -right-4 bg-amber-500 text-xs rounded-full px-1.5 py-0.5 text-white font-bold shadow">
+                                        {unreadCount}
+                                    </span>
+                                )}
+                            </span>
+                        </Link>
+                    )}
                 </div>
                 <hr className="mb-6 border-gray-200 sm:mx-auto" />
                 <MobileUserSection user={user} logout={logout} setIsOpen={setIsOpen} />
