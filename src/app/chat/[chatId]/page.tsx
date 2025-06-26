@@ -82,25 +82,23 @@ export default function ChatDemo() {
     };
   }, [chatId, user?.id]);
 
-  if (loading || !user?.id) return <div>Cargando...</div>;
+  if (loading || !user?.id) return <div className="pt-24 text-center">Cargando...</div>;
 
   return (
-    <div className="flex flex-col bg-gray-50 min-h-screen">
-      <main className="flex-1 flex flex-col p-4 sm:p-6 lg:p-8 pt-32 pb-8"> {/* pt-32 para navbar alta */}
-        <div className="max-w-4xl mx-auto w-full flex flex-col space-y-6">
-          {/* Chat Section */}
-          <div className="bg-white rounded-lg shadow-md flex-1 min-h-[50vh] overflow-hidden border border-gray-200">
-            <div className="p-4 flex flex-col h-full max-h-[70vh] overflow-y-auto"> {/* max-h y scroll */}
-              <ChatBox
-                messages={messages}
-                onSend={handleSendMessage}
-                currentUserId={user.id}
-                chatId={chatId}
-                contract={contract}
-                onContractCreate={handleContractCreate}
-                onContractAccept={handleContractAccept}
-              />
-            </div>
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      <main className="flex-1 flex justify-center items-stretch" style={{ paddingTop: '80px', paddingBottom: '40px' }}>
+        {/* Ajusta paddingTop según el alto real de tu navbar */}
+        <div className="w-full max-w-4xl flex flex-col flex-1">
+          <div className="flex-1 flex flex-col bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+            <ChatBox
+              messages={messages}
+              onSend={handleSendMessage}
+              currentUserId={user.id}
+              chatId={chatId}
+              contract={contract}
+              onContractCreate={handleContractCreate}
+              onContractAccept={handleContractAccept}
+            />
           </div>
         </div>
       </main>

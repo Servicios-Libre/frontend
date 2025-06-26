@@ -85,7 +85,7 @@ const ChatBox = ({
       </div>
 
       {/* Mensajes */}
-      <div className="flex-1 h-64 overflow-y-auto border-b mb-4 space-y-2 pr-2" style={{ maxHeight: '50vh' }}>
+      <div className="flex-1 overflow-y-auto border-b mb-4 space-y-2 pr-2" style={{ maxHeight: '60vh' }}>
         {localMessages.map((msg) => (
           <div
             key={msg.id}
