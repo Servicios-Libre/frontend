@@ -32,14 +32,19 @@ export default function ChatDemo() {
   const handleSendMessage = async (text: string) => {
     if (!user?.id || !token) return;
     const newMessage = {
+      id: Math.random().toString(36), // temporal, el backend dará el real
       senderId: user.id,
       message: text,
       timestamp: new Date().toISOString(),
     };
-    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/${chatId}/messages`, newMessage, {
+    setMessages(prev => [...prev, newMessage]);
+    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/${chatId}/messages`, {
+      senderId: user.id,
+      message: text,
+      timestamp: newMessage.timestamp,
+    }, {
       headers: { Authorization: `Bearer ${token}` }
     });
-    // El backend debe emitir el mensaje por socket
   };
 
   // Contrato (si lo usás)
@@ -66,7 +71,8 @@ export default function ChatDemo() {
         ...prev,
         {
           ...msg,
-          message: msg.content, // <--- adapta aquí
+          message: msg.content, // adapta content a message
+          senderId: msg.sender, // adapta sender a senderId
           timestamp: msg.createdAt || msg.timestamp
         }
       ]);
@@ -75,6 +81,7 @@ export default function ChatDemo() {
     return () => {
       socket.emit("leaveChat", { chatRoom: `chat_${chatId}` });
       socket.off("newMessage");
+      socket.off("connect");
     };
   }, [chatId, user?.id]);
 
