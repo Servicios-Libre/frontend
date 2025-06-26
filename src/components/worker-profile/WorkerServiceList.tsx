@@ -4,6 +4,7 @@ import EditServiceModal from "./EditServiceModal";
 import ServiceDetailModal from "./ServiceDetailModal"; // <-- Importo el modal de detalle
 import { useState } from "react";
 import Link from "next/link";
+import StartChatButton from "./StartChatButton";
 
 export default function WorkerServiceList({
   services,
@@ -30,12 +31,18 @@ export default function WorkerServiceList({
       <div className="flex flex-col sm:flex-row sm:items-center mb-6 gap-4">
         <h2 className="text-2xl font-bold text-gray-900">Servicios publicados</h2>
         {isOwner && (
-          <Link
-            href="/solicitud"
-            className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow transition ml-auto text-center"
-          >
-            + Crear servicio nuevo
-          </Link>
+          <>
+            <Link
+              href="/solicitud"
+              className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow transition ml-auto text-center"
+            >
+              + Crear servicio nuevo
+            </Link>
+            <StartChatButton
+              otherUserId={workerId}
+              label="Probar chat"
+            />
+          </>
         )}
       </div>
       <div className="grid gap-4 sm:gap-6 grid-cols-[repeat(auto-fit,minmax(260px,1fr))]">
