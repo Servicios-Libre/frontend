@@ -67,15 +67,19 @@ export default function ChatDemo() {
     socket.emit("joinChat", { chatRoom: `chat_${chatId}` });
 
     socket.on("newMessage", (msg) => {
-      setMessages(prev => [
-        ...prev,
-        {
-          ...msg,
-          message: msg.content, // adapta content a message
-          senderId: msg.sender, // adapta sender a senderId
-          timestamp: msg.createdAt || msg.timestamp
-        }
-      ]);
+      setMessages(prev => {
+        // Evita duplicados por id
+        if (prev.some(m => m.id === msg.id)) return prev;
+        return [
+          ...prev,
+          {
+            ...msg,
+            message: msg.content,
+            senderId: msg.sender,
+            timestamp: msg.createdAt || msg.timestamp
+          }
+        ];
+      });
     });
 
     return () => {
