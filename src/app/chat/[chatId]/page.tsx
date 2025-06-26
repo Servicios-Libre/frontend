@@ -62,12 +62,12 @@ export default function ChatDemo() {
     socket.emit("joinChat", { chatRoom: `chat_${chatId}` });
 
     socket.on("newMessage", (msg) => {
-      // Adaptar el campo para que el componente lo entienda
       setMessages(prev => [
         ...prev,
         {
           ...msg,
-          timestamp: msg.createdAt // agrega timestamp si tu componente lo espera así
+          message: msg.content, // <--- adapta aquí
+          timestamp: msg.createdAt || msg.timestamp
         }
       ]);
     });
