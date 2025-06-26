@@ -20,6 +20,7 @@ export default function WorkerManagementPage() {
   const [profile, setProfile] = useState<User | null>(null);
   const [profileServices, setProfileServices] = useState<WorkerService[]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const { showToast } = useToast();
 
@@ -98,7 +99,11 @@ export default function WorkerManagementPage() {
 
   return (
     <div className="min-h-screen flex bg-gray-100">
-      <Sidebar workerRequests={requests.length} />
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        workerRequests={requests.length}
+      />
       <main className="flex-1 p-6 md:p-10">
         <h1 className="text-4xl font-extrabold mb-10 text-black flex items-center gap-3">
           <FaUserCog className="text-indigo-600" /> Worker Management Menu

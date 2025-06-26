@@ -23,7 +23,7 @@ export default function ServiceDetailModal({
             onClick={onClose}
         >
             <div
-                className="bg-white rounded-2xl max-w-2xl w-full shadow-xl overflow-hidden relative flex flex-col animate-fade-in border border-gray-200"
+                className="bg-white rounded-2xl max-w-xl w-full shadow-xl overflow-hidden relative flex flex-col animate-fade-in border border-gray-200"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Botón cerrar */}
@@ -37,7 +37,7 @@ export default function ServiceDetailModal({
 
                 {/* Carrusel más grande - Pasamos la clase de altura directamente al carrusel */}
                 {/* === CAMBIO CLAVE AQUÍ: Pasamos heightClass="h-64" === */}
-                <ImageCarousel images={imagesToShow} heightClass="h-64" />
+                <ImageCarousel images={imagesToShow} heightClass="h-64" objectPosition="top" />
 
                 {/* Contenido principal */}
                 <div className="p-6 sm:p-8 flex flex-col gap-6">
