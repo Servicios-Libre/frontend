@@ -53,6 +53,7 @@ const ChatBox = ({
       setLocalMessages(prev => [...prev, msg]);
       // Notificación con sonido si el mensaje es de otro usuario
       if (msg.senderId !== currentUserId) {
+        console.log("mensaje: ", msg);
         toast.info("¡Nuevo mensaje recibido!");
         play();
       }
