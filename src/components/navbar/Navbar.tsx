@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { useAuth } from "@/context/AuthContext";
 import { UserDropdown, MobileUserSection } from "./UserSections";
+import { FaRegComments } from "react-icons/fa"; // o FaBell
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
@@ -40,6 +41,11 @@ export default function Navbar() {
                         <Link href="/servicios" className="text-white font-medium hover:underline-offset-0 ml-6">Servicios</Link>
                         <Link href="/sobre-nosotros" className="text-white font-medium hover:underline-offset-0 ml-6">Sobre nosotros</Link>
                         <Link href="/ayuda" className="text-white font-medium hover:underline-offset-0 ml-6">Ayuda</Link>
+                        <Link href="/chat" className="relative ml-6 group">
+                            <FaRegComments className="text-2xl hover:text-amber-400 transition" />
+                            {/* Badge de notificaciones (opcional) */}
+                            {/* <span className="absolute -top-2 -right-2 bg-amber-500 text-xs rounded-full px-1.5 py-0.5 text-white font-bold">2</span> */}
+                        </Link>
                         <UserDropdown user={user} logout={logout} />
                     </div>
                     {/* Botón Hamburguesa */}
@@ -64,6 +70,11 @@ export default function Navbar() {
                     <Link href="/servicios" className="block py-2 hover:underline" onClick={() => setIsOpen(!isOpen)}>Servicios</Link>
                     <Link href="/sobre-nosotros" className="block py-2 hover:underline" onClick={() => setIsOpen(!isOpen)}>Sobre nosotros</Link>
                     <Link href="/ayuda" className="block py-2 hover:underline" onClick={() => setIsOpen(!isOpen)}>Ayuda</Link>
+                    <Link href="/chat" className="block py-2 hover:underline" onClick={() => setIsOpen(!isOpen)}>
+                        <span className="inline-flex items-center gap-2">
+                            <FaRegComments className="inline" /> Chats
+                        </span>
+                    </Link>
                 </div>
                 <hr className="mb-6 border-gray-200 sm:mx-auto" />
                 <MobileUserSection user={user} logout={logout} setIsOpen={setIsOpen} />
