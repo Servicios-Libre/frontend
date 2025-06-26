@@ -104,7 +104,7 @@ export default function WorkerServiceCard({
               <div
                 className="absolute bottom-full right-0 mb-1 opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 ease-out bg-gray-800 text-white text-xs px-2 py-1 rounded shadow-md whitespace-nowrap z-50"
               >
-                Subí una imagen para revisión
+                Sube una imagen para que un admin valide tu servicio.
               </div>
             )}
           </div>

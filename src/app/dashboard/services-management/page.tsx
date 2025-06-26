@@ -8,6 +8,7 @@ import { fetchActiveServices, deactivateService } from "@/services/dashboard/ser
 import { Ticket, Servicio } from "@/types";
 import { useToast } from "@/context/ToastContext";
 import { FaTools } from "react-icons/fa";
+import Image from "next/image";
 
 export default function ServicesMenuPage() {
   // Solicitudes pendientes
@@ -20,6 +21,7 @@ export default function ServicesMenuPage() {
   const [servicesPage, setServicesPage] = useState(1);
   const [loadingServiceId, setLoadingServiceId] = useState<string | undefined>();
   const [search, setSearch] = useState("");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const { showToast } = useToast();
 
@@ -87,7 +89,27 @@ export default function ServicesMenuPage() {
 
   return (
     <div className="min-h-screen flex bg-gray-100">
-      <Sidebar />
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        workerRequests={requests.length}
+      />
+      <header className="lg:hidden sticky top-0 z-30 bg-gradient-to-r from-purple-800 to-indigo-900 p-4 flex justify-between items-center shadow-lg">
+        <Image
+          src="/img/logosl.png"
+          alt="logo"
+          width={120}
+          height={120}
+          className="object-contain filter brightness-125"
+        />
+        <button
+          onClick={() => setIsSidebarOpen(true)}
+          className="text-white hover:text-gray-300 transition-colors duration-200 p-2 rounded-full hover:bg-white/10"
+          aria-label="Abrir menú"
+        >
+          <FaTools className="text-2xl" />
+        </button>
+      </header>
       <main className="flex-1 p-6 md:p-10">
         <h1 className="text-4xl font-extrabold mb-10 text-black flex items-center gap-3">
           <FaTools className="text-blue-600" /> Gestión de Servicios

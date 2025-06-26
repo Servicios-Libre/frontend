@@ -10,10 +10,12 @@ type ImageData = {
 
 export default function ImageCarousel({
     images,
-    heightClass = "h-48", // Nuevo prop con valor por defecto
+    heightClass = "h-48",
+    objectPosition = "center", // 🔧 NUEVO: permite pasar "top", "bottom", etc.
 }: {
     images: ImageData[];
-    heightClass?: string; // Declara el nuevo prop como opcional y de tipo string
+    heightClass?: string;
+    objectPosition?: "center" | "top" | "bottom"; // podés extender si querés
 }) {
     const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -39,8 +41,8 @@ export default function ImageCarousel({
                     src={images[currentIndex].photo_url}
                     alt={`Imagen ${currentIndex + 1}`}
                     fill
-                    style={{ objectFit: "cover" }}
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" // Optimizado para diferentes tamaños de pantalla
+                    style={{ objectFit: "cover", objectPosition }} // 🔧 Aplica la prop aquí
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
             </div>
 

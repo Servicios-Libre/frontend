@@ -3,6 +3,8 @@ import Image from "next/image";
 import { WorkerService } from "@/types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { editarServicio } from "@/services/serviciosService";
+import { useAuth } from "@/context/AuthContext";
 
 type Props = {
   service: WorkerService;
@@ -17,6 +19,7 @@ export default function EditServiceModal({ service, isOpen, onClose, onSave }: P
   const [previewImages, setPreviewImages] = useState<{ id?: string; photo_url: string }[]>(service.work_photos);
   const [newFilesArray, setNewFilesArray] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const { token } = useAuth() || {};
 
   useEffect(() => {
     return () => {
@@ -59,23 +62,39 @@ export default function EditServiceModal({ service, isOpen, onClose, onSave }: P
     setPreviewImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = () => {
-    const dataTransfer = new DataTransfer();
-    newFilesArray.forEach((file) => dataTransfer.items.add(file));
-    const finalNewFilesList = dataTransfer.files;
+  const handleSubmit = async () => {
 
-    onSave(
-      {
-        ...service,
+    if (!token) {
+      console.error("No hay token, no se puede actualizar el servicio.");
+      return;
+    }
+
+    try {
+      await editarServicio(service.id, {
         title,
         description,
-        work_photos: previewImages.filter(
-          (img): img is { id: string; photo_url: string } => typeof img.id === "string"
-        ),
-      },
-      finalNewFilesList
-    );
-    onClose();
+      }, token);
+
+      const dataTransfer = new DataTransfer();
+      newFilesArray.forEach((file) => dataTransfer.items.add(file));
+      const finalNewFilesList = dataTransfer.files;
+
+      onSave(
+        {
+          ...service,
+          title,
+          description,
+          work_photos: previewImages.filter(
+            (img): img is { id: string; photo_url: string } => typeof img.id === "string"
+          ),
+        },
+        finalNewFilesList
+      );
+
+      onClose();
+    } catch (error) {
+      console.error("Error al actualizar el servicio:", error);
+    }
   };
 
   if (!isOpen) return null;
