@@ -4,9 +4,6 @@ import { ChatMessage, ChatContract } from '@/types';
 import { useState, useRef, useEffect } from 'react';
 import ContractForm from './ContractForm';
 import ContractView from './ContractView';
-import { getSocket } from '@/services/chat/socket';
-import useSound from "use-sound";
-import { toast } from "react-toastify";
 
 interface ChatBoxProps {
   messages: ChatMessage[];
@@ -15,7 +12,6 @@ interface ChatBoxProps {
   contract: ChatContract | null;
   onContractCreate: (contract: ChatContract) => void;
   onContractAccept: () => void;
-  chatId: string;
   otherUserName?: string;
   clienteName: string;
   trabajadorName: string;
@@ -28,7 +24,6 @@ const ChatBox = ({
   contract,
   onContractCreate,
   onContractAccept,
-  chatId,
   otherUserName = "Usuario",
   clienteName,
   trabajadorName
@@ -38,9 +33,6 @@ const ChatBox = ({
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const [showContractForm, setShowContractForm] = useState(false);
 
-  // Usa el sonido desde public/assets/notification.mp3
-  const [play] = useSound("/assets/notification.mp3", { volume: 0.5 });
-
   useEffect(() => {
     setLocalMessages(messages);
   }, [messages]);
@@ -48,28 +40,6 @@ const ChatBox = ({
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [localMessages]);
-
-  useEffect(() => {
-    const socket = getSocket();
-    socket.emit("joinRoom", chatId);
-
-    const handleReceive = (msg: ChatMessage) => {
-      setLocalMessages(prev => [...prev, msg]);
-      // Notificación con sonido si el mensaje es de otro usuario
-      if (msg.senderId !== currentUserId) {
-        console.log("mensaje: ", msg);
-        toast.info("¡Nuevo mensaje recibido!");
-        play();
-      }
-    };
-
-    socket.on("receiveMessage", handleReceive);
-    console.log("receiveMessage", handleReceive);
-
-    return () => {
-      socket.off("receiveMessage", handleReceive);
-    };
-  }, [chatId, currentUserId, play]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,7 +58,7 @@ const ChatBox = ({
         <span className="font-semibold text-gray-700">{otherUserName}</span>
       </div>
 
-      {/* Nueva sección para mostrar cliente y trabajador */}
+      {/* Info rápida de cliente y trabajador */}
       <div className="flex items-center justify-between bg-gray-100 rounded-lg px-4 py-2 mb-2">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-blue-200 flex items-center justify-center text-blue-800 font-bold">

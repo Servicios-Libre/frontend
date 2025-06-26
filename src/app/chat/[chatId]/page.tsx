@@ -7,6 +7,8 @@ import { useParams } from 'next/navigation';
 import axios from 'axios';
 import { useAuthUser } from '@/hooks/useAuthUser';
 import { getSocket } from "@/services/chat/socket";
+import useSound from "use-sound";
+import { toast } from "react-toastify";
 
 export default function ChatDemo() {
   const params = useParams();
@@ -16,6 +18,7 @@ export default function ChatDemo() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [contract, setContract] = useState<ChatContract | null>(null);
   const [loading, setLoading] = useState(true);
+  const [play] = useSound("/assets/notification.mp3", { volume: 0.5 });
 
   // Mientras el backend no devuelve info de usuarios, usa valores por defecto
   const clienteName = "Cliente";
@@ -67,6 +70,11 @@ export default function ChatDemo() {
       setMessages(prev => {
         // Evita duplicados por id
         if (prev.some(m => m.id === msg.id)) return prev;
+        // Notificación solo si el mensaje es de otro usuario
+        if (msg.sender !== user.id) {
+          toast.info("¡Nuevo mensaje recibido!");
+          play();
+        }
         return [
           ...prev,
           {
@@ -84,7 +92,7 @@ export default function ChatDemo() {
       socket.off("newMessage");
       socket.off("connect");
     };
-  }, [chatId, user?.id]);
+  }, [chatId, user?.id, play]);
 
   if (loading || !user?.id) return <div className="pt-24 text-center">Cargando...</div>;
 
@@ -98,7 +106,6 @@ export default function ChatDemo() {
               messages={messages}
               onSend={handleSendMessage}
               currentUserId={user.id}
-              chatId={chatId}
               contract={contract}
               onContractCreate={handleContractCreate}
               onContractAccept={handleContractAccept}
