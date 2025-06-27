@@ -110,9 +110,7 @@ export default function ChatDemo() {
 
         {/* Panel derecho: ChatBox */}
         <section className="flex-1 flex flex-col h-[calc(100vh-5rem)] bg-white/90 shadow-inner relative">
-          {loading ? (
-            <div className="flex-1 flex items-center justify-center text-gray-500">Cargando chat...</div>
-          ) : (
+          {!loading && (
             <ChatBox
               messages={messages}
               onSend={handleSendMessage}
