@@ -20,8 +20,8 @@ export default function ChatDemo() {
   const [chats, setChats] = useState<any[]>([]);
   const [loadingChats, setLoadingChats] = useState(true);
 
-  const clienteName = "Cliente";
-  const trabajadorName = "Trabajador";
+  const [clienteName, setClienteName] = useState("Cliente");
+  const [trabajadorName, setTrabajadorName] = useState("Trabajador");
 
   useEffect(() => {
     if (!user?.id || !token) return;
@@ -41,7 +41,25 @@ export default function ChatDemo() {
       .get(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/${chatId}/messages`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => setMessages(res.data.messages))
+      .then((res) => {
+        setMessages(res.data.messages);
+
+        const { user1, user2 } = res.data;
+
+        if (!user1 || !user2) return;
+
+        if (user1.role === "worker" && user2.role === "user") {
+          setTrabajadorName(user1.name);
+          setClienteName(user2.name);
+        } else if (user2.role === "worker" && user1.role === "user") {
+          setTrabajadorName(user2.name);
+          setClienteName(user1.name);
+        } else {
+          // fallback si roles no están claros
+          setTrabajadorName("Trabajador");
+          setClienteName("Cliente");
+        }
+      })
       .finally(() => setLoading(false));
   }, [chatId, token]);
 
