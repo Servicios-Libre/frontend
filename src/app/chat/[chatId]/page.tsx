@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import ChatBox from '@/components/chat/ChatBox';
-import { ChatMessage, ChatContract } from '@/types';
-import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import axios from 'axios';
-import { useAuthUser } from '@/hooks/useAuthUser';
+import ChatBox from "@/components/chat/ChatBox";
+import { ChatMessage, ChatContract } from "@/types";
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import axios from "axios";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 export default function ChatDemo() {
   const params = useParams();
@@ -26,42 +26,56 @@ export default function ChatDemo() {
   useEffect(() => {
     if (!user?.id || !token) return;
     setLoadingChats(true);
-    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/inbox`, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => setChats(res.data))
+    axios
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/inbox`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => setChats(res.data))
       .finally(() => setLoadingChats(false));
   }, [user, token]);
 
   useEffect(() => {
     if (!chatId || !token) return;
     setLoading(true);
-    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/${chatId}/messages`, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => setMessages(res.data.menssages))
+    axios
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/${chatId}/messages`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => setMessages(res.data.messages))
       .finally(() => setLoading(false));
   }, [chatId, token]);
 
   const handleSendMessage = async (text: string) => {
     if (!user?.id || !token) return;
-    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/${chatId}/messages`, {
-      senderId: user.id,
-      message: text,
-      timestamp: new Date().toISOString(),
-    }, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/chat/${chatId}/messages`,
+      {
+        senderId: user.id,
+        message: text,
+        timestamp: new Date().toISOString(),
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    return response.data; // <-- ESTA línea es la clave
   };
 
   const handleContractCreate = (contractData: ChatContract) => {
     setContract(contractData);
   };
   const handleContractAccept = () => {
-    if (contract) setContract(prev => prev && { ...prev, accepted: true });
+    if (contract) setContract((prev) => prev && { ...prev, accepted: true });
   };
 
-  if (!user) return <div className="pt-24 text-center">Debes iniciar sesión para ver tus chats.</div>;
+  if (!user)
+    return (
+      <div className="pt-24 text-center">
+        Debes iniciar sesión para ver tus chats.
+      </div>
+    );
 
   return (
     <div className="min-h-screen flex bg-[#ece5dd] overflow-hidden">
@@ -74,12 +88,16 @@ export default function ChatDemo() {
         </div>
         <div className="flex-1 overflow-y-auto">
           {loadingChats ? (
-            <div className="text-center py-8 text-gray-500">Cargando chats...</div>
+            <div className="text-center py-8 text-gray-500">
+              Cargando chats...
+            </div>
           ) : chats.length === 0 ? (
-            <div className="text-center py-8 text-gray-400">No tienes chats activos.</div>
+            <div className="text-center py-8 text-gray-400">
+              No tienes chats activos.
+            </div>
           ) : (
             <ul className="divide-y divide-gray-100">
-              {chats.map(chat => (
+              {chats.map((chat) => (
                 <li
                   key={chat.id}
                   className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-blue-50 transition
@@ -90,9 +108,15 @@ export default function ChatDemo() {
                     {chat.otherUserName?.[0]?.toUpperCase() || "?"}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-semibold truncate">{chat.otherUserName}</div>
+                    <div className="font-semibold truncate">
+                      {chat.otherUserName}
+                    </div>
                     <div className="text-xs text-gray-500 truncate">
-                      {chat.lastMessage?.message || <span className="italic text-gray-400">Sin mensajes aún</span>}
+                      {chat.lastMessage?.message || (
+                        <span className="italic text-gray-400">
+                          Sin mensajes aún
+                        </span>
+                      )}
                     </div>
                   </div>
                 </li>

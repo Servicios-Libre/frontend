@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { ChatMessage, ChatContract } from '@/types';
-import { useState, useRef, useEffect } from 'react';
-import ContractForm from './ContractForm';
-import ContractView from './ContractView';
-import { FaPaperPlane } from 'react-icons/fa';
+import { ChatMessage, ChatContract } from "@/types";
+import { useState, useRef, useEffect } from "react";
+import ContractForm from "./ContractForm";
+import ContractView from "./ContractView";
+import { FaPaperPlane } from "react-icons/fa";
 
 interface ChatBoxProps {
   messages: ChatMessage[];
-  onSend: (message: string) => void;
+  onSend: (message: string) => Promise<ChatMessage>;
   currentUserId: string;
   contract: ChatContract | null;
   onContractCreate: (contract: ChatContract) => void;
@@ -17,17 +17,17 @@ interface ChatBoxProps {
   trabajadorName: string;
 }
 
-const ChatBox = ({ 
-  messages, 
-  onSend, 
-  currentUserId, 
+const ChatBox = ({
+  messages,
+  onSend,
+  currentUserId,
   contract,
   onContractCreate,
   onContractAccept,
   clienteName,
-  trabajadorName
+  trabajadorName,
 }: ChatBoxProps) => {
-  const [newMessage, setNewMessage] = useState('');
+  const [newMessage, setNewMessage] = useState("");
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>(messages);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
@@ -38,14 +38,22 @@ const ChatBox = ({
   }, [messages]);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (newMessage.trim() === '') return;
-    await onSend(newMessage.trim());
-    setNewMessage('');
+    if (newMessage.trim() === "") return;
+
+    const msg = await onSend(newMessage.trim());
+    if (msg) {
+      setLocalMessages((prev) => [...prev, msg]);
+    }
+
+    setNewMessage("");
     setTimeout(scrollToBottom, 100);
   };
 
@@ -60,7 +68,9 @@ const ChatBox = ({
           </div>
           <div>
             <span className="font-bold text-gray-800">{clienteName}</span>
-            <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-semibold">Cliente</span>
+            <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-semibold">
+              Cliente
+            </span>
           </div>
         </div>
         {/* Trabajador */}
@@ -70,7 +80,9 @@ const ChatBox = ({
           </div>
           <div>
             <span className="font-bold text-gray-800">{trabajadorName}</span>
-            <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded font-semibold">Trabajador</span>
+            <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded font-semibold">
+              Trabajador
+            </span>
           </div>
         </div>
       </div>
@@ -106,24 +118,36 @@ const ChatBox = ({
         className="flex-1 min-h-0 overflow-y-auto px-6 py-4 space-y-2 bg-[#ece5dd] relative"
         ref={messagesContainerRef}
       >
-        {localMessages?.map((msg) => {
+        {(localMessages || []).map((msg) => {
           const isOwn = msg.senderId === currentUserId;
           return (
             <div
               key={msg.id}
-              className={`flex ${isOwn ? 'justify-end' : 'justify-start'} animate-fade-in`}
+              className={`flex ${
+                isOwn ? "justify-end" : "justify-start"
+              } animate-fade-in`}
             >
-              <div className={`
+              <div
+                className={`
                 relative px-5 py-3 rounded-2xl shadow-sm transition-all duration-200
-                ${isOwn
-                  ? 'bg-gradient-to-br from-blue-500 to-blue-700 text-white rounded-br-[0.75rem]'
-                  : 'bg-white border border-gray-200 text-gray-900 rounded-bl-[0.75rem]'
+                ${
+                  isOwn
+                    ? "bg-gradient-to-br from-blue-500 to-blue-700 text-white rounded-br-[0.75rem]"
+                    : "bg-white border border-gray-200 text-gray-900 rounded-bl-[0.75rem]"
                 }
                 max-w-[70%]
-              `}>
+              `}
+              >
                 <p className="break-words">{msg.message}</p>
-                <span className={`block text-xs mt-2 text-right ${isOwn ? 'text-blue-100' : 'text-gray-400'}`}>
-                  {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                <span
+                  className={`block text-xs mt-2 text-right ${
+                    isOwn ? "text-blue-100" : "text-gray-400"
+                  }`}
+                >
+                  {new Date(msg.timestamp).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                 </span>
               </div>
             </div>
@@ -135,8 +159,8 @@ const ChatBox = ({
       {/* Input sticky abajo */}
       <div className="sticky bottom-0 left-0 right-0 px-6 py-2 bg-[#f0f0f0]">
         {contract && !contract.accepted && (
-          <ContractView 
-            contract={contract} 
+          <ContractView
+            contract={contract}
             onAccept={onContractAccept}
             onCancel={() => setShowContractForm(false)}
           />
@@ -152,7 +176,7 @@ const ChatBox = ({
         )}
 
         {showContractForm && (
-          <ContractForm 
+          <ContractForm
             onSubmit={onContractCreate}
             onCancel={() => setShowContractForm(false)}
           />
@@ -171,7 +195,7 @@ const ChatBox = ({
           <button
             type="submit"
             className="flex items-center justify-center px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow transition-all duration-150"
-            disabled={newMessage.trim() === ''}
+            disabled={newMessage.trim() === ""}
             aria-label="Enviar mensaje"
           >
             <FaPaperPlane className="text-lg" />
@@ -184,8 +208,14 @@ const ChatBox = ({
           animation: fadeIn 0.4s;
         }
         @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px);}
-          to { opacity: 1; transform: translateY(0);}
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
       `}</style>
     </div>
