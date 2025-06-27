@@ -23,6 +23,7 @@ interface AuthContextType {
   loading: boolean;
   setToken: (token: string | null) => void;
   logout: () => void;
+  unreadCount: number;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -59,6 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setTokenState] = useState<string | null>(getInitialToken());
   const [user, setUser] = useState<JwtPayload | null>(getInitialUser());
   const [loading, setLoading] = useState(true);
+  const [unreadCount] = useState(0);
 
   useEffect(() => {
     setLoading(false);
@@ -92,7 +94,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ token, user, loading, setToken, logout }}>
+    <AuthContext.Provider value={{ token, user, loading, setToken, logout, unreadCount }}>
       {children}
     </AuthContext.Provider>
   );
