@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { getWorkerById, addPhotosToService } from "@/services/worker-profile/workerServices";
 import { User, WorkerService } from "@/types";
@@ -39,7 +40,6 @@ export default function WorkerProfileClient({ id }: { id: string }) {
         setUser(data);
         setLoading(false);
 
-        // Buscar el servicio si hay serviceId en la URL
         if (serviceIdFromQuery) {
           const found = data.services.find((s) => s.id === serviceIdFromQuery);
           if (found) {
@@ -64,37 +64,42 @@ export default function WorkerProfileClient({ id }: { id: string }) {
     }
 
     try {
-      const uploadedPhotos = await addPhotosToService(updatedService.id, newFiles);
+      let uploadedPhotos: { id: string; photo_url: string; }[] = [];
+
+      if (newFiles && newFiles.length > 0) {
+        uploadedPhotos = await addPhotosToService(updatedService.id, newFiles);
+      }
+
       setUser((prev) =>
         prev
           ? {
-            ...prev,
-            services: prev.services.map((s) =>
-              s.id === updatedService.id
-                ? {
-                  ...s,
-                  title: updatedService.title,
-                  description: updatedService.description,
-                  work_photos: [
-                    ...s.work_photos.filter((img) => typeof img.id === "string"),
-                    ...uploadedPhotos,
-                  ],
-                }
-                : s
-            ),
-          }
+              ...prev,
+              services: prev.services.map((s) =>
+                s.id === updatedService.id
+                  ? {
+                      ...s,
+                      title: updatedService.title,
+                      description: updatedService.description,
+                      work_photos: [
+                        ...updatedService.work_photos, // ya vienen filtradas las eliminadas
+                        ...uploadedPhotos,
+                      ],
+                    }
+                  : s
+              ),
+            }
           : prev
       );
     } catch (err) {
-      console.error("Error al añadir fotos:", err);
-      setError("Error al guardar las nuevas fotos.");
+      console.error("Error al guardar los cambios del servicio:", err);
+      setError("Error al guardar los cambios.");
     } finally {
       setIsSaving(false);
     }
   };
 
   if (loading) return <p className="text-center py-10">Cargando perfil...</p>;
-  if (isSaving) return <p className="text-center py-10">Guardando fotos...</p>;
+  if (isSaving) return <p className="text-center py-10">Guardando cambios...</p>;
   if (error) return <p className="text-center py-10 text-red-500">{error}</p>;
   if (!user) return <p className="text-center py-10">Trabajador no encontrado.</p>;
 

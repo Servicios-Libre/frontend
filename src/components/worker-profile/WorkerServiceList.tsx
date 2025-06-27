@@ -1,30 +1,57 @@
 import { WorkerService } from "@/types";
 import WorkerServiceCard from "./WorkerServiceCard";
 import EditServiceModal from "./EditServiceModal";
-import ServiceDetailModal from "./ServiceDetailModal"; // <-- Importo el modal de detalle
-import { useState } from "react";
+import ServiceDetailModal from "./ServiceDetailModal";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import StartChatButton from "./StartChatButton";
+import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import { eliminarServicio } from "@/services/serviciosService";
+import { useToast } from "@/context/ToastContext";
 
 export default function WorkerServiceList({
   services,
   onSave,
   isOwner,
   openDetailInitially,
-  workerId, // <-- NUEVO: recibe el workerId como prop
+  workerId,
 }: {
   services: WorkerService[];
   onSave: (updated: WorkerService, newFiles: FileList | null) => void;
   isOwner: boolean;
   openDetailInitially?: WorkerService | null;
-  workerId: string; // <-- NUEVO: tipado
+  workerId: string;
 }) {
   const [editingService, setEditingService] = useState<WorkerService | null>(null);
   const [detailedService, setDetailedService] = useState<WorkerService | null>(openDetailInitially ?? null);
+  const { showToast } = useToast();
+  const [serviceToDelete, setServiceToDelete] = useState<WorkerService | null>(null);
+  const [servicesState, setServicesState] = useState<WorkerService[]>(services);
+
+  // Si cambian los servicios desde el padre, se actualiza
+  useEffect(() => {
+    setServicesState(services);
+  }, [services]);
 
   const visibleServices = isOwner
-    ? services
-    : services.filter((s) => s.ticket?.status === "accepted");
+    ? servicesState
+    : servicesState.filter((s) => s.ticket?.status === "accepted");
+
+  const handleConfirmDelete = async () => {
+    if (!serviceToDelete) return;
+
+    try {
+      await eliminarServicio(serviceToDelete.id);
+      showToast("Servicio eliminado exitosamente", "success");
+
+      // Elimina del estado local
+      setServicesState((prev) => prev.filter((s) => s.id !== serviceToDelete.id));
+      setServiceToDelete(null);
+    } catch (err) {
+      showToast("Error al eliminar el servicio", "error");
+      console.error("Error al eliminar servicio:", err);
+    }
+  };
 
   return (
     <section className="w-full max-w-5xl py-6">
@@ -53,7 +80,8 @@ export default function WorkerServiceList({
               service={service}
               onEdit={setEditingService}
               isOwner={isOwner}
-              onDetail={setDetailedService} // paso función para abrir modal detalle
+              onDetail={setDetailedService}
+              onDelete={setServiceToDelete}
             />
           ))
         ) : (
@@ -61,7 +89,6 @@ export default function WorkerServiceList({
         )}
       </div>
 
-      {/* Modal edición (solo owner) */}
       {editingService && (
         <EditServiceModal
           service={{ ...editingService, ticket: editingService.ticket ?? undefined }}
@@ -71,12 +98,20 @@ export default function WorkerServiceList({
         />
       )}
 
-      {/* Modal detalle (solo usuarios comunes, no owner) */}
       {detailedService && !isOwner && (
         <ServiceDetailModal
           service={detailedService}
-          workerId={workerId} // <-- PASA EL workerId AQUÍ
+          workerId={workerId}
           onClose={() => setDetailedService(null)}
+        />
+      )}
+
+      {serviceToDelete && (
+        <ConfirmDeleteModal
+          service={serviceToDelete}
+          isOpen={!!serviceToDelete}
+          onClose={() => setServiceToDelete(null)}
+          onConfirm={handleConfirmDelete}
         />
       )}
     </section>
