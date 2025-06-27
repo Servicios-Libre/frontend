@@ -106,7 +106,7 @@ const ChatBox = ({
         className="flex-1 min-h-0 overflow-y-auto px-6 py-4 space-y-2 bg-[#ece5dd] relative"
         ref={messagesContainerRef}
       >
-        {localMessages.map((msg) => {
+        {localMessages?.map((msg) => {
           const isOwn = msg.senderId === currentUserId;
           return (
             <div
