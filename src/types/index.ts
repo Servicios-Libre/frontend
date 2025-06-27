@@ -53,9 +53,13 @@ export interface Servicio {
     id: string;
     name: string;
     email: string;
-    // agrega más campos si tu backend los envía
   };
-  user?: string; // opcional, para compatibilidad
+  user?: string;
+  ticket?: {
+    id: string;
+    status: string;
+    type: string;
+  };
 }
 
 export enum TicketStatus {
@@ -144,7 +148,7 @@ export interface WorkerRequestTicket {
   type: "to-worker" | "service";
   status: "pending" | "accepted" | "rejected";
   created_at: string;
-  user: UserBasic;
+  user: User;
 }
 
 // User completo para dashboard (con role, email, premium, etc)

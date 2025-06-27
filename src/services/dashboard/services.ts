@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Servicio } from "@/types";
 import axios from "axios";
+import api from "@/services/axiosConfig";
 const API = process.env.NEXT_PUBLIC_API_URL || "";
 
 function getToken() {
@@ -28,7 +29,7 @@ export async function fetchActiveServices(page = 1, limit = 10, search = ""): Pr
   const params: any = { page, limit };
   if (search) params.search = search;
   try {
-    const res = await axiosInstance.get("/services", { params });
+    const res = await api.get("/services", { params });
     return {
       services: res.data.servicios || [],
       total: res.data.total || 0,
@@ -36,6 +37,24 @@ export async function fetchActiveServices(page = 1, limit = 10, search = ""): Pr
   } catch (error) {
     throw new Error("Error al obtener servicios activos");
   }
+}
+
+export async function fetchAllActiveServices(search = ""): Promise<Servicio[]> {
+  const limit = 50;
+  let page = 1;
+  let allServices: Servicio[] = [];
+  let totalFetched = 0;
+  let total = Infinity;
+
+  while (totalFetched < total) {
+    const { services, total: totalFromServer } = await fetchActiveServices(page, limit, search);
+    allServices = allServices.concat(services);
+    totalFetched += services.length;
+    total = totalFromServer;
+    page++;
+  }
+
+  return allServices;
 }
 
 export async function deactivateService(serviceId: string) {
