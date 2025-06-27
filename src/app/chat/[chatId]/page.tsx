@@ -39,7 +39,7 @@ export default function ChatDemo() {
     axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/${chatId}/messages`, {
       headers: { Authorization: `Bearer ${token}` }
     })
-      .then(res => setMessages(res.data))
+      .then(res => setMessages(res.data.menssages))
       .finally(() => setLoading(false));
   }, [chatId, token]);
 
@@ -66,7 +66,7 @@ export default function ChatDemo() {
   return (
     <div className="min-h-screen flex bg-[#ece5dd] overflow-hidden">
       {/* Fondo decorativo tipo WhatsApp */}
-      <div className="fixed inset-0 z-0 bg-[url('/img/whatsapp-bg.png')] bg-repeat opacity-20 pointer-events-none" />
+      <div className="fixed inset-0 z-0 bg-repeat opacity-20 pointer-events-none" />
       {/* Panel izquierdo */}
       <aside className="hidden md:flex flex-col w-full max-w-xs h-screen bg-white/80 border-r border-gray-200 z-10 overflow-y-auto">
         <div className="p-4 border-b bg-white/90">

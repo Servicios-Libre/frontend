@@ -1,25 +1,27 @@
 'use client';
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { FaRegComments } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
 import { UserDropdown, MobileUserSection } from "./UserSections";
-import { FaRegComments } from "react-icons/fa";
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
+    const [mounted, setMounted] = useState(false);
     const auth = useAuth();
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     if (!auth) {
         return null;
     }
 
-    const { user, logout } = auth;
-
-    // Simulación de mensajes sin leer (reemplaza por tu lógica real)
-    const unreadCount = 2; // <-- Cambia esto por tu estado real
+    const { user, logout, unreadCount } = auth;
 
     return (
         <>
@@ -44,8 +46,8 @@ export default function Navbar() {
                         <Link href="/servicios" className="text-white font-medium hover:underline-offset-0 ml-6">Servicios</Link>
                         <Link href="/sobre-nosotros" className="text-white font-medium hover:underline-offset-0 ml-6">Sobre nosotros</Link>
                         <Link href="/ayuda" className="text-white font-medium hover:underline-offset-0 ml-6">Ayuda</Link>
-                        {/* Icono de chat solo si está logueado */}
-                        {user && (
+                        {/* Icono de chat solo si está logueado y el componente está montado */}
+                        {mounted && user && (
                             <Link href="/chat" className="relative ml-6 group">
                                 <FaRegComments className="text-2xl hover:text-amber-400 transition" />
                                 {/* Badge de notificaciones */}
@@ -80,8 +82,8 @@ export default function Navbar() {
                     <Link href="/servicios" className="block py-2 hover:underline" onClick={() => setIsOpen(!isOpen)}>Servicios</Link>
                     <Link href="/sobre-nosotros" className="block py-2 hover:underline" onClick={() => setIsOpen(!isOpen)}>Sobre nosotros</Link>
                     <Link href="/ayuda" className="block py-2 hover:underline" onClick={() => setIsOpen(!isOpen)}>Ayuda</Link>
-                    {/* Icono de chat solo si está logueado */}
-                    {user && (
+                    {/* Icono de chat solo si está logueado y el componente está montado */}
+                    {mounted && user && (
                         <Link href="/chat" className="block py-2 hover:underline" onClick={() => setIsOpen(!isOpen)}>
                             <span className="inline-flex items-center gap-2 relative">
                                 <FaRegComments className="inline" /> Chats

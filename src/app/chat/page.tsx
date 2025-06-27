@@ -17,6 +17,10 @@ export default function ChatInboxPage() {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => setChats(res.data))
+      .catch(error => {
+        console.error('Error fetching chats:', error.response?.data || error.message);
+        setChats([]);
+      })
       .finally(() => setLoading(false));
   }, [user, token]);
 
@@ -43,11 +47,11 @@ export default function ChatInboxPage() {
                 <div className="flex items-center gap-4">
                   {/* Avatar con inicial */}
                   <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg border border-blue-200">
-                    {chat.otherUserName?.[0]?.toUpperCase() || "?"}
+                    {chat.otherUsername?.[0]?.toUpperCase() || "?"}
                   </div>
                   <div>
                     <div className="font-semibold text-lg group-hover:text-blue-600 transition">
-                      {chat.otherUserName}
+                      {chat.otherUsername}
                     </div>
                     <div className="text-sm text-gray-500 truncate max-w-xs">
                       {chat.lastMessage?.message || <span className="italic text-gray-400">Sin mensajes aún</span>}
