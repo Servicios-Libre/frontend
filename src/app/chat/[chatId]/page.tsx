@@ -72,7 +72,7 @@ export default function ChatDemo() {
     <div className="min-h-screen flex flex-col bg-[#ece5dd]">
       {/* Fondo decorativo tipo WhatsApp */}
       <div className="fixed inset-0 z-0 bg-[url('/img/whatsapp-bg.png')] bg-repeat opacity-20 pointer-events-none" />
-      <main className="flex-1 flex overflow-hidden pt-20">
+      <main className="flex-1 flex min-h-0 h-[calc(100vh-5rem)]"> {/* min-h-0 es clave */}
         {/* Panel izquierdo: Lista de chats */}
         <aside className="hidden md:flex flex-col w-full max-w-xs bg-white/80 border-r border-gray-200 z-10">
           <div className="p-4 border-b bg-white/90">
@@ -109,7 +109,7 @@ export default function ChatDemo() {
         </aside>
 
         {/* Panel derecho: ChatBox */}
-        <section className="flex-1 flex flex-col h-[calc(100vh-5rem)] bg-white/90 shadow-inner relative">
+        <section className="flex-1 flex flex-col h-full min-h-0">
           {!loading && (
             <ChatBox
               messages={messages}

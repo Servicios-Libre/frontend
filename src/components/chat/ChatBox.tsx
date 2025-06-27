@@ -85,13 +85,13 @@ const ChatBox = ({
               <div className={`
                 relative px-5 py-3 rounded-2xl shadow-sm transition-all duration-200
                 ${isOwn
-                  ? 'bg-gradient-to-br from-green-400 to-green-600 text-white rounded-br-[0.75rem]'
+                  ? 'bg-gradient-to-br from-blue-500 to-blue-700 text-white rounded-br-[0.75rem]'
                   : 'bg-white border border-gray-200 text-gray-900 rounded-bl-[0.75rem]'
                 }
                 max-w-[70%]
               `}>
                 <p className="break-words">{msg.message}</p>
-                <span className={`block text-xs mt-2 text-right ${isOwn ? 'text-green-100' : 'text-gray-400'}`}>
+                <span className={`block text-xs mt-2 text-right ${isOwn ? 'text-blue-100' : 'text-gray-400'}`}>
                   {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </span>
               </div>
