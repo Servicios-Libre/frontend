@@ -30,26 +30,33 @@ const ChatBox = ({
   const [newMessage, setNewMessage] = useState('');
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>(messages);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const messagesContainerRef = useRef<HTMLDivElement | null>(null);
   const [showContractForm, setShowContractForm] = useState(false);
 
   useEffect(() => {
     setLocalMessages(messages);
   }, [messages]);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [localMessages]);
+  // Detectar si el usuario no está al final del scroll (ya no se usa showScrollDown)
+  // Puedes eliminar el siguiente useEffect si no usas el botón de bajar al final
+
+  // Función para scrollear al final (por si la necesitas en otro lado)
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newMessage.trim() === '') return;
     await onSend(newMessage.trim());
     setNewMessage('');
+    // Opcional: bajar al final al enviar mensaje
+    setTimeout(scrollToBottom, 100);
   };
 
   return (
     <div className="flex flex-col h-full w-full bg-white">
-      {/* Cabecera sticky */}
+      {/* Cabecera sticky dentro del área de chat */}
       <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-3 bg-[#f0f0f0] border-b shadow-sm">
         {/* Cliente */}
         <div className="flex items-center gap-3">
@@ -72,9 +79,11 @@ const ChatBox = ({
           </div>
         </div>
       </div>
-
       {/* Mensajes con scroll interno */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-6 py-4 space-y-2 bg-[#ece5dd]">
+      <div
+        className="flex-1 min-h-0 overflow-y-auto px-6 py-4 space-y-2 bg-[#ece5dd] relative"
+        ref={messagesContainerRef}
+      >
         {localMessages.map((msg) => {
           const isOwn = msg.senderId === currentUserId;
           return (
@@ -99,9 +108,9 @@ const ChatBox = ({
           );
         })}
         <div ref={messagesEndRef} />
+        {/* Botón de bajar al final eliminado */}
       </div>
-
-      {/* Contrato y formulario + input sticky abajo */}
+      {/* Input sticky abajo */}
       <div className="sticky bottom-0 left-0 right-0 px-6 py-2 bg-[#f0f0f0]">
         {contract && !contract.accepted && (
           <ContractView 
@@ -147,7 +156,6 @@ const ChatBox = ({
           </button>
         </form>
       </div>
-
       {/* Animación fade-in para mensajes nuevos */}
       <style jsx global>{`
         .animate-fade-in {

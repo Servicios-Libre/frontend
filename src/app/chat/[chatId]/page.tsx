@@ -20,11 +20,9 @@ export default function ChatDemo() {
   const [chats, setChats] = useState<any[]>([]);
   const [loadingChats, setLoadingChats] = useState(true);
 
-  // Mientras el backend no devuelve info de usuarios, usa valores por defecto
   const clienteName = "Cliente";
   const trabajadorName = "Trabajador";
 
-  // Cargar lista de chats (panel izquierdo)
   useEffect(() => {
     if (!user?.id || !token) return;
     setLoadingChats(true);
@@ -35,7 +33,6 @@ export default function ChatDemo() {
       .finally(() => setLoadingChats(false));
   }, [user, token]);
 
-  // Cargar mensajes del chat seleccionado (panel derecho)
   useEffect(() => {
     if (!chatId || !token) return;
     setLoading(true);
@@ -46,7 +43,6 @@ export default function ChatDemo() {
       .finally(() => setLoading(false));
   }, [chatId, token]);
 
-  // Envía mensaje real
   const handleSendMessage = async (text: string) => {
     if (!user?.id || !token) return;
     await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/${chatId}/messages`, {
@@ -58,7 +54,6 @@ export default function ChatDemo() {
     });
   };
 
-  // Contrato (si lo usás)
   const handleContractCreate = (contractData: ChatContract) => {
     setContract(contractData);
   };
@@ -69,60 +64,58 @@ export default function ChatDemo() {
   if (!user) return <div className="pt-24 text-center">Debes iniciar sesión para ver tus chats.</div>;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#ece5dd]">
+    <div className="min-h-screen flex bg-[#ece5dd] overflow-hidden">
       {/* Fondo decorativo tipo WhatsApp */}
       <div className="fixed inset-0 z-0 bg-[url('/img/whatsapp-bg.png')] bg-repeat opacity-20 pointer-events-none" />
-      <main className="flex-1 flex min-h-0 h-[calc(100vh-5rem)]">
-        {/* Panel izquierdo */}
-        <aside className="hidden md:flex flex-col w-full max-w-xs bg-white/80 border-r border-gray-200 z-10">
-          <div className="p-4 border-b bg-white/90">
-            <h2 className="text-lg font-bold text-gray-700 mb-2">Chats</h2>
-          </div>
-          <div className="flex-1 overflow-y-auto">
-            {loadingChats ? (
-              <div className="text-center py-8 text-gray-500">Cargando chats...</div>
-            ) : chats.length === 0 ? (
-              <div className="text-center py-8 text-gray-400">No tienes chats activos.</div>
-            ) : (
-              <ul className="divide-y divide-gray-100">
-                {chats.map(chat => (
-                  <li
-                    key={chat.id}
-                    className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-green-50 transition
-                      ${chat.id === chatId ? "bg-green-100/60" : ""}`}
-                    onClick={() => router.push(`/chat/${chat.id}`)}
-                  >
-                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg border border-blue-200">
-                      {chat.otherUserName?.[0]?.toUpperCase() || "?"}
+      {/* Panel izquierdo */}
+      <aside className="hidden md:flex flex-col w-full max-w-xs h-screen bg-white/80 border-r border-gray-200 z-10 overflow-y-auto">
+        <div className="p-4 border-b bg-white/90">
+          <h2 className="text-lg font-bold text-gray-700 mb-2">Chats</h2>
+        </div>
+        <div className="flex-1 overflow-y-auto">
+          {loadingChats ? (
+            <div className="text-center py-8 text-gray-500">Cargando chats...</div>
+          ) : chats.length === 0 ? (
+            <div className="text-center py-8 text-gray-400">No tienes chats activos.</div>
+          ) : (
+            <ul className="divide-y divide-gray-100">
+              {chats.map(chat => (
+                <li
+                  key={chat.id}
+                  className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-blue-50 transition
+                    ${chat.id === chatId ? "bg-blue-100/60" : ""}`}
+                  onClick={() => router.push(`/chat/${chat.id}`)}
+                >
+                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg border border-blue-200">
+                    {chat.otherUserName?.[0]?.toUpperCase() || "?"}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold truncate">{chat.otherUserName}</div>
+                    <div className="text-xs text-gray-500 truncate">
+                      {chat.lastMessage?.message || <span className="italic text-gray-400">Sin mensajes aún</span>}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-semibold truncate">{chat.otherUserName}</div>
-                      <div className="text-xs text-gray-500 truncate">
-                        {chat.lastMessage?.message || <span className="italic text-gray-400">Sin mensajes aún</span>}
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </aside>
-        {/* Panel derecho */}
-        <section className="flex-1 flex flex-col h-full min-h-0">
-          {!loading && (
-            <ChatBox
-              messages={messages}
-              onSend={handleSendMessage}
-              currentUserId={user.id}
-              contract={contract}
-              onContractCreate={handleContractCreate}
-              onContractAccept={handleContractAccept}
-              clienteName={clienteName}
-              trabajadorName={trabajadorName}
-            />
+                  </div>
+                </li>
+              ))}
+            </ul>
           )}
-        </section>
-      </main>
+        </div>
+      </aside>
+      {/* Panel derecho */}
+      <section className="flex-1 flex flex-col h-screen overflow-hidden">
+        {!loading && (
+          <ChatBox
+            messages={messages}
+            onSend={handleSendMessage}
+            currentUserId={user.id}
+            contract={contract}
+            onContractCreate={handleContractCreate}
+            onContractAccept={handleContractAccept}
+            clienteName={clienteName}
+            trabajadorName={trabajadorName}
+          />
+        )}
+      </section>
     </div>
   );
 }
