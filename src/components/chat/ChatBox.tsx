@@ -37,10 +37,6 @@ const ChatBox = ({
     setLocalMessages(messages);
   }, [messages]);
 
-  // Detectar si el usuario no está al final del scroll (ya no se usa showScrollDown)
-  // Puedes eliminar el siguiente useEffect si no usas el botón de bajar al final
-
-  // Función para scrollear al final (por si la necesitas en otro lado)
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   };
@@ -50,13 +46,12 @@ const ChatBox = ({
     if (newMessage.trim() === '') return;
     await onSend(newMessage.trim());
     setNewMessage('');
-    // Opcional: bajar al final al enviar mensaje
     setTimeout(scrollToBottom, 100);
   };
 
   return (
     <div className="flex flex-col h-full w-full bg-white">
-      {/* Cabecera sticky dentro del área de chat */}
+      {/* Cabecera sticky */}
       <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-3 bg-[#f0f0f0] border-b shadow-sm">
         {/* Cliente */}
         <div className="flex items-center gap-3">
@@ -79,6 +74,33 @@ const ChatBox = ({
           </div>
         </div>
       </div>
+
+      {/* Info de usuario (cards) */}
+      <div className="flex gap-6 px-6 py-4 bg-white border-b">
+        {/* Card Cliente */}
+        <div className="flex-1 flex items-center gap-4 bg-white rounded-xl shadow border border-blue-100 p-4">
+          <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xl border-2 border-white shadow">
+            {clienteName.charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <div className="font-semibold text-gray-800">{clienteName}</div>
+            <div className="text-xs text-blue-600 font-bold">Cliente</div>
+            {/* <div className="text-xs text-gray-500">correo@cliente.com</div> */}
+          </div>
+        </div>
+        {/* Card Trabajador */}
+        <div className="flex-1 flex items-center gap-4 bg-white rounded-xl shadow border border-green-100 p-4">
+          <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-xl border-2 border-white shadow">
+            {trabajadorName.charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <div className="font-semibold text-gray-800">{trabajadorName}</div>
+            <div className="text-xs text-green-600 font-bold">Trabajador</div>
+            {/* <div className="text-xs text-gray-500">correo@trabajador.com</div> */}
+          </div>
+        </div>
+      </div>
+
       {/* Mensajes con scroll interno */}
       <div
         className="flex-1 min-h-0 overflow-y-auto px-6 py-4 space-y-2 bg-[#ece5dd] relative"
@@ -108,8 +130,8 @@ const ChatBox = ({
           );
         })}
         <div ref={messagesEndRef} />
-        {/* Botón de bajar al final eliminado */}
       </div>
+
       {/* Input sticky abajo */}
       <div className="sticky bottom-0 left-0 right-0 px-6 py-2 bg-[#f0f0f0]">
         {contract && !contract.accepted && (
