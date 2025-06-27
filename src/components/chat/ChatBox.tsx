@@ -13,7 +13,6 @@ interface ChatBoxProps {
   contract: ChatContract | null;
   onContractCreate: (contract: ChatContract) => void;
   onContractAccept: () => void;
-  otherUserName?: string;
   clienteName: string;
   trabajadorName: string;
 }
@@ -49,9 +48,9 @@ const ChatBox = ({
   };
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-2xl shadow-xl overflow-hidden">
+    <div className="flex flex-col h-full bg-white">
       {/* Cabecera sticky */}
-      <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-white border-b shadow-sm">
+      <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-3 bg-[#f0f0f0] border-b shadow-sm">
         {/* Cliente */}
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-blue-200 flex items-center justify-center text-blue-800 font-bold text-lg border-2 border-white shadow">
@@ -74,8 +73,8 @@ const ChatBox = ({
         </div>
       </div>
 
-      {/* Mensajes con scroll */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-4 py-6 space-y-4 bg-gradient-to-b from-gray-50 to-white">
+      {/* Mensajes */}
+      <div className="flex-1 min-h-0 overflow-y-auto px-6 py-4 space-y-2 bg-[#ece5dd]">
         {localMessages.map((msg) => {
           const isOwn = msg.senderId === currentUserId;
           return (
@@ -84,25 +83,17 @@ const ChatBox = ({
               className={`flex ${isOwn ? 'justify-end' : 'justify-start'} animate-fade-in`}
             >
               <div className={`
-                relative px-5 py-3 rounded-3xl shadow-md transition-all duration-200
+                relative px-5 py-3 rounded-2xl shadow-sm transition-all duration-200
                 ${isOwn
-                  ? 'bg-gradient-to-br from-blue-400 to-blue-600 text-white rounded-br-[0.75rem]'
-                  : 'bg-white border border-gray-200 text-gray-800 rounded-bl-[0.75rem]'
+                  ? 'bg-gradient-to-br from-green-400 to-green-600 text-white rounded-br-[0.75rem]'
+                  : 'bg-white border border-gray-200 text-gray-900 rounded-bl-[0.75rem]'
                 }
-                max-w-[75%]
+                max-w-[70%]
               `}>
                 <p className="break-words">{msg.message}</p>
-                <span className={`block text-xs mt-2 text-right ${isOwn ? 'text-blue-100' : 'text-gray-400'}`}>
+                <span className={`block text-xs mt-2 text-right ${isOwn ? 'text-green-100' : 'text-gray-400'}`}>
                   {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </span>
-                {/* Tail */}
-                <span className={`
-                  absolute bottom-0
-                  ${isOwn
-                    ? 'right-0 translate-x-1/2 bg-blue-500'
-                    : 'left-0 -translate-x-1/2 bg-white border border-gray-200'}
-                  w-3 h-3 rounded-full
-                `}></span>
               </div>
             </div>
           );
@@ -111,7 +102,7 @@ const ChatBox = ({
       </div>
 
       {/* Contrato y formulario */}
-      <div className="px-4 pt-2 pb-0 bg-white">
+      <div className="px-6 py-2 bg-[#f0f0f0]">
         {contract && !contract.accepted && (
           <ContractView 
             contract={contract} 
@@ -135,10 +126,7 @@ const ChatBox = ({
             onCancel={() => setShowContractForm(false)}
           />
         )}
-      </div>
 
-      {/* Input sticky */}
-      <div className="sticky bottom-0 z-10 bg-white px-4 pb-4 pt-2">
         {/* Input de mensaje */}
         <form onSubmit={handleSubmit} className="flex gap-2 mt-2 items-center">
           <input
@@ -146,12 +134,12 @@ const ChatBox = ({
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Escribe un mensaje..."
-            className="flex-1 px-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow text-gray-800 bg-white placeholder-gray-400"
+            className="flex-1 px-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-400 shadow text-gray-800 bg-white placeholder-gray-400"
             aria-label="Escribe un mensaje"
           />
           <button
             type="submit"
-            className="flex items-center justify-center px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow transition-all duration-150"
+            className="flex items-center justify-center px-4 py-3 bg-green-500 hover:bg-green-600 text-white rounded-full shadow transition-all duration-150"
             disabled={newMessage.trim() === ''}
             aria-label="Enviar mensaje"
           >

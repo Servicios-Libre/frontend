@@ -97,10 +97,12 @@ export default function ChatDemo() {
   if (loading || !user?.id) return <div className="pt-24 text-center">Cargando...</div>;
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      <main className="flex-1 flex justify-center items-stretch">
-        <div className="w-full max-w-4xl flex flex-col flex-1">
-          <div className="flex-1 flex flex-col h-full">
+    <div className="min-h-screen flex flex-col bg-[#ece5dd] relative">
+      <main className="flex-1 flex justify-center items-center">
+        {/* Fondo decorativo tipo WhatsApp */}
+        <div className="fixed inset-0 z-0 bg-[url('/img/whatsapp-bg.png')] bg-repeat opacity-20 pointer-events-none" />
+        <section className="relative z-10 w-full max-w-3xl h-[90vh] flex flex-col">
+          <div className="flex-1 flex flex-col rounded-2xl shadow-2xl overflow-hidden border border-gray-200 bg-white">
             <ChatBox
               messages={messages}
               onSend={handleSendMessage}
@@ -112,7 +114,7 @@ export default function ChatDemo() {
               trabajadorName={trabajadorName}
             />
           </div>
-        </div>
+        </section>
       </main>
     </div>
   );
