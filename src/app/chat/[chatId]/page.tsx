@@ -98,10 +98,9 @@ export default function ChatDemo() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
-      <main className="flex-1 flex justify-center items-stretch" style={{ paddingTop: '80px', paddingBottom: '40px' }}>
-        {/* Ajusta paddingTop según el alto real de tu navbar */}
+      <main className="flex-1 flex justify-center items-stretch">
         <div className="w-full max-w-4xl flex flex-col flex-1">
-          <div className="flex-1 flex flex-col bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+          <div className="flex-1 flex flex-col h-full">
             <ChatBox
               messages={messages}
               onSend={handleSendMessage}
