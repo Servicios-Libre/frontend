@@ -3,28 +3,39 @@
 import ChatBox from '@/components/chat/ChatBox';
 import { ChatMessage, ChatContract } from '@/types';
 import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
 import { useAuthUser } from '@/hooks/useAuthUser';
-import { getSocket } from "@/services/chat/socket";
-import useSound from "use-sound";
-import { toast } from "react-toastify";
 
 export default function ChatDemo() {
   const params = useParams();
   const chatId = params?.chatId as string;
   const { user, token } = useAuthUser();
+  const router = useRouter();
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [contract, setContract] = useState<ChatContract | null>(null);
   const [loading, setLoading] = useState(true);
-  const [play] = useSound("/assets/notification.mp3", { volume: 0.5 });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [chats, setChats] = useState<any[]>([]);
+  const [loadingChats, setLoadingChats] = useState(true);
 
   // Mientras el backend no devuelve info de usuarios, usa valores por defecto
   const clienteName = "Cliente";
   const trabajadorName = "Trabajador";
 
-  // Carga mensajes reales
+  // Cargar lista de chats (panel izquierdo)
+  useEffect(() => {
+    if (!user?.id || !token) return;
+    setLoadingChats(true);
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/inbox`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => setChats(res.data))
+      .finally(() => setLoadingChats(false));
+  }, [user, token]);
+
+  // Cargar mensajes del chat seleccionado (panel derecho)
   useEffect(() => {
     if (!chatId || !token) return;
     setLoading(true);
@@ -55,64 +66,65 @@ export default function ChatDemo() {
     if (contract) setContract(prev => prev && { ...prev, accepted: true });
   };
 
-  useEffect(() => {
-    if (!chatId || !user?.id) return;
-
-    const socket = getSocket();
-    socket.on("connect", () => {
-      console.log("Socket conectado:", socket.id);
-    });
-
-    // Unirse a la sala con el nombre correcto
-    socket.emit("joinChat", { chatRoom: `chat_${chatId}` });
-
-    socket.on("newMessage", (msg) => {
-      setMessages(prev => {
-        // Evita duplicados por id
-        if (prev.some(m => m.id === msg.id)) return prev;
-        // Notificación solo si el mensaje es de otro usuario
-        if (msg.sender !== user.id) {
-          toast.info("¡Nuevo mensaje recibido!");
-          play();
-        }
-        return [
-          ...prev,
-          {
-            ...msg,
-            message: msg.content,
-            senderId: msg.sender,
-            timestamp: msg.createdAt || msg.timestamp
-          }
-        ];
-      });
-    });
-
-    return () => {
-      socket.emit("leaveChat", { chatRoom: `chat_${chatId}` });
-      socket.off("newMessage");
-      socket.off("connect");
-    };
-  }, [chatId, user?.id, play]);
-
-  if (loading || !user?.id) return <div className="pt-24 text-center">Cargando...</div>;
+  if (!user) return <div className="pt-24 text-center">Debes iniciar sesión para ver tus chats.</div>;
 
   return (
     <div className="min-h-screen flex flex-col bg-[#ece5dd]">
       {/* Fondo decorativo tipo WhatsApp */}
       <div className="fixed inset-0 z-0 bg-[url('/img/whatsapp-bg.png')] bg-repeat opacity-20 pointer-events-none" />
-      <main className="flex-1 flex flex-col">
-        <div className="flex-1 flex flex-col">
-          <ChatBox
-            messages={messages}
-            onSend={handleSendMessage}
-            currentUserId={user.id}
-            contract={contract}
-            onContractCreate={handleContractCreate}
-            onContractAccept={handleContractAccept}
-            clienteName={clienteName}
-            trabajadorName={trabajadorName}
-          />
-        </div>
+      <main className="flex-1 flex overflow-hidden pt-20">
+        {/* Panel izquierdo: Lista de chats */}
+        <aside className="hidden md:flex flex-col w-full max-w-xs bg-white/80 border-r border-gray-200 z-10">
+          <div className="p-4 border-b bg-white/90">
+            <h2 className="text-lg font-bold text-gray-700 mb-2">Chats</h2>
+          </div>
+          <div className="flex-1 overflow-y-auto">
+            {loadingChats ? (
+              <div className="text-center py-8 text-gray-500">Cargando chats...</div>
+            ) : chats.length === 0 ? (
+              <div className="text-center py-8 text-gray-400">No tienes chats activos.</div>
+            ) : (
+              <ul className="divide-y divide-gray-100">
+                {chats.map(chat => (
+                  <li
+                    key={chat.id}
+                    className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-green-50 transition
+                      ${chat.id === chatId ? "bg-green-100/60" : ""}`}
+                    onClick={() => router.push(`/chat/${chat.id}`)}
+                  >
+                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg border border-blue-200">
+                      {chat.otherUserName?.[0]?.toUpperCase() || "?"}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold truncate">{chat.otherUserName}</div>
+                      <div className="text-xs text-gray-500 truncate">
+                        {chat.lastMessage?.message || <span className="italic text-gray-400">Sin mensajes aún</span>}
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </aside>
+
+        {/* Panel derecho: ChatBox */}
+        <section className="flex-1 flex flex-col h-[calc(100vh-5rem)] bg-white/90 shadow-inner relative">
+          {loading ? (
+            <div className="flex-1 flex items-center justify-center text-gray-500">Cargando chat...</div>
+          ) : (
+            <ChatBox
+              messages={messages}
+              onSend={handleSendMessage}
+              currentUserId={user.id}
+              contract={contract}
+              onContractCreate={handleContractCreate}
+              onContractAccept={handleContractAccept}
+              clienteName={clienteName}
+              trabajadorName={trabajadorName}
+            />
+          )}
+        </section>
       </main>
     </div>
   );
