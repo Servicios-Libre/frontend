@@ -1,48 +1,57 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import api from "@/services/axiosConfig"; // Ajustá esta ruta si es diferente
 import { User, WorkerService } from "@/types";
-const API = process.env.NEXT_PUBLIC_API_URL || "";
 
-function getToken() {
-  if (typeof window === "undefined") return "";
-  return localStorage.getItem("token") || "";
+export async function fetchAllUsers(): Promise<User[]> {
+  const pageSize = 50;
+  let page = 1;
+  let allUsers: User[] = [];
+
+  while (true) {
+    const res = await api.get("/users", {
+      params: {
+        page,
+        limit: pageSize,
+      },
+    });
+
+    const { users } = res.data;
+    allUsers = [...allUsers, ...users];
+
+    if (users.length < pageSize) break;
+    page++;
+  }
+
+  return allUsers;
 }
 
-export async function fetchWorkers(page = 1, limit = 10, search = ""): Promise<{ users: User[]; total: number }> {
-  const params = new URLSearchParams({ role: "worker", page: String(page), limit: String(limit) });
-  if (search) params.append("search", search);
-  const res = await fetch(`${API}/users?${params.toString()}`, {
-    headers: { Authorization: `Bearer ${getToken()}` },
-    cache: "no-store",
-  });
-  if (!res.ok) throw new Error("Error al obtener trabajadores");
-  return res.json();
+export async function fetchWorkers(page = 1, limit = 5, search = ""): Promise<{ users: User[]; total: number }> {
+  const params: Record<string, string> = {
+    role: "worker",
+    page: String(page),
+    limit: String(limit),
+  };
+  if (search) params.search = search;
+
+  const res = await api.get("/users", { params });
+  return res.data;
 }
 
 export async function downgradeWorker(userId: string) {
-  const token = getToken();
-  await fetch(`${API}/users/to-user/${userId}`, {
-    method: "PUT",
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  await api.put(`/users/to-user/${userId}`);
 }
 
 export async function fetchUserProfile(userId: string) {
-  const res = await fetch(`${API}/users/byId?id=${userId}`, {
-    headers: { Authorization: `Bearer ${getToken()}` },
-    cache: "no-store",
+  const res = await api.get(`/users/byId`, {
+    params: { id: userId },
   });
-  if (!res.ok) throw new Error("Error al obtener perfil");
-  return res.json();
+  return res.data;
 }
 
 export async function fetchWorkerServices(userId: string): Promise<WorkerService[]> {
-  const res = await fetch(`${API}/services/worker/${userId}`, {
-    headers: { Authorization: `Bearer ${getToken()}` },
-    cache: "no-store",
-  });
-  if (!res.ok) throw new Error("Error al obtener servicios");
-  const data = await res.json();
-  // Mapeo seguro a WorkerService[]
+  const res = await api.get(`/services/worker/${userId}`);
+  const data = res.data;
+
   return data.map((s: any): WorkerService => ({
     id: s.id,
     title: s.title,
@@ -50,9 +59,9 @@ export async function fetchWorkerServices(userId: string): Promise<WorkerService
     category: s.category ?? { id: "", name: "", icon: "" },
     work_photos: Array.isArray(s.work_photos)
       ? s.work_photos.map((wp: any) => ({
-          id: wp.id ?? "",
-          photo_url: wp.photo_url ?? "",
-        }))
+        id: wp.id ?? "",
+        photo_url: wp.photo_url ?? "",
+      }))
       : [],
   }));
 }

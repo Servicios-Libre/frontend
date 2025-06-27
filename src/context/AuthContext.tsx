@@ -28,7 +28,14 @@ interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuth = () => useContext(AuthContext);
+// Aquí la corrección importante:
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth debe usarse dentro de un AuthProvider");
+  }
+  return context;
+};
 
 const getInitialToken = () => {
   if (typeof window !== "undefined") {
@@ -71,7 +78,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(null);
       }
     } else {
-      // Solo actualizamos el estado si hay cambios
       if (token !== null) {
         localStorage.removeItem('token');
         setTokenState(null);
@@ -80,13 +86,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Logout global: borra token local y cierra sesión NextAuth
   const logout = useCallback(() => {
-    // 1. Limpia el token local SIEMPRE primero
     localStorage.removeItem('token');
     setTokenState(null);
     setUser(null);
-    // 2. Luego llama a signOut (esto desmonta el árbol y redirige)
     signOut({ callbackUrl: "/landing" });
   }, []);
 
