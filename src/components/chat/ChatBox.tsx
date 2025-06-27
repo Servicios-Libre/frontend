@@ -48,7 +48,7 @@ const ChatBox = ({
   };
 
   return (
-    <div className="flex flex-col h-full bg-white">
+    <div className="flex flex-col h-full w-full bg-white">
       {/* Cabecera sticky */}
       <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-3 bg-[#f0f0f0] border-b shadow-sm">
         {/* Cliente */}
