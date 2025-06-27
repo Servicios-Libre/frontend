@@ -73,7 +73,7 @@ const ChatBox = ({
         </div>
       </div>
 
-      {/* Mensajes */}
+      {/* Mensajes con scroll interno */}
       <div className="flex-1 min-h-0 overflow-y-auto px-6 py-4 space-y-2 bg-[#ece5dd]">
         {localMessages.map((msg) => {
           const isOwn = msg.senderId === currentUserId;
@@ -101,8 +101,8 @@ const ChatBox = ({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Contrato y formulario */}
-      <div className="px-6 py-2 bg-[#f0f0f0]">
+      {/* Contrato y formulario + input sticky abajo */}
+      <div className="sticky bottom-0 left-0 right-0 px-6 py-2 bg-[#f0f0f0]">
         {contract && !contract.accepted && (
           <ContractView 
             contract={contract} 
@@ -114,7 +114,7 @@ const ChatBox = ({
         {!contract && (
           <button
             onClick={() => setShowContractForm(true)}
-            className="w-full mb-4 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md font-semibold transition"
+            className="w-full mb-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md font-semibold transition"
           >
             Crear Contrato
           </button>
@@ -134,12 +134,12 @@ const ChatBox = ({
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Escribe un mensaje..."
-            className="flex-1 px-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-400 shadow text-gray-800 bg-white placeholder-gray-400"
+            className="flex-1 px-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow text-gray-800 bg-white placeholder-gray-400"
             aria-label="Escribe un mensaje"
           />
           <button
             type="submit"
-            className="flex items-center justify-center px-4 py-3 bg-green-500 hover:bg-green-600 text-white rounded-full shadow transition-all duration-150"
+            className="flex items-center justify-center px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow transition-all duration-150"
             disabled={newMessage.trim() === ''}
             aria-label="Enviar mensaje"
           >
