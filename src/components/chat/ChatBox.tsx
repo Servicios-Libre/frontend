@@ -49,7 +49,7 @@ const ChatBox = ({
   };
 
   return (
-    <div className="bg-white shadow-xl rounded-2xl flex flex-col h-full overflow-hidden">
+    <div className="flex flex-col h-[80vh] max-h-[800px] bg-white rounded-2xl shadow-xl overflow-hidden">
       {/* Cabecera sticky */}
       <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-white border-b shadow-sm">
         {/* Cliente */}
@@ -74,7 +74,7 @@ const ChatBox = ({
         </div>
       </div>
 
-      {/* Mensajes */}
+      {/* Mensajes con scroll */}
       <div className="flex-1 min-h-0 overflow-y-auto px-4 py-6 space-y-4 bg-gradient-to-b from-gray-50 to-white">
         {localMessages.map((msg) => {
           const isOwn = msg.senderId === currentUserId;
@@ -135,7 +135,10 @@ const ChatBox = ({
             onCancel={() => setShowContractForm(false)}
           />
         )}
+      </div>
 
+      {/* Input sticky */}
+      <div className="sticky bottom-0 z-10 bg-white px-4 pb-4 pt-2">
         {/* Input de mensaje */}
         <form onSubmit={handleSubmit} className="flex gap-2 mt-2 items-center">
           <input
