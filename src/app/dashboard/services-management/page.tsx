@@ -92,7 +92,6 @@ export default function ServicesMenuPage() {
       <Sidebar
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
-        workerRequests={requests.length}
       />
       <header className="lg:hidden sticky top-0 z-30 bg-gradient-to-r from-purple-800 to-indigo-900 p-4 flex justify-between items-center shadow-lg">
         <Image
