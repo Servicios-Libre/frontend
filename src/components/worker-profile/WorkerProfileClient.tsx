@@ -8,7 +8,11 @@ import WorkerServiceList from "./WorkerServiceList";
 import { jwtDecode } from "jwt-decode";
 import { useSearchParams } from "next/navigation";
 
-export default function WorkerProfileClient({ id }: { id: string }) {
+type WorkerProfileClientProps = {
+  id: string;
+};
+
+export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
