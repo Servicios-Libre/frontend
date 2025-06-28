@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import { useEffect } from "react";
 import { useSession } from "next-auth/react";
@@ -15,28 +16,19 @@ export default function GoogleAuthSync() {
   const auth = useAuth();
 
   useEffect(() => {
-    // Si la sesión está autenticada y hay backendJwt, setea el token
-    if (
-      status === "authenticated" &&
-      session?.backendJwt &&
-      auth?.token !== session.backendJwt
-    ) {
-      localStorage.setItem("token", session.backendJwt);
-      if (auth && auth.setToken) {
-        auth.setToken(session.backendJwt);
+    if (status === "authenticated" && session?.backendJwt) {
+      // Solo setear token si todavía no está
+      if (auth?.token !== session.backendJwt) {
+        localStorage.setItem("token", session.backendJwt);
+        auth?.setToken?.(session.backendJwt);
       }
     }
 
-    // Solo borramos el token si:
-    // 1. La sesión está NO autenticada
-    // 2. Y el token actual es un token de Google (tiene backendJwt)
-    if (status === "unauthenticated" && session?.backendJwt) {
+    if (status === "unauthenticated") {
       localStorage.removeItem("token");
-      if (auth && auth.setToken) {
-        auth.setToken(null);
-      }
+      auth?.setToken?.(null);
     }
-  }, [session?.backendJwt, status, auth?.token, auth]);
+  }, [status, session?.backendJwt]); // Simplificamos deps
 
   return null;
 }
