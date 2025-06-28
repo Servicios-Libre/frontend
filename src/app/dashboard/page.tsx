@@ -10,14 +10,13 @@ import {
   FaUserTie,
   FaArrowRight,
   FaClock,
-  FaBars,
   FaInfoCircle,
 } from 'react-icons/fa';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useState } from 'react';
 import { useAdminContext } from '@/context/AdminContext';
 import { LoadingScreen } from '@/components/dashboard/LoadingScreen';
+import MobileHeader from "@/components/dashboard/MobileHeader";
 
 export default function DashboardPage() {
   const { users, loading, acceptedServiceCount } = useAdminContext();
@@ -46,22 +45,8 @@ export default function DashboardPage() {
       />
 
       <div className="flex-1 flex flex-col">
-        <header className="lg:hidden sticky top-0 z-30 bg-gradient-to-r from-purple-800 to-indigo-900 p-4 flex justify-between items-center shadow-lg">
-          <Image
-            src="/img/logosl.png"
-            alt="logo"
-            width={120}
-            height={120}
-            className="object-contain filter brightness-125"
-          />
-          <button
-            onClick={() => setIsSidebarOpen(true)}
-            className="text-white hover:text-gray-300 p-2 rounded-full hover:bg-white/10"
-            aria-label="Abrir menú"
-          >
-            <FaBars className="text-2xl" />
-          </button>
-        </header>
+
+        <MobileHeader onOpenSidebar={() => setIsSidebarOpen(true)} />
 
         <main className="flex-1 p-8 text-white">
           <h1 className="hidden lg:block text-3xl font-bold mb-8 tracking-wide">Panel de Administración</h1>
