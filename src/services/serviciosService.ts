@@ -31,3 +31,19 @@ export const editarServicio = async (
 
   return response.data;
 };
+
+export const eliminarServicio = async (id: string) => {
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+  if (!token) {
+    throw new Error("No autorizado: token no disponible");
+  }
+
+  const response = await api.delete(`/services/delete/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
+};

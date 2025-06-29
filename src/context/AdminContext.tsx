@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { User, Servicio } from "@/types";
+import { User, Servicio, WorkerRequestTicket } from "@/types";
 import { fetchAllUsers } from "@/services/dashboard/worker";
 import { fetchAllActiveServices } from "@/services/dashboard/services";
 import { fetchWorkerRequests } from "@/services/dashboard/tickets";
@@ -14,8 +14,9 @@ interface AdminContextProps {
   acceptedServiceCount: number;
   refreshAcceptedServices?: () => Promise<void>;
   workerRequestsCount: number;
+  workerRequests: WorkerRequestTicket[]; // ✅ NUEVO
   refreshWorkerRequests: () => Promise<void>;
-  isReady: boolean; // ✅ NUEVO
+  isReady: boolean;
 }
 
 const AdminContext = createContext<AdminContextProps>({
@@ -23,15 +24,17 @@ const AdminContext = createContext<AdminContextProps>({
   loading: true,
   refreshUsers: async () => {},
   acceptedServiceCount: 0,
+  workerRequests: [],
   workerRequestsCount: 0,
   refreshWorkerRequests: async () => {},
-  isReady: false, // ✅ NUEVO
+  isReady: false,
 });
 
 export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
   const { token, loading: authLoading, user } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [acceptedServiceCount, setAcceptedServiceCount] = useState(0);
+  const [workerRequests, setWorkerRequests] = useState<WorkerRequestTicket[]>([]);
   const [workerRequestsCount, setWorkerRequestsCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -64,9 +67,11 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
     if (!token || !isAdmin) return;
     try {
       const requests = await fetchWorkerRequests();
+      setWorkerRequests(requests);
       setWorkerRequestsCount(requests.length);
     } catch (error) {
       console.error("Error al cargar solicitudes de worker", error);
+      setWorkerRequests([]);
       setWorkerRequestsCount(0);
     }
   };
@@ -77,6 +82,7 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
     if (!token || !isAdmin) {
       setUsers([]);
       setAcceptedServiceCount(0);
+      setWorkerRequests([]);
       setWorkerRequestsCount(0);
       setLoading(false);
       return;
@@ -102,9 +108,10 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
         refreshUsers,
         acceptedServiceCount,
         refreshAcceptedServices,
+        workerRequests,
         workerRequestsCount,
         refreshWorkerRequests,
-        isReady: !loading, // ✅ Esto es clave
+        isReady: !loading,
       }}
     >
       {children}

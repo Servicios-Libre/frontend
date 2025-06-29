@@ -5,17 +5,21 @@ import Sidebar from "@/components/dashboard/Sidebar";
 import {
   acceptWorkerRequest,
   rejectWorkerRequest,
-  fetchWorkerRequests
+  fetchWorkerRequests,
 } from "@/services/dashboard/tickets";
 import { downgradeWorker } from "@/services/dashboard/worker";
 import { User, WorkerRequestTicket } from "@/types";
 import { useToast } from "@/context/ToastContext";
 import { FaUserCheck, FaUserCog } from "react-icons/fa";
 import RequestProfileModal from "@/components/dashboard/worker-menu/RequestProfileModal";
-import Link from "next/link";
 import { useAdminContext } from "@/context/AdminContext";
 import { useAuth } from "@/context/AuthContext";
 import { LoadingScreen } from "@/components/dashboard/LoadingScreen";
+import { WorkersList } from "@/components/dashboard/worker-menu/WorkersList";
+import { RequestsList } from "@/components/dashboard/worker-menu/RequestsList";
+import { SearchInput } from "@/components/dashboard/SearchInput";
+import Pagination from "@/components/dashboard/Pagination";
+import MobileHeader from "@/components/dashboard/MobileHeader";
 
 export default function WorkerManagementPage() {
   const {
@@ -33,8 +37,37 @@ export default function WorkerManagementPage() {
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const { showToast } = useToast();
 
+  const [currentRequestPage, setCurrentRequestPage] = useState(1);
+  const requestsPerPage = 5;
+
+  const [currentWorkerPage, setCurrentWorkerPage] = useState(1);
+  const workersPerPage = 5;
+
+  const [searchTerm, setSearchTerm] = useState("");
+
   const isAdmin = authUser?.role === "admin";
   const workers = users.filter((u) => u.role === "worker");
+
+  const filteredWorkers = workers.filter((worker) =>
+    worker.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    worker.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalRequestPages = Math.ceil(requests.length / requestsPerPage);
+  const paginatedRequests = requests.slice(
+    (currentRequestPage - 1) * requestsPerPage,
+    currentRequestPage * requestsPerPage
+  );
+
+  const totalWorkerPages = Math.ceil(filteredWorkers.length / workersPerPage);
+  const paginatedWorkers = filteredWorkers.slice(
+    (currentWorkerPage - 1) * workersPerPage,
+    currentWorkerPage * workersPerPage
+  );
+
+  useEffect(() => {
+    setCurrentWorkerPage(1);
+  }, [searchTerm]);
 
   useEffect(() => {
     if (!token || !isAdmin) {
@@ -47,7 +80,7 @@ export default function WorkerManagementPage() {
   }, [token, isAdmin, showToast]);
 
   const handleViewRequestProfile = (basicUser: User) => {
-    const fullUser = users.find(u => u.id === basicUser.id);
+    const fullUser = users.find((u) => u.id === basicUser.id);
     if (fullUser) {
       setRequestProfile(fullUser);
       setIsRequestModalOpen(true);
@@ -96,10 +129,7 @@ export default function WorkerManagementPage() {
     setLoadingId(undefined);
   };
 
-  // 🚫 Protege el render hasta que esté listo (previene hydration error)
-  if (!isReady) {
-    return <LoadingScreen />;
-  }
+  if (!isReady) return <LoadingScreen />;
 
   if (!isAdmin) {
     return (
@@ -110,64 +140,48 @@ export default function WorkerManagementPage() {
   }
 
   return (
-    <div className="min-h-screen flex bg-indigo-950">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-indigo-950">
+      {/* Overlay mobile */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-30 z-40 lg:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
+      {/* Header mobile */}
+      <MobileHeader onOpenSidebar={() => setIsSidebarOpen(true)} />
+
       <main className="flex-1 p-6 md:p-10 text-white">
+
+        {/* Título principal */}
         <h1 className="text-3xl font-bold mb-10 flex items-center gap-3">
           <FaUserCog className="text-indigo-400" /> Gestión de Trabajadores
         </h1>
 
         {/* Solicitudes pendientes */}
         <section className="mb-12">
-          <div className="mb-4">
-            <h2 className="text-2xl font-semibold mb-2 flex items-center gap-2">
-              <FaUserCheck className="text-emerald-400" /> Solicitudes pendientes
-              {requests.length > 0 && (
-                <span className="ml-2 bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full text-sm font-medium">
-                  {requests.length} nuevas
-                </span>
-              )}
-            </h2>
-            <div className="grid gap-4">
-              {requests.map((req) => (
-                <div
-                  key={req.id}
-                  className="bg-indigo-800 rounded-xl p-4 shadow-md flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:bg-indigo-700 transition"
-                >
-                  <div>
-                    <p className="text-lg font-semibold">{req.user.name}</p>
-                    <p className="text-sm text-indigo-200">{req.user.email}</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleAccept(req)}
-                      disabled={loadingId === req.id}
-                      className="bg-emerald-500 hover:bg-emerald-400 text-white font-semibold py-1 px-4 rounded-lg text-sm"
-                    >
-                      {loadingId === req.id ? "Procesando..." : "Aceptar"}
-                    </button>
-                    <button
-                      onClick={() => handleReject(req)}
-                      disabled={loadingId === req.id}
-                      className="bg-red-500 hover:bg-red-400 text-white font-semibold py-1 px-4 rounded-lg text-sm"
-                    >
-                      {loadingId === req.id ? "Procesando..." : "Rechazar"}
-                    </button>
-                    <button
-                      onClick={() => handleViewRequestProfile(req.user)}
-                      className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-1 px-4 rounded-lg text-sm"
-                    >
-                      Ver perfil
-                    </button>
-                  </div>
-                </div>
-              ))}
-              {requests.length === 0 && (
-                <p className="text-indigo-300 text-center">No hay solicitudes pendientes.</p>
-              )}
-            </div>
-          </div>
+          <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+            <FaUserCheck className="text-emerald-400" /> Solicitudes pendientes
+            {requests.length > 0 && (
+              <span className="ml-2 bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full text-sm font-medium">
+                {requests.length} nuevas
+              </span>
+            )}
+          </h2>
+
+          <RequestsList
+            requests={paginatedRequests}
+            onViewProfile={handleViewRequestProfile}
+          />
+
+          <Pagination
+            totalPages={totalRequestPages}
+            currentPage={currentRequestPage}
+            onPageChange={setCurrentRequestPage}
+          />
         </section>
 
         {/* Trabajadores activos */}
@@ -176,46 +190,41 @@ export default function WorkerManagementPage() {
             <FaUserCog className="text-indigo-400" /> Trabajadores activos
           </h2>
 
-          {usersLoading ? (
-            <p>Cargando trabajadores...</p>
-          ) : workers.length === 0 ? (
-            <p className="text-indigo-300">No hay trabajadores activos.</p>
-          ) : (
-            <div className="grid gap-4">
-              {workers.map((worker) => (
-                <div
-                  key={worker.id}
-                  className="bg-indigo-800 rounded-xl p-4 shadow-md flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:bg-indigo-700 transition"
-                >
-                  <div>
-                    <p className="text-lg font-semibold">{worker.name}</p>
-                    <p className="text-sm text-indigo-200">{worker.email}</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleDowngrade(worker)}
-                      disabled={loadingId === worker.id}
-                      className={`${loadingId === worker.id ? "opacity-60 cursor-wait" : ""
-                        } bg-red-500 hover:bg-red-400 text-white font-semibold py-1 px-4 rounded-lg text-sm`}
-                    >
-                      {loadingId === worker.id ? "Procesando..." : "Dar de baja"}
-                    </button>
-                    <Link href={`/worker-profile/${worker.id}`}>
-                      <button className="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-1 px-4 rounded-lg text-sm">
-                        Ver perfil
-                      </button>
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          <div className="mb-4">
+            <SearchInput
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              placeholder="Buscar trabajador..."
+            />
+          </div>
+
+          <WorkersList
+            workers={paginatedWorkers}
+            loading={usersLoading}
+            loadingId={loadingId}
+            onDowngrade={handleDowngrade}
+          />
+
+          <Pagination
+            totalPages={totalWorkerPages}
+            currentPage={currentWorkerPage}
+            onPageChange={setCurrentWorkerPage}
+          />
         </section>
 
+        {/* Modal de perfil de solicitud */}
         <RequestProfileModal
           user={requestProfile}
           open={isRequestModalOpen}
           onClose={() => setIsRequestModalOpen(false)}
+          onAccept={(userId) => {
+            const ticket = requests.find((t) => t.user.id === userId);
+            if (ticket) handleAccept(ticket);
+          }}
+          onReject={(userId) => {
+            const ticket = requests.find((t) => t.user.id === userId);
+            if (ticket) handleReject(ticket);
+          }}
         />
       </main>
     </div>

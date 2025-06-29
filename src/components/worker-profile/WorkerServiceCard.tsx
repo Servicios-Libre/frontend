@@ -7,12 +7,14 @@ export default function WorkerServiceCard({
   service,
   onEdit,
   isOwner,
-  onDetail, // nuevo prop opcional
+  onDetail,
+  onDelete,
 }: {
   service: WorkerService;
   onEdit: (service: WorkerService) => void;
   isOwner: boolean;
   onDetail?: (service: WorkerService) => void;
+  onDelete: (service: WorkerService) => void;
 }) {
   const imagesToShow = service.work_photos.length > 0
     ? service.work_photos
@@ -76,7 +78,10 @@ export default function WorkerServiceCard({
             </button>
 
             <button
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(service); // <-- Aquí
+              }}
               className="cursor-pointer absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-md transition z-20"
               aria-label="Eliminar servicio"
               title="Eliminar servicio"
@@ -102,9 +107,9 @@ export default function WorkerServiceCard({
 
             {statusKey === "pending" && (
               <div
-                className="absolute bottom-full right-0 mb-1 opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 ease-out bg-gray-800 text-white text-xs px-2 py-1 rounded shadow-md whitespace-nowrap z-50"
+                className="absolute bottom-full right-0 mb-1 opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 ease-out bg-gray-800 text-white text-xs px-2 py-1 rounded shadow-md whitespace-nowrap z-99"
               >
-                Sube una imagen para que un admin valide tu servicio.
+                Solo se validan servícios con imagenes.
               </div>
             )}
           </div>
