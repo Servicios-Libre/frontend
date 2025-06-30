@@ -24,6 +24,13 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
   const serviceIdFromQuery = searchParams.get("serviceId");
 
   useEffect(() => {
+    document.title = `Servicio Libre - ${user?.name}`
+    return () => {
+      document.title = 'Servicio Libre'
+    }
+  }, [user?.name])
+
+  useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       try {
