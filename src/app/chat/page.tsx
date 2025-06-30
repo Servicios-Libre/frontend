@@ -50,7 +50,7 @@ export default function ChatInboxPage() {
                     {chat.otherUsername?.[0]?.toUpperCase() || "?"}
                   </div>
                   <div>
-                    <div className="font-semibold text-lg group-hover:text-blue-600 transition">
+                    <div className="font-semibold text-black text-lg group-hover:text-blue-600 transition">
                       {chat.otherUsername}
                     </div>
                     <div className="text-sm text-gray-500 truncate max-w-xs">

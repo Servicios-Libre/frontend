@@ -55,7 +55,6 @@ export default function ChatDemo() {
           setTrabajadorName(user2.name);
           setClienteName(user1.name);
         } else {
-          // fallback si roles no están claros
           setTrabajadorName("Trabajador");
           setClienteName("Cliente");
         }
@@ -78,7 +77,7 @@ export default function ChatDemo() {
       }
     );
 
-    return response.data; // <-- ESTA línea es la clave
+    return response.data;
   };
 
   const handleContractCreate = (contractData: ChatContract) => {
@@ -96,11 +95,12 @@ export default function ChatDemo() {
     );
 
   return (
-    <div className="min-h-screen flex bg-[#ece5dd] overflow-hidden">
+    <div className="min-h-screen flex bg-[#ece5dd] overflow-x-auto overflow-y-hidden">
       {/* Fondo decorativo tipo WhatsApp */}
       <div className="fixed inset-0 z-0 bg-repeat opacity-20 pointer-events-none" />
+      
       {/* Panel izquierdo */}
-      <aside className="hidden md:flex flex-col w-full max-w-xs h-screen bg-white/80 border-r border-gray-200 z-10 overflow-y-auto">
+      <aside className="hidden md:flex flex-col w-full max-w-xs h-screen pt-20 bg-white/80 border-r border-gray-200 z-10 overflow-y-auto">
         <div className="p-4 border-b bg-white/90">
           <h2 className="text-lg font-bold text-gray-700 mb-2">Chats</h2>
         </div>
@@ -123,11 +123,11 @@ export default function ChatDemo() {
                   onClick={() => router.push(`/chat/${chat.id}`)}
                 >
                   <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg border border-blue-200">
-                    {chat.otherUserName?.[0]?.toUpperCase() || "?"}
+                    {chat.otherUsername?.[0]?.toUpperCase() || "?"}
                   </div>
-                  <div className="flex-1 min-w-0">
+                  <div className="text-black flex-1 min-w-0">
                     <div className="font-semibold truncate">
-                      {chat.otherUserName}
+                      {chat.otherUsername}
                     </div>
                     <div className="text-xs text-gray-500 truncate">
                       {chat.lastMessage?.message || (
@@ -143,8 +143,9 @@ export default function ChatDemo() {
           )}
         </div>
       </aside>
-      {/* Panel derecho */}
-      <section className="flex-1 flex flex-col h-screen overflow-hidden">
+
+      {/* Panel derecho (chat principal) */}
+      <section className="flex-1 flex flex-col h-screen pt-20 overflow-hidden">
         {!loading && (
           <ChatBox
             messages={messages}

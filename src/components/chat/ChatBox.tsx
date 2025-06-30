@@ -59,34 +59,6 @@ const ChatBox = ({
 
   return (
     <div className="flex flex-col h-full w-full bg-white">
-      {/* Cabecera sticky */}
-      <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-3 bg-[#f0f0f0] border-b shadow-sm">
-        {/* Cliente */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-blue-200 flex items-center justify-center text-blue-800 font-bold text-lg border-2 border-white shadow">
-            {clienteName.charAt(0).toUpperCase()}
-          </div>
-          <div>
-            <span className="font-bold text-gray-800">{clienteName}</span>
-            <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-semibold">
-              Cliente
-            </span>
-          </div>
-        </div>
-        {/* Trabajador */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-lg border-2 border-white shadow">
-            {trabajadorName.charAt(0).toUpperCase()}
-          </div>
-          <div>
-            <span className="font-bold text-gray-800">{trabajadorName}</span>
-            <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded font-semibold">
-              Trabajador
-            </span>
-          </div>
-        </div>
-      </div>
-
       {/* Info de usuario (cards) */}
       <div className="flex gap-6 px-6 py-4 bg-white border-b">
         {/* Card Cliente */}
