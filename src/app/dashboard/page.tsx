@@ -13,7 +13,7 @@ import {
   FaInfoCircle,
 } from 'react-icons/fa';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAdminContext } from '@/context/AdminContext';
 import { LoadingScreen } from '@/components/dashboard/LoadingScreen';
 import MobileHeader from "@/components/dashboard/MobileHeader";
@@ -27,7 +27,15 @@ export default function DashboardPage() {
     { id: 2, text: 'Usuario 2 actualizó su perfil.' },
     { id: 3, text: 'Usuario 1 aprobó un servicio.' },
   ];
-
+  
+  useEffect(() => {
+    document.title = "Servicio Libre - Dashboard"
+    
+    return () => {
+      document.title = "Servicio Libre"
+    }
+  }, [])
+  
   if (loading) {
     return <LoadingScreen />;
   }
@@ -36,6 +44,7 @@ export default function DashboardPage() {
   const totalAdmins = users?.filter((u) => u.role === 'admin').length ?? 0;
   const totalWorkers = users?.filter((u) => u.role === 'worker').length ?? 0;
   const totalRegularUsers = users?.filter((u) => u.role === 'user').length ?? 0;
+
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-indigo-950">

@@ -25,6 +25,14 @@ export default function ServicesMenuPage() {
 
   const { showToast } = useToast();
 
+  useEffect(() => {
+    document.title = "Servicio Libre - Manejar servicios"
+
+    return () => {
+      document.title = "Servicio Libre"
+    }
+  }, [])
+
   // Solicitudes pendientes
   useEffect(() => {
     fetchServiceRequests()

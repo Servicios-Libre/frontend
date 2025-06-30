@@ -23,7 +23,15 @@ export default function ChatDemo() {
   const [clienteName, setClienteName] = useState("Cliente");
   const [trabajadorName, setTrabajadorName] = useState("Trabajador");
 
+
   useEffect(() => {
+    let otroNombre = clienteName;
+  if (user?.name === clienteName) {
+    otroNombre = trabajadorName;
+  } else if (user?.name === trabajadorName) {
+    otroNombre = clienteName;
+  }
+  document.title = `Servicio Libre - Chat con ${otroNombre.split(" ")[0]}`;
     if (!user?.id || !token) return;
     setLoadingChats(true);
     axios
@@ -32,7 +40,11 @@ export default function ChatDemo() {
       })
       .then((res) => setChats(res.data))
       .finally(() => setLoadingChats(false));
-  }, [user, token]);
+
+    return () => {
+      document.title = "Servicio Libre"
+    }
+  }, [user, token, clienteName, trabajadorName]);
 
   useEffect(() => {
     if (!chatId || !token) return;

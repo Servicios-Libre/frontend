@@ -1,11 +1,13 @@
 import WorkerProfileClient from "@/components/worker-profile/WorkerProfileClient";
 
-export default async function WorkerProfilePage({
-  params,
-}: {
-  params: Promise<{ workerId: string }>;
-}) {
-  const { workerId } = await params;
+interface WorkerProfilePageProps {
+  params: { workerId: string };
+}
+
+export default function WorkerProfilePage({ params }: WorkerProfilePageProps) {
+  const { workerId } = params;
+
+
   return (
     <div className="bg-white min-h-screen">
       <WorkerProfileClient id={workerId} />

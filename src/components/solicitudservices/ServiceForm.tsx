@@ -31,6 +31,7 @@ export const ServiceForm = () => {
   const auth = useAuth();
 
   useEffect(() => {
+    document.title = "Servicio Libre - Crear servicio"
     const fetchCategories = async () => {
       try {
         const cats = await obtenerCategorias();
@@ -43,6 +44,9 @@ export const ServiceForm = () => {
       }
     };
     fetchCategories();
+     return () => {
+        document.title = "Servicio Libre"
+      }
   }, []);
 
   const { showToast } = useToast();

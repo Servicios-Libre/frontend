@@ -66,6 +66,14 @@ export default function WorkerManagementPage() {
   );
 
   useEffect(() => {
+    document.title = "Servicio Libre - Manejar trabajadores"
+
+    return () => {
+      document.title = "Servicio Libre"
+    }
+  }, [])
+
+  useEffect(() => {
     setCurrentWorkerPage(1);
   }, [searchTerm]);
 
