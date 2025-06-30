@@ -1,14 +1,12 @@
 import { io, Socket } from "socket.io-client";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL
+const URL = process.env.NEXT_PUBLIC_API_URL; // Debe ser la URL de tu backend
 
 let socket: Socket | null = null;
 
-export function connectSocket() {
-    if (!socket) {
-        socket = io(API_URL, { transports: ["websocket"] });
-    }
-    return socket
+export function getSocket() {
+  if (!socket) {
+    socket = io(URL, { transports: ["websocket"] });
+  }
+  return socket;
 }
-
-export const getSocket = () => socket
