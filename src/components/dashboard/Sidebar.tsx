@@ -1,9 +1,19 @@
 "use client";
 
-import Link from 'next/link';
-import Image from 'next/image';
-import { usePathname } from 'next/navigation';
-import { FaThLarge, FaTools, FaUserCog, FaTicketAlt, FaCogs, FaMoneyBill, FaUser, FaQuestionCircle, FaTimes } from 'react-icons/fa';
+import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import {
+  FaThLarge,
+  FaTools,
+  FaUserCog,
+  FaTicketAlt,
+  FaCogs,
+  FaChartBar,
+  FaUserShield,
+  FaSignOutAlt,
+  FaTimes,
+} from "react-icons/fa";
 import { useAdminContext } from "@/context/AdminContext";
 
 interface SidebarProps {
@@ -13,11 +23,10 @@ interface SidebarProps {
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
-  const { workerRequestsCount, isReady } = useAdminContext();
+  const { workerRequestsCount, serviceRequestsCount, isReady } = useAdminContext();
 
   return (
     <>
-      {/* Overlay para mobile */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black opacity-70 z-40 lg:hidden"
@@ -28,7 +37,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       <aside
         className={`fixed inset-y-0 left-0 w-64 bg-gradient-to-t from-purple-700 to-indigo-800 min-h-screen
                    transform transition-transform duration-300 ease-in-out z-50
-                   ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 lg:static lg:shadow-xl`}
+                   ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 lg:static lg:shadow-xl`}
       >
         <div className="p-6 flex justify-between items-start">
           <Image
@@ -48,28 +57,75 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         </div>
 
         <nav className="mt-8 px-4 space-y-2">
-          <p className="text-xs text-gray-300 font-semibold uppercase tracking-wider mb-3">Menú Principal</p>
-
-          <NavLink href="/dashboard" icon={<FaThLarge />} text="Dashboard" pathname={pathname} onClick={onClose} />
-          <NavLink href="/dashboard/services-management" icon={<FaTools />} text="Servicios" pathname={pathname} onClick={onClose} />
+          <p className="text-xs text-gray-300 font-semibold uppercase tracking-wider mb-3">Menú principal</p>
 
           <NavLink
-            href="/dashboard/worker-management"
-            icon={<FaUserCog />}
-            text="Worker Menu"
-            notificationCount={isReady ? workerRequestsCount : undefined} // ✅ solo mostrar si está listo
+            href="/dashboard"
+            icon={<FaThLarge />}
+            text="Dashboard"
             pathname={pathname}
             onClick={onClose}
           />
 
-          <NavLink href="#" icon={<FaTicketAlt />} text="Tickets" pathname={pathname} onClick={onClose} />
+          <NavLink
+            href="/dashboard/services-management"
+            icon={<FaTools />}
+            text="Servicios"
+            notificationCount={isReady ? serviceRequestsCount : undefined}
+            pathname={pathname}
+            onClick={onClose}
+          />
+
+          <NavLink
+            href="/dashboard/worker-management"
+            icon={<FaUserCog />}
+            text="Trabajadores"
+            notificationCount={isReady ? workerRequestsCount : undefined}
+            pathname={pathname}
+            onClick={onClose}
+          />
+
+          <NavLink
+            href="/dashboard/tickets"
+            icon={<FaTicketAlt />}
+            text="Tickets"
+            pathname={pathname}
+            onClick={onClose}
+          />
 
           <p className="text-xs text-gray-300 font-semibold uppercase tracking-wider mt-8 mb-3">Administración</p>
 
-          <NavLink href="#" icon={<FaCogs />} text="Settings" pathname={pathname} onClick={onClose} />
-          <NavLink href="#" icon={<FaMoneyBill />} text="Payment" pathname={pathname} onClick={onClose} />
-          <NavLink href="#" icon={<FaUser />} text="Accounts" pathname={pathname} onClick={onClose} />
-          <NavLink href="#" icon={<FaQuestionCircle />} text="Help" pathname={pathname} onClick={onClose} />
+          <NavLink
+            href="/dashboard/admins"
+            icon={<FaUserShield />}
+            text="Admins"
+            pathname={pathname}
+            onClick={onClose}
+          />
+
+          <NavLink
+            href="/dashboard/stats"
+            icon={<FaChartBar />}
+            text="Estadísticas"
+            pathname={pathname}
+            onClick={onClose}
+          />
+
+          <NavLink
+            href="/dashboard/config"
+            icon={<FaCogs />}
+            text="Configuración"
+            pathname={pathname}
+            onClick={onClose}
+          />
+
+          <NavLink
+            href="/servicios"
+            icon={<FaSignOutAlt />}
+            text="Salir"
+            pathname={pathname}
+            onClick={onClose}
+          />
         </nav>
       </aside>
     </>
@@ -85,13 +141,22 @@ interface NavLinkProps {
   onClick?: () => void;
 }
 
-const NavLink: React.FC<NavLinkProps> = ({ href, icon, text, notificationCount, pathname, onClick }) => {
+const NavLink: React.FC<NavLinkProps> = ({
+  href,
+  icon,
+  text,
+  notificationCount,
+  pathname,
+  onClick,
+}) => {
   const isActive = pathname === href;
 
-  const goldenGradientClasses = 'bg-gradient-to-r from-amber-400 via-amber-200 to-amber-400 text-amber-900 shadow-lg';
-  const hoverClasses = 'hover:bg-white/10 hover:text-white hover:translate-x-1';
-  const activeIconColor = 'text-amber-900';
-  const inactiveIconColor = 'text-gray-200';
+  const goldenGradientClasses =
+    "bg-gradient-to-r from-amber-400 via-amber-200 to-amber-400 text-amber-900 shadow-lg";
+  const hoverClasses =
+    "hover:bg-white/10 hover:text-white hover:translate-x-1";
+  const activeIconColor = "text-amber-900";
+  const inactiveIconColor = "text-gray-200";
 
   return (
     <Link
@@ -100,12 +165,21 @@ const NavLink: React.FC<NavLinkProps> = ({ href, icon, text, notificationCount, 
         ${isActive ? `${goldenGradientClasses} translate-x-2` : `text-gray-200 ${hoverClasses}`}`}
       onClick={onClick}
     >
-      <div className={`text-xl ${isActive ? activeIconColor : `${inactiveIconColor} group-hover:scale-110 transition-transform duration-200`}`}>
+      <div
+        className={`text-xl ${
+          isActive
+            ? activeIconColor
+            : `${inactiveIconColor} group-hover:scale-110 transition-transform duration-200`
+        }`}
+      >
         {icon}
       </div>
       <span className="font-semibold">{text}</span>
       {notificationCount !== undefined && notificationCount > 0 && (
-        <span className="absolute right-3 top-1/2 -translate-y-1/2 bg-yellow-400 text-white text-xs font-bold rounded-full px-2 py-0.5 min-w-[24px] text-center transform scale-90 group-hover:scale-100 transition-transform duration-200 origin-right">
+        <span
+          className={`absolute right-3 top-1/2 -translate-y-1/2 text-white text-xs font-bold rounded-full px-2 py-0.5 min-w-[24px] text-center transform scale-90 group-hover:scale-100 transition-transform duration-200 origin-right
+          ${isActive ? "bg-purple-700" : "bg-amber-500"}`}
+        >
           {notificationCount}
         </span>
       )}

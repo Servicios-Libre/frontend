@@ -1,18 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import api from "@/services/axiosConfig"; // Ajustá esta ruta si es diferente
 import { User, WorkerService } from "@/types";
+import { getSession } from "next-auth/react";
 
 export async function fetchAllUsers(): Promise<User[]> {
+  const session = await getSession();
+  const token = session?.backendJwt;
+
+  if (!token) throw new Error("Token no encontrado");
+
   const pageSize = 50;
   let page = 1;
   let allUsers: User[] = [];
 
   while (true) {
     const res = await api.get("/users", {
-      params: {
-        page,
-        limit: pageSize,
-      },
+      params: { page, limit: pageSize },
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     const { users } = res.data;

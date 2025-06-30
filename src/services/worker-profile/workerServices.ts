@@ -1,9 +1,7 @@
 import api from "@/services/axiosConfig";
 import { User } from "@/types";
 
-export const getWorkerById = async (id: string): Promise<User> => {
-  const token = localStorage.getItem("token");
-
+export const getWorkerById = async (id: string, token?: string): Promise<User> => {
   if (token) {
     try {
       const response = await api.get(`/users/worker/${id}`, {
@@ -34,8 +32,7 @@ export const getWorkerById = async (id: string): Promise<User> => {
   }
 };
 
-export const uploadServiceImages = async (serviceId: string, files: File[]) => {
-  const token = localStorage.getItem("token");
+export const uploadServiceImages = async (serviceId: string, files: File[], token: string) => {
   if (!token) throw new Error("No hay token de autenticación.");
   if (!serviceId) throw new Error("ID de servicio inválido.");
 
@@ -43,7 +40,7 @@ export const uploadServiceImages = async (serviceId: string, files: File[]) => {
 
   const formData = new FormData();
   files.forEach((file) => {
-    formData.append("images", file); // clave correcta
+    formData.append("images", file);
   });
 
   try {
@@ -53,7 +50,7 @@ export const uploadServiceImages = async (serviceId: string, files: File[]) => {
       },
     });
     results.push(res.data);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     if (error.response?.status === 413) {
       throw new Error("La imagen es demasiado grande. Máximo 2MB.");
@@ -71,7 +68,8 @@ export const uploadServiceImages = async (serviceId: string, files: File[]) => {
 
 export const addPhotosToService = async (
   serviceId: string,
-  newFiles: FileList | null
+  newFiles: FileList | null,
+  token: string
 ): Promise<{ id: string; photo_url: string }[]> => {
   if (!newFiles || newFiles.length === 0) {
     return [];
@@ -80,7 +78,7 @@ export const addPhotosToService = async (
   const filesArray = Array.from(newFiles);
 
   try {
-    await uploadServiceImages(serviceId, filesArray);
+    await uploadServiceImages(serviceId, filesArray, token);
     const simulatedUploadedPhotos = filesArray.map((file, index) => ({
       id: `temp-id-${Date.now()}-${index}`,
       photo_url: URL.createObjectURL(file),

@@ -7,6 +7,7 @@ import WorkerHeader from "./WorkerHeader";
 import WorkerServiceList from "./WorkerServiceList";
 import { jwtDecode } from "jwt-decode";
 import { useSearchParams } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 type WorkerProfileClientProps = {
   id: string;
@@ -23,22 +24,28 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
   const searchParams = useSearchParams();
   const serviceIdFromQuery = searchParams.get("serviceId");
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        const decoded = jwtDecode<{ id: string }>(token);
-        if (decoded.id === id) {
-          setIsOwner(true);
-        }
-      } catch (e) {
-        console.error("Error decoding token", e);
-      }
-    }
-  }, [id]);
+  const { token, loading: authLoading } = useAuth(); // 👈 usamos authLoading
 
   useEffect(() => {
-    getWorkerById(id)
+    if (authLoading || !token) return; // 👈 esperamos a que cargue
+    try {
+      const decoded = jwtDecode<{ id: string }>(token);
+      setIsOwner(decoded.id === id);
+    } catch (e) {
+      console.error("Error decoding token", e);
+      setIsOwner(false);
+    }
+  }, [id, token, authLoading]);
+
+  useEffect(() => {
+    if (authLoading) return; // 👈 esperamos que cargue el token
+    if (!token) {
+      setError("No hay token disponible");
+      setLoading(false);
+      return;
+    }
+
+    getWorkerById(id, token)
       .then((data) => {
         setUser(data);
         setLoading(false);
@@ -54,7 +61,7 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
         setError(e.message || "Error al cargar el perfil");
         setLoading(false);
       });
-  }, [id, serviceIdFromQuery]);
+  }, [id, serviceIdFromQuery, token, authLoading]);
 
   const handleSaveService = async (updatedService: WorkerService, newFiles: FileList | null) => {
     setIsSaving(true);
@@ -67,30 +74,30 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
     }
 
     try {
-      let uploadedPhotos: { id: string; photo_url: string; }[] = [];
+      let uploadedPhotos: { id: string; photo_url: string }[] = [];
 
       if (newFiles && newFiles.length > 0) {
-        uploadedPhotos = await addPhotosToService(updatedService.id, newFiles);
+        uploadedPhotos = await addPhotosToService(updatedService.id, newFiles, token!);
       }
 
       setUser((prev) =>
         prev
           ? {
-              ...prev,
-              services: prev.services.map((s) =>
-                s.id === updatedService.id
-                  ? {
-                      ...s,
-                      title: updatedService.title,
-                      description: updatedService.description,
-                      work_photos: [
-                        ...updatedService.work_photos, // ya vienen filtradas las eliminadas
-                        ...uploadedPhotos,
-                      ],
-                    }
-                  : s
-              ),
-            }
+            ...prev,
+            services: prev.services.map((s) =>
+              s.id === updatedService.id
+                ? {
+                  ...s,
+                  title: updatedService.title,
+                  description: updatedService.description,
+                  work_photos: [
+                    ...updatedService.work_photos,
+                    ...uploadedPhotos,
+                  ],
+                }
+                : s
+            ),
+          }
           : prev
       );
     } catch (err) {
@@ -101,7 +108,7 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
     }
   };
 
-  if (loading) return <p className="text-center py-10">Cargando perfil...</p>;
+  if (loading || authLoading) return <p className="text-center py-10">Cargando perfil...</p>;
   if (isSaving) return <p className="text-center py-10">Guardando cambios...</p>;
   if (error) return <p className="text-center py-10 text-red-500">{error}</p>;
   if (!user) return <p className="text-center py-10">Trabajador no encontrado.</p>;
@@ -122,6 +129,16 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
             isOwner={isOwner}
             workerId={user.id}
             openDetailInitially={initialService}
+            onDeleteComplete={(deletedId) => {
+              setUser((prev) =>
+                prev
+                  ? {
+                    ...prev,
+                    services: prev.services.filter((s) => s.id !== deletedId),
+                  }
+                  : prev
+              );
+            }}
           />
         </section>
       </div>

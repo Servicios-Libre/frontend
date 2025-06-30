@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { registerUser, loginUser } from "@/services/authService"; // Asegúrate de importar loginUser
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import axios, { AxiosError } from "axios";
 import CountryCitySelect from "./CountryCitySelect";
-import { useRouter } from "next/navigation"; // Importa useRouter
-import { useAuth } from "@/context/AuthContext";
+import { registerUser } from "@/services/authService";
 
 type Props = {
   setMessage: (msg: string) => void;
@@ -13,8 +13,6 @@ type Props = {
 };
 
 export default function RegisterForm({ setMessage, setError }: Props) {
-  const auth = useAuth();
-
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -29,9 +27,11 @@ export default function RegisterForm({ setMessage, setError }: Props) {
     zip_code: "",
   });
 
-  const router = useRouter(); // Inicializa router
+  const router = useRouter();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setError("");
     setMessage("");
@@ -41,14 +41,33 @@ export default function RegisterForm({ setMessage, setError }: Props) {
     e.preventDefault();
     setError("");
     setMessage("");
+
     const {
-      firstName, lastName, email, password, confirmPassword,
-      phone, street, house_number, city, state, zip_code,
+      firstName,
+      lastName,
+      email,
+      password,
+      confirmPassword,
+      phone,
+      street,
+      house_number,
+      city,
+      state,
+      zip_code,
     } = formData;
 
     if (
-      !firstName || !lastName || !email || !password || !confirmPassword ||
-      !phone || !street || !house_number || !city || !state || !zip_code
+      !firstName ||
+      !lastName ||
+      !email ||
+      !password ||
+      !confirmPassword ||
+      !phone ||
+      !street ||
+      !house_number ||
+      !city ||
+      !state ||
+      !zip_code
     ) {
       setError("Todos los campos son obligatorios.");
       return;
@@ -57,6 +76,7 @@ export default function RegisterForm({ setMessage, setError }: Props) {
       setError("Las contraseñas no coinciden.");
       return;
     }
+
     try {
       const fullName = `${firstName} ${lastName}`;
       await registerUser({
@@ -71,14 +91,22 @@ export default function RegisterForm({ setMessage, setError }: Props) {
         state,
         zip_code,
       });
-      // Login automático después del registro
-      const res = await loginUser(email, password);
-      auth?.setToken(res.token); // Actualiza el contexto y el localStorage
-      setMessage("¡Registro y login exitosos!");
-      setTimeout(() => {
-        router.push("/servicios");
-      }, 1000);
 
+      // Login automático con NextAuth Credentials
+      const result = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
+      });
+
+      if (result?.error) {
+        setError("Error al iniciar sesión después del registro.");
+      } else if (result?.ok) {
+        setMessage("¡Registro y login exitosos!");
+        setTimeout(() => {
+          router.push("/servicios");
+        }, 1000);
+      }
     } catch (err) {
       if (axios.isAxiosError(err)) {
         const axiosError = err as AxiosError<{ message?: string }>;
@@ -99,6 +127,7 @@ export default function RegisterForm({ setMessage, setError }: Props) {
           className="w-full rounded-md border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
           value={formData.firstName}
           onChange={handleChange}
+          required
         />
         <input
           name="lastName"
@@ -107,6 +136,7 @@ export default function RegisterForm({ setMessage, setError }: Props) {
           className="w-full rounded-md border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
           value={formData.lastName}
           onChange={handleChange}
+          required
         />
       </div>
       <input

@@ -6,10 +6,9 @@ import { WorkerService } from "@/types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { editarServicio } from "@/services/serviciosService";
-import { eliminarFotoDeServicio } from "@/services/profileService"; // ⚠️ Agregar esta función en tu servicio
+import { eliminarFotoDeServicio } from "@/services/serviciosService";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
-
 
 type Props = {
   service: WorkerService;
@@ -25,7 +24,8 @@ export default function EditServiceModal({ service, isOpen, onClose, onSave }: P
   const [newFilesArray, setNewFilesArray] = useState<File[]>([]);
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const { token } = useAuth() || {};
+
+  const { token } = useAuth();
   const { showToast } = useToast();
 
   useEffect(() => {
@@ -73,6 +73,8 @@ export default function EditServiceModal({ service, isOpen, onClose, onSave }: P
       setNewFilesArray((prev) =>
         prev.filter((file) => URL.createObjectURL(file) !== img.photo_url)
       );
+    } else {
+      setImagesToDelete((prev) => [...prev, img.id!]);
     }
 
     setPreviewImages((prev) => prev.filter((_, i) => i !== index));
@@ -81,6 +83,7 @@ export default function EditServiceModal({ service, isOpen, onClose, onSave }: P
   const handleSubmit = async () => {
     if (!token) {
       console.error("No hay token, no se puede actualizar el servicio.");
+      showToast("No estás autorizado para realizar esta acción.", "error");
       return;
     }
 
@@ -90,20 +93,24 @@ export default function EditServiceModal({ service, isOpen, onClose, onSave }: P
     }
 
     try {
+      // Eliminar fotos marcadas para borrar
       for (const photoId of imagesToDelete) {
         try {
-          await eliminarFotoDeServicio(service.id, photoId);
+          await eliminarFotoDeServicio(service.id, photoId, token);
         } catch (error) {
           console.error(`Error al eliminar imagen con ID ${photoId}:`, error);
         }
       }
 
+      // Editar servicio con nuevo título y descripción
       await editarServicio(service.id, { title, description }, token);
 
+      // Preparar nuevos archivos para enviar al padre
       const dataTransfer = new DataTransfer();
       newFilesArray.forEach((file) => dataTransfer.items.add(file));
       const finalNewFilesList = dataTransfer.files;
 
+      // Notificar al componente padre
       onSave(
         {
           ...service,
@@ -122,7 +129,6 @@ export default function EditServiceModal({ service, isOpen, onClose, onSave }: P
       showToast("Error al guardar los cambios. Intenta de nuevo.", "error");
     }
   };
-
 
   if (!isOpen) return null;
 
@@ -152,8 +158,9 @@ export default function EditServiceModal({ service, isOpen, onClose, onSave }: P
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Ej: Plomería de emergencia"
-              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:outline-none transition text-gray-800 ${title.trim() === "" ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-500"
-                }`}
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:outline-none transition text-gray-800 ${
+                title.trim() === "" ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-500"
+              }`}
             />
           </div>
 
@@ -167,8 +174,9 @@ export default function EditServiceModal({ service, isOpen, onClose, onSave }: P
               onChange={(e) => setDescription(e.target.value)}
               rows={4}
               placeholder="Describe el servicio..."
-              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:outline-none transition resize-y text-gray-800 ${description.trim() === "" ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-500"
-                }`}
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:outline-none transition resize-y text-gray-800 ${
+                description.trim() === "" ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-500"
+              }`}
             />
           </div>
 
@@ -178,7 +186,10 @@ export default function EditServiceModal({ service, isOpen, onClose, onSave }: P
             </label>
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
               {previewImages.map((img, i) => (
-                <div key={img.id ?? `new-${i}`} className="relative w-full aspect-square rounded-lg overflow-hidden border border-gray-200 group">
+                <div
+                  key={img.id ?? `new-${i}`}
+                  className="relative w-full aspect-square rounded-lg overflow-hidden border border-gray-200 group"
+                >
                   <Image
                     src={img.photo_url}
                     alt={`Foto ${i + 1}`}
