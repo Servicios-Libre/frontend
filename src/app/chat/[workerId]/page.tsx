@@ -1,6 +1,6 @@
 'use client';
 
-import ChatBox from '@/components/chat/ChatBox';
+import ChatBox from '@/components/chat/ChatExample';
 import { ChatMessage, ChatContract, UserBasic } from '@/types';
 import { useState } from 'react';
 
