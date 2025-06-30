@@ -1,23 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { config } from '@fortawesome/fontawesome-svg-core';
-import '@fortawesome/fontawesome-svg-core/styles.css';
-import ClientLayoutWrapper from "@/components/layoutapp/ClientLayoutWrapper";
-import { AuthProvider } from "@/context/AuthContext";
-import { ToastProvider } from "@/context/ToastContext";
-
-config.autoAddCss = false;
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { Providers } from "./providers";
+import GoogleAuthSync from "@/components/auth/GoogleAuthSync";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -31,16 +17,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <AuthProvider>
-          <ToastProvider>
-            <ClientLayoutWrapper>
-
-              {children}
-
-            </ClientLayoutWrapper>
-          </ToastProvider>
-        </AuthProvider>
+      <body>
+        <Providers>
+          <GoogleAuthSync />
+          {children}
+          <ToastContainer position="top-right" autoClose={2500} />
+        </Providers>
       </body>
     </html>
   );

@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from 'react';
 import { obtenerCategorias } from '@/services/categoriasService';
 import Link from 'next/link';
@@ -16,6 +17,7 @@ type Categoria = {
 };
 
 export const ServiceForm = () => {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -27,12 +29,6 @@ export const ServiceForm = () => {
   const [categories, setCategories] = useState<Categoria[]>([]);
   const [catLoading, setCatLoading] = useState(true);
   const auth = useAuth();
-
-  // auth?.user?..forEach(service => {
-  //   console.log("Título del servicio:", service.title);
-  //   console.log("Categoría:", service.category?.name);
-  //   console.log("Descripción:", service.description);
-  // });
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -71,7 +67,6 @@ export const ServiceForm = () => {
 
     setLoading(true);
     try {
-
       if (!auth?.user?.id) {
         showToast("No se pudo obtener el ID del usuario.", "error");
         setLoading(false);
@@ -89,6 +84,10 @@ export const ServiceForm = () => {
       setSuccess(true);
       setFormData({ title: '', description: '', category: '' });
       setErrors({});
+
+      // Redirigir a perfil de worker
+      router.push(`/worker-profile/${auth.user.id}`);
+
     } catch (err) {
       if (axios.isAxiosError(err)) {
         const msg = err.response?.data?.message || "Error al enviar la solicitud.";
@@ -101,7 +100,6 @@ export const ServiceForm = () => {
     } finally {
       setLoading(false);
     }
-
   };
 
   return (

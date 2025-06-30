@@ -1,32 +1,42 @@
 "use client";
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { jwtDecode } from "jwt-decode";
+import { signOut } from "next-auth/react";
+
+type UserRole = "user" | "worker" | "admin" | null;
 
 interface JwtPayload {
   name?: string;
   email?: string;
   id?: string;
-  role?: string;
-  tickets?: [{
-    id: string,
-    type: string,
-    status: string
-  }];
+  role?: UserRole;
+  tickets?: Array<{
+    id: string;
+    type: string;
+    status: string;
+  }>;
 }
 
 interface AuthContextType {
   token: string | null;
   user: JwtPayload | null;
   loading: boolean;
-  setToken: (token: string | null, userData?: JwtPayload) => void;
+  setToken: (token: string | null) => void;
   logout: () => void;
+  unreadCount: number;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuth = () => useContext(AuthContext);
+// Aquí la corrección importante:
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth debe usarse dentro de un AuthProvider");
+  }
+  return context;
+};
 
-// Funciones para obtener el token y el usuario antes del primer render
 const getInitialToken = () => {
   if (typeof window !== "undefined") {
     return localStorage.getItem('token');
@@ -49,38 +59,42 @@ const getInitialUser = () => {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setTokenState] = useState<string | null>(getInitialToken());
   const [user, setUser] = useState<JwtPayload | null>(getInitialUser());
-  const [loading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [unreadCount] = useState(0);
 
-  const setToken = (newToken: string | null, userData?: JwtPayload) => {
+  useEffect(() => {
+    setLoading(false);
+  }, []);
+
+  const setToken = (newToken: string | null) => {
     if (newToken) {
       localStorage.setItem('token', newToken);
       setTokenState(newToken);
-      if (userData) {
-        setUser(userData);
-      } else {
-        setUser(jwtDecode<JwtPayload>(newToken));
+      try {
+        const decoded = jwtDecode<JwtPayload>(newToken);
+        setUser(decoded);
+      } catch (error) {
+        console.error('Error al decodificar token:', error);
+        setUser(null);
       }
     } else {
-      localStorage.removeItem('token');
-      setTokenState(null);
-      setUser(null);
+      if (token !== null) {
+        localStorage.removeItem('token');
+        setTokenState(null);
+        setUser(null);
+      }
     }
   };
 
-  // Envolver logout en useCallback para referencia estable
-  const logout = useCallback(() => setToken(null), []);
-
-  useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (window as any).globalLogout = logout;
-    return () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (window as any).globalLogout = undefined;
-    };
-  }, [logout]);
+  const logout = useCallback(() => {
+    localStorage.removeItem('token');
+    setTokenState(null);
+    setUser(null);
+    signOut({ callbackUrl: "/landing" });
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ token, user, loading, setToken, logout }}>
+    <AuthContext.Provider value={{ token, user, loading, setToken, logout, unreadCount }}>
       {children}
     </AuthContext.Provider>
   );

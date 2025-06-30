@@ -38,3 +38,11 @@ export const updateProfileImage = async (file: File) => {
     console.error("Error subiendo imagen:", error);
   }
 };
+
+export const eliminarFotoDeServicio = async (serviceId: string, photoId: string) => {
+  return api.delete(`/files/service/${serviceId}`, {
+    params: {
+      workPhoto_id: photoId,
+    },
+  });
+};

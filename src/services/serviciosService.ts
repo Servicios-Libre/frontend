@@ -1,7 +1,5 @@
-import axios from "axios";
 import { Servicio } from "@/types";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL; // <-- Cambiado
+import api from "./axiosConfig";
 
 export const obtenerServicios = async (
   busqueda: string,
@@ -16,6 +14,36 @@ export const obtenerServicios = async (
   query.append("page", String(page));
   query.append("limit", String(limit));
 
-  const response = await axios.get(`${API_URL}/services?${query.toString()}`);
+  const response = await api.get(`/services?${query.toString()}`);
+  return response.data;
+};
+
+export const editarServicio = async (
+  id: string,
+  data: { title: string; description: string },
+  token: string
+) => {
+  const response = await api.put(`/services/edit/${id}`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
+};
+
+export const eliminarServicio = async (id: string) => {
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+  if (!token) {
+    throw new Error("No autorizado: token no disponible");
+  }
+
+  const response = await api.delete(`/services/delete/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
   return response.data;
 };

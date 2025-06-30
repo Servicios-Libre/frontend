@@ -53,7 +53,10 @@ export default function ServiciosPage() {
                 const serviciosGrid: ServicioGrid[] = data.servicios.map((servicio: Servicio) => ({
                     id: servicio.id,
                     title: servicio.title,
-                    worker: { name: servicio.user }, // Asume que 'user' es el nombre
+                    worker: {
+                        id: servicio.worker.id,
+                        name: servicio.worker.name
+                    }, // <-- Asegura string
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     work_photos: (servicio.work_photos as any[]).map((foto: any) => ({
                         photo_url: foto.photo_url

@@ -9,9 +9,10 @@ export interface Service {
 }
 
 export interface ServicioGrid {
-  id: string | number;
+  id: string;
   title: string;
   worker: {
+    id: string;
     name: string;
   };
   work_photos: { photo_url: string }[];
@@ -48,7 +49,23 @@ export interface Servicio {
     name: string;
     icon: string;
   };
-  user: string;
+  worker: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  user?: string;
+  ticket?: {
+    id: string;
+    status: string;
+    type: string;
+  };
+}
+
+export enum TicketStatus {
+  PENDING = 'pending',
+  ACCEPTED = 'accepted',
+  REJECTED = 'rejected',
 }
 
 export type IconName =
@@ -111,11 +128,18 @@ export interface WorkerService {
 // Ticket normal (sin user embebido)
 export interface Ticket {
   id: string;
-  type: "worker" | "service";
+  type: string;
   status: string;
   created_at: string;
-  userId: string;
-  serviceId?: string;
+  user?: {
+    email: string;
+    name: string;
+  };
+  service?: {
+    id: string;
+    title: string;
+    description: string;
+  };
 }
 
 // Ticket para solicitudes de worker (con user embebido)
@@ -124,7 +148,7 @@ export interface WorkerRequestTicket {
   type: "to-worker" | "service";
   status: "pending" | "accepted" | "rejected";
   created_at: string;
-  user: UserBasic;
+  user: User;
 }
 
 // User completo para dashboard (con role, email, premium, etc)
@@ -150,9 +174,9 @@ export interface ServiceContractFormValues {
 export interface ChatMessage {
   id: string;
   senderId: string;
-  receiverId: string;
   message: string;
   timestamp: string;
+  receiverId?: string; // <-- Hacelo opcional
 }
 
 export interface ChatContract {

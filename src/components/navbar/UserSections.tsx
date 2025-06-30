@@ -6,7 +6,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faUser, faFileInvoice, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 
 interface User {
+    id?: string;
     name?: string;
+    role?: "user" | "worker" | "admin" | null;
 }
 
 export function UserDropdown({
@@ -66,6 +68,24 @@ export function UserDropdown({
                         >
                             Perfil
                         </Link>
+                        {user.role === "worker" && user.id && (
+                            <Link
+                                href={`/worker-profile/${user.id}`}
+                                onClick={() => setDropdownOpen(false)}
+                                className="block px-4 py-2 hover:bg-blue-100 hover:text-blue-700 transition-colors duration-150 cursor-pointer"
+                            >
+                                Perfil de trabajador
+                            </Link>
+                        )}
+                        {user.role === "admin" && (
+                            <Link
+                                href="/dashboard"
+                                onClick={() => setDropdownOpen(false)}
+                                className="block px-4 py-2 hover:bg-blue-100 hover:text-blue-700 transition-colors duration-150 cursor-pointer"
+                            >
+                                Panel de administrador
+                            </Link>
+                        )}
                         <Link
                             href="/facturas"
                             onClick={() => setDropdownOpen(false)}
@@ -131,6 +151,26 @@ export function MobileUserSection({
                     <FontAwesomeIcon icon={faUser} className="text-blue-400" />
                     <span>Perfil</span>
                 </Link>
+                {user.role === "worker" && user.id && (
+                    <Link
+                        href={`/worker-profile/${user.id}`}
+                        onClick={() => setIsOpen(false)}
+                        className="w-full px-4 py-2 hover:bg-blue-100 hover:text-blue-700 text-sm flex items-center gap-2 transition-colors duration-150 cursor-pointer"
+                    >
+                        <FontAwesomeIcon icon={faUser} className="text-blue-400" />
+                        <span>Perfil de trabajador</span>
+                    </Link>
+                )}
+                {user.role === "admin" && (
+                    <Link
+                        href="/dashboard"
+                        onClick={() => setIsOpen(false)}
+                        className="w-full px-4 py-2 hover:bg-blue-100 hover:text-blue-700 text-sm flex items-center gap-2 transition-colors duration-150 cursor-pointer"
+                    >
+                        <FontAwesomeIcon icon={faUser} className="text-blue-400" />
+                        <span>Panel de administrador</span>
+                    </Link>
+                )}
                 <Link
                     href="/facturas"
                     onClick={() => setIsOpen(false)}
@@ -141,7 +181,7 @@ export function MobileUserSection({
                 </Link>
                 <button
                     onClick={() => {
-                        logout();
+                        logout(); // Esto borra el token y cierra sesión NextAuth
                         setIsOpen(false);
                         router.push("/landing");
                     }}

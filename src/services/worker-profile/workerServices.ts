@@ -3,20 +3,35 @@ import { User } from "@/types";
 
 export const getWorkerById = async (id: string): Promise<User> => {
   const token = localStorage.getItem("token");
-  if (!token) throw new Error("No se encontró el token");
 
-  const response = await api.get(`/users/worker/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  if (token) {
+    try {
+      const response = await api.get(`/users/worker/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-  const data = response.data;
-  if (data.address_id && !data.address) {
-    data.address = data.address_id;
+      const data = response.data;
+      if (data.address_id && !data.address) {
+        data.address = data.address_id;
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Error autenticado:", error);
+      throw new Error("Error al obtener datos del trabajador.");
+    }
+  } else {
+    // Lógica para usuarios no logueados
+    try {
+      const response = await api.get(`/services/worker/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error no autenticado:", error);
+      throw new Error("Error al obtener servicios públicos del trabajador.");
+    }
   }
-
-  return data;
 };
 
 export const uploadServiceImages = async (serviceId: string, files: File[]) => {
@@ -38,7 +53,7 @@ export const uploadServiceImages = async (serviceId: string, files: File[]) => {
       },
     });
     results.push(res.data);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     if (error.response?.status === 413) {
       throw new Error("La imagen es demasiado grande. Máximo 2MB.");
