@@ -24,7 +24,7 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
   const searchParams = useSearchParams();
   const serviceIdFromQuery = searchParams.get("serviceId");
 
-  const { token, loading: authLoading } = useAuth(); // 👈 usamos authLoading
+  const { token, loading: authLoading } = useAuth();
 
   useEffect(() => {
     if (authLoading || !token) return; // 👈 esperamos a que cargue

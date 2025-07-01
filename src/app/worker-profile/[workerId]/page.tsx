@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth"; // asegurate que este archivo exista y esté bien exportado
+import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import WorkerProfileClient from "@/components/worker-profile/WorkerProfileClient";
 
@@ -16,7 +16,7 @@ export default async function WorkerProfilePage({ params }: Props) {
     redirect("/auth");
   }
 
-  const { id } = await params;
+  const { id } = params; // ✅ sin await
 
   return (
     <div className="bg-white min-h-screen">
