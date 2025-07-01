@@ -47,11 +47,17 @@ export default function RegisterForm({ setMessage, setError }: Props) {
     loadStates();
   }, []);
 
-  const provincias = statesData.map((prov) => prov.state);
+  const provincias = [...new Set(statesData.map((prov) => prov.state))];
 
   const ciudades =
     formData.state !== ""
-      ? statesData.find((prov) => prov.state === formData.state)?.cities.map((city) => city.name) || []
+      ? [
+        ...new Set(
+          statesData
+            .find((prov) => prov.state === formData.state)
+            ?.cities.map((city) => city.name) || []
+        ),
+      ]
       : [];
 
   const handleChange = (
