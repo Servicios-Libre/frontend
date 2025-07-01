@@ -1,8 +1,7 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { authOptions } from "@/lib/auth"; // asegurate que este archivo exista y esté bien exportado
 import { redirect } from "next/navigation";
 import WorkerProfileClient from "@/components/worker-profile/WorkerProfileClient";
-import { JSX } from "react";
 
 type Props = {
   params: {
@@ -10,8 +9,7 @@ type Props = {
   };
 };
 
-// ✅ Solución: tipado explícito para componente async
-export default async function WorkerProfilePage({ params }: Props): Promise<JSX.Element> {
+export default async function WorkerProfilePage({ params }: Props) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
