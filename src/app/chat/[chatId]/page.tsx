@@ -19,35 +19,40 @@ export default function ChatDemo() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [chats, setChats] = useState<any[]>([]);
   const [loadingChats, setLoadingChats] = useState(true);
-
+  
   const [clienteName, setClienteName] = useState("Cliente");
   const [trabajadorName, setTrabajadorName] = useState("Trabajador");
-
+  
   useEffect(() => {
+    document.title = "Servicio Libre - Chat"
+  }, [])
+  
+  useEffect(() => {
+    
     if (!user?.id || !token) return;
     setLoadingChats(true);
     axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/inbox`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => setChats(res.data))
-      .finally(() => setLoadingChats(false));
+    .get(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/inbox`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    .then((res) => setChats(res.data))
+    .finally(() => setLoadingChats(false));
   }, [user, token]);
-
+  
   useEffect(() => {
     if (!chatId || !token) return;
     setLoading(true);
     axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/${chatId}/messages`, {
-        headers: { Authorization: `Bearer ${token}` },
+    .get(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/${chatId}/messages`, {
+      headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
         setMessages(res.data.messages);
-
+        
         const { user1, user2 } = res.data;
-
+        
         if (!user1 || !user2) return;
-
+        
         if (user1.role === "worker" && user2.role === "user") {
           setTrabajadorName(user1.name);
           setClienteName(user2.name);
@@ -61,15 +66,16 @@ export default function ChatDemo() {
         }
       })
       .finally(() => setLoading(false));
-  }, [chatId, token]);
+    }, [chatId, token]);
 
-  const handleSendMessage = async (text: string) => {
-    if (!user?.id || !token) return;
-
-    const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/chat/${chatId}/messages`,
-      {
-        senderId: user.id,
+    
+    const handleSendMessage = async (text: string) => {
+      if (!user?.id || !token) return;
+      
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/chat/${chatId}/messages`,
+        {
+          senderId: user.id,
         message: text,
         timestamp: new Date().toISOString(),
       },

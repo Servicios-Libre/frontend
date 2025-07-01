@@ -14,9 +14,6 @@ export default function ChatInboxPage() {
   useEffect(() => {
     document.title = "Servicio Libre - Tus chats"
 
-    return () => {
-      document.title = "Servicio Libre";
-    };
   }, [])
 
   useEffect(() => {

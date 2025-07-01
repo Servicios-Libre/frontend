@@ -65,6 +65,10 @@ export default function WorkerManagementPage() {
   const paginatedRequests = workerRequests; // ya viene paginada del backend
 
   useEffect(() => {
+    document.title = "Servicio Libre - Dashboard de trabajadores"
+   }, [])
+
+  useEffect(() => {
     setCurrentWorkerPage(1);
   }, [searchTerm]);
 

@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getWorkerById, addPhotosToService } from "@/services/worker-profile/workerServices";
+import {
+  getWorkerById,
+  addPhotosToService,
+} from "@/services/worker-profile/workerServices";
 import { User, WorkerService } from "@/types";
 import WorkerHeader from "./WorkerHeader";
 import WorkerServiceList from "./WorkerServiceList";
@@ -19,12 +22,18 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
-  const [initialService, setInitialService] = useState<WorkerService | null>(null);
+  const [initialService, setInitialService] = useState<WorkerService | null>(
+    null
+  );
 
   const searchParams = useSearchParams();
   const serviceIdFromQuery = searchParams.get("serviceId");
 
   const { token, loading: authLoading } = useAuth();
+
+  useEffect(() => {
+    if (user?.name) document.title = `Servicio Libre - ${user?.name}`;
+  }, [user?.name]);
 
   useEffect(() => {
     if (authLoading || !token) return;
@@ -63,7 +72,10 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
       });
   }, [id, serviceIdFromQuery, token, authLoading]);
 
-  const handleSaveService = async (updatedService: WorkerService, newFiles: FileList | null) => {
+  const handleSaveService = async (
+    updatedService: WorkerService,
+    newFiles: FileList | null
+  ) => {
     setIsSaving(true);
     setError(null);
 
@@ -77,7 +89,11 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
       let uploadedPhotos: { id: string; photo_url: string }[] = [];
 
       if (newFiles && newFiles.length > 0) {
-        uploadedPhotos = await addPhotosToService(updatedService.id, newFiles, token!);
+        uploadedPhotos = await addPhotosToService(
+          updatedService.id,
+          newFiles,
+          token!
+        );
       }
 
       setUser((prev) =>
@@ -108,10 +124,13 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
     }
   };
 
-  if (loading || authLoading) return <p className="text-center py-10">Cargando perfil...</p>;
-  if (isSaving) return <p className="text-center py-10">Guardando cambios...</p>;
+  if (loading || authLoading)
+    return <p className="text-center py-10">Cargando perfil...</p>;
+  if (isSaving)
+    return <p className="text-center py-10">Guardando cambios...</p>;
   if (error) return <p className="text-center py-10 text-red-500">{error}</p>;
-  if (!user) return <p className="text-center py-10">Trabajador no encontrado.</p>;
+  if (!user)
+    return <p className="text-center py-10">Trabajador no encontrado.</p>;
 
   return (
     <main className="min-h-screen bg-[#f6f8fa] pt-20">
