@@ -4,12 +4,14 @@
 import LoadingScreen from "@/components/loading-screen/LoadingScreen";
 import { useEffect, useState } from "react";
 import { getProfile, updateProfile, updateProfileImage } from "@/services/profileService";
+import { updateSocialLinks } from "@/services/profileService"
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileForm from "@/components/profile/ProfileForm";
 import ProfileActions from "@/components/profile/ProfileActions";
 import { locationOptions, countries } from "@/databauti/locations";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/context/ToastContext";
 
 const requiredFields = [
   { key: "phone", label: "Teléfono" },
@@ -19,6 +21,7 @@ const requiredFields = [
   { key: "state", label: "Estado" },
   { key: "zip_code", label: "Código postal" },
   { key: "user_pic", label: "Foto de perfil" },
+  { key: "description", label: "Descripción" },
 ];
 
 type ProfileFormType = {
@@ -29,13 +32,18 @@ type ProfileFormType = {
   state: string;
   zip_code: string;
   user_pic?: string;
+  description: string;
+  facebook?: string;
+  linkedin?: string;
+  twitter?: string;
+  instagram?: string;
 };
 
 export type Ticket = {
   id: string,
   type: string,
   status: string,
-  created_at: string, 
+  created_at: string,
   userId: string
 }
 
@@ -50,6 +58,11 @@ export default function ProfilePage() {
     state: "",
     zip_code: "",
     user_pic: "",
+    description: "",
+    facebook: "",
+    linkedin: "",
+    twitter: "",
+    instagram: "",
   });
   const [originalData, setOriginalData] = useState<ProfileFormType | null>(null);
   const [userName, setUserName] = useState<string>("");
@@ -60,7 +73,7 @@ export default function ProfilePage() {
     id: "",
     type: "",
     status: "",
-    created_at: "", 
+    created_at: "",
     userId: ""
   });
 
@@ -69,6 +82,7 @@ export default function ProfilePage() {
   const loading = auth?.loading ?? false;
   const token = auth?.token;
   const router = useRouter();
+  const { showToast } = useToast();
 
   useEffect(() => {
     document.title = "Servicio Libre - Mi Perfil";
@@ -101,7 +115,13 @@ export default function ProfilePage() {
               : "",
             zip_code: data.address_id?.zip_code?.toString() ?? "",
             user_pic: data.user_pic ?? "",
+            description: data.description ?? "",
+            facebook: data.facebook ?? "",
+            linkedin: data.linkedin ?? "",
+            twitter: data.twitter ?? "",
+            instagram: data.instagram ?? "",
           });
+
           setOriginalData({
             phone: data.phone?.toString() ?? "",
             street: data.address_id?.street ?? "",
@@ -112,6 +132,11 @@ export default function ProfilePage() {
               : "",
             zip_code: data.address_id?.zip_code?.toString() ?? "",
             user_pic: data.user_pic ?? "",
+            description: data.description ?? "",
+            facebook: data.facebook ?? "",
+            linkedin: data.linkedin ?? "",
+            twitter: data.twitter ?? "",
+            instagram: data.instagram ?? "",
           });
           setUserName(data.name || data.username || "Usuario");
         } catch (error) {
@@ -132,7 +157,9 @@ export default function ProfilePage() {
     return <LoadingScreen />;
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -154,6 +181,11 @@ export default function ProfilePage() {
   };
 
   const handleSave = async () => {
+    if (!formData.description || formData.description.trim() === "") {
+      showToast("Agrega una descripción a tu perfil antes de solicitar ser trabajador.", "error");
+      return;
+    }
+
     try {
       const dataToSend: any = {
         phone: formData.phone ? Number(formData.phone) : undefined,
@@ -162,17 +194,29 @@ export default function ProfilePage() {
         city: formData.city,
         state: formData.state,
         zip_code: formData.zip_code ? String(formData.zip_code) : undefined,
+        description: formData.description,
       };
-      if (dataToSend) {
-        await updateProfile(token, dataToSend);
-      }
+
+      const socialData = {
+        facebook: formData.facebook,
+        linkedin: formData.linkedin,
+        twitter: formData.twitter,
+        instagram: formData.instagram,
+      };
+
+      await updateProfile(token, dataToSend);
+      await updateSocialLinks(socialData);
+
       if (userImageFile) {
         await updateProfileImage(token, userImageFile);
       }
+
       setOriginalData(formData);
       setEditMode(false);
+      showToast("Perfil actualizado correctamente", "success");
     } catch (error) {
       console.error("Error al actualizar perfil:", error);
+      showToast("Hubo un error al actualizar el perfil", "error");
     }
   };
 

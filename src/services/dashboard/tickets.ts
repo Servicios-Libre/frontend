@@ -30,7 +30,7 @@ export async function fetchServiceRequestsPaginated(
     headers: { Authorization: `Bearer ${token}` },
   });
 
-  const [tickets, total] = res.data;
+  const {tickets, total} = res.data;
 
   return {
     tickets,
@@ -75,7 +75,7 @@ export async function fetchWorkerRequestsPaginated(
     headers: { Authorization: `Bearer ${token}` },
   });
 
-  const [tickets, total] = res.data;
+  const {tickets, total} = res.data;
 
   return {
     tickets,
