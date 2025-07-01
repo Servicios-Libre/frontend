@@ -5,6 +5,7 @@ import Image from 'next/image';
 import JobCard from '../../components/landing/JobCard';
 import StoryCard from '../../components/landing/StoryCard';
 import ReviewCard from '../../components/landing/ReviewCard';
+import { useEffect } from 'react';
 
 /* Temporal Data */
 const jobs = [
@@ -83,6 +84,10 @@ const opiniones = [
 
 export default function LandingPage() {
   const router = useRouter();
+
+    useEffect(() => {
+      document.title = "Servicio Libre - inicio"
+     }, [])
 
   return (
     <main className="bg-gray-50 text-gray-800 min-h-screen">

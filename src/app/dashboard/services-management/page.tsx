@@ -68,6 +68,10 @@ export default function ServicesMenuPage() {
   };
 
   useEffect(() => {
+    document.title = "Servicio Libre - Dashboard de servicios"
+   }, [])
+
+  useEffect(() => {
     if (isReady) {
       refreshServiceRequests();
       refreshActiveServices();

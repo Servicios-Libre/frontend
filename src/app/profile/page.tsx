@@ -71,7 +71,9 @@ export default function ProfilePage() {
   const router = useRouter();
 
   useEffect(() => {
+    document.title = "Servicio Libre - Mi Perfil";
     setMounted(true);
+
   }, []);
 
   // Redirección si no hay usuario autenticado

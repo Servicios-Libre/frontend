@@ -31,6 +31,7 @@ export const ServiceForm = () => {
   const auth = useAuth();
 
   useEffect(() => {
+    document.title = 'Servicio Libre - Crear Servicio'
     const fetchCategories = async () => {
       try {
         const cats = await obtenerCategorias();
