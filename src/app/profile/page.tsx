@@ -67,10 +67,13 @@ export default function ProfilePage() {
   const auth = useAuth();
   const user = auth?.user;
   const loading = auth?.loading ?? false;
+  const token = auth?.token;
   const router = useRouter();
 
   useEffect(() => {
+    document.title = "Servicio Libre - Mi Perfil";
     setMounted(true);
+
   }, []);
 
   // Redirección si no hay usuario autenticado
@@ -85,7 +88,7 @@ export default function ProfilePage() {
     if (user) {
       const fetchProfile = async () => {
         try {
-          const data = await getProfile();
+          const data = await getProfile(token);
           const ticketData = data.tickets.find((ticket: Ticket) => ticket.status === "pending" && ticket.type === "to-worker");
           setTicket(ticketData);
           setFormData({
@@ -117,7 +120,7 @@ export default function ProfilePage() {
       };
       fetchProfile();
     }
-  }, [user]);
+  }, [user, token]);
 
   // Loader pantalla completa mientras no está montado
   if (!mounted) {
@@ -161,10 +164,10 @@ export default function ProfilePage() {
         zip_code: formData.zip_code ? String(formData.zip_code) : undefined,
       };
       if (dataToSend) {
-        await updateProfile(dataToSend);
+        await updateProfile(token, dataToSend);
       }
       if (userImageFile) {
-        await updateProfileImage(userImageFile);
+        await updateProfileImage(token, userImageFile);
       }
       setOriginalData(formData);
       setEditMode(false);

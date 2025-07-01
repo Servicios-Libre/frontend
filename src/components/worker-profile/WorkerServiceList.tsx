@@ -4,10 +4,10 @@ import EditServiceModal from "./EditServiceModal";
 import ServiceDetailModal from "./ServiceDetailModal";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import StartChatButton from "./StartChatButton";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import { eliminarServicio } from "@/services/serviciosService";
 import { useToast } from "@/context/ToastContext";
+import { useAuth } from "@/context/AuthContext";
 
 export default function WorkerServiceList({
   services,
@@ -15,18 +15,21 @@ export default function WorkerServiceList({
   isOwner,
   openDetailInitially,
   workerId,
+  onDeleteComplete,
 }: {
   services: WorkerService[];
   onSave: (updated: WorkerService, newFiles: FileList | null) => void;
   isOwner: boolean;
   openDetailInitially?: WorkerService | null;
   workerId: string;
+  onDeleteComplete?: (deletedId: string) => void;
 }) {
   const [editingService, setEditingService] = useState<WorkerService | null>(null);
   const [detailedService, setDetailedService] = useState<WorkerService | null>(openDetailInitially ?? null);
   const { showToast } = useToast();
   const [serviceToDelete, setServiceToDelete] = useState<WorkerService | null>(null);
   const [servicesState, setServicesState] = useState<WorkerService[]>(services);
+  const { token } = useAuth();
 
   // Si cambian los servicios desde el padre, se actualiza
   useEffect(() => {
@@ -41,12 +44,13 @@ export default function WorkerServiceList({
     if (!serviceToDelete) return;
 
     try {
-      await eliminarServicio(serviceToDelete.id);
+      await eliminarServicio(serviceToDelete.id, token!);
       showToast("Servicio eliminado exitosamente", "success");
 
       // Elimina del estado local
       setServicesState((prev) => prev.filter((s) => s.id !== serviceToDelete.id));
       setServiceToDelete(null);
+      onDeleteComplete?.(serviceToDelete.id);
     } catch (err) {
       showToast("Error al eliminar el servicio", "error");
       console.error("Error al eliminar servicio:", err);
@@ -65,10 +69,6 @@ export default function WorkerServiceList({
             >
               + Crear servicio nuevo
             </Link>
-            <StartChatButton
-              otherUserId={workerId}
-              label="Probar chat"
-            />
           </>
         )}
       </div>

@@ -28,6 +28,7 @@ export default function ServiciosPage() {
 
     // Efecto para actualizar la cantidad al redimensionar la ventana
     useEffect(() => {
+        document.title = "Servicio Libre - Servicios"
         const actualizarCantidad = () => {
             setServiciosPorPagina(window.innerWidth >= 640 ? 8 : 4);
         };
@@ -36,7 +37,9 @@ export default function ServiciosPage() {
         // Llamar una vez al montar para asegurar el valor correcto
         actualizarCantidad();
 
-        return () => window.removeEventListener("resize", actualizarCantidad);
+        return () => {
+            window.removeEventListener("resize", actualizarCantidad);
+        } 
     }, []);
 
     useEffect(() => {

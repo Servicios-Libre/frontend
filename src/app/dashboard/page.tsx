@@ -13,7 +13,7 @@ import {
   FaInfoCircle,
 } from 'react-icons/fa';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAdminContext } from '@/context/AdminContext';
 import { LoadingScreen } from '@/components/dashboard/LoadingScreen';
 import MobileHeader from "@/components/dashboard/MobileHeader";
@@ -21,6 +21,10 @@ import MobileHeader from "@/components/dashboard/MobileHeader";
 export default function DashboardPage() {
   const { users, loading, acceptedServiceCount } = useAdminContext();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    document.title = "Servicio Libre - Dashboard"
+  }, [])
 
   const activities = [
     { id: 1, text: 'Usuario 3 fue dado de alta como trabajador.' },

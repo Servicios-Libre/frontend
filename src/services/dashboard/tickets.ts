@@ -1,90 +1,134 @@
-import { WorkerRequestTicket } from "@/types";
-import { Ticket, Servicio } from "@/types";
-const API = process.env.NEXT_PUBLIC_API_URL || "";
+import api from "@/services/axiosConfig";
+import { getSession } from "next-auth/react";
+import { Ticket, Servicio, WorkerRequestTicket } from "@/types";
 
-function getToken() {
-  if (typeof window === "undefined") return "";
-  return localStorage.getItem("token") || "";
+async function getToken() {
+  const session = await getSession();
+  return session?.backendJwt || "";
 }
 
-export async function fetchWorkerRequests(): Promise<WorkerRequestTicket[]> {
-  const res = await fetch(`${API}/tickets?type=to-worker&status=pending`, {
-    headers: { Authorization: `Bearer ${getToken()}` },
-    cache: "no-store",
+// ==========================
+// SOLICITUDES DE SERVICIOS
+// ==========================
+export async function fetchServiceRequests(): Promise<Ticket[]> {
+  const token = await getToken();
+  const res = await api.get("/tickets", {
+    params: { type: "service", status: "pending" },
+    headers: { Authorization: `Bearer ${token}` },
   });
-  if (!res.ok) throw new Error("Error al obtener solicitudes");
-  return res.json();
+  return res.data;
+}
+
+export async function fetchServiceRequestsPaginated(
+  page = 1,
+  limit = 5
+): Promise<{ tickets: Ticket[]; total: number }> {
+  const token = await getToken();
+
+  const res = await api.get("/tickets", {
+    params: { type: "service", status: "pending", page, limit },
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const [tickets, total] = res.data;
+
+  return {
+    tickets,
+    total,
+  };
+}
+
+export async function acceptServiceRequest(ticketId: string) {
+  const token = await getToken();
+  await api.put(`/tickets/accept/${ticketId}`, null, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function rejectServiceRequest(ticketId: string) {
+  const token = await getToken();
+  await api.put(`/tickets/reject/${ticketId}`, null, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+// ==========================
+// SOLICITUDES DE WORKERS
+// ==========================
+export async function fetchWorkerRequests(): Promise<WorkerRequestTicket[]> {
+  const token = await getToken();
+  const res = await api.get("/tickets", {
+    params: { type: "to-worker", status: "pending" },
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+}
+
+export async function fetchWorkerRequestsPaginated(
+  page = 1,
+  limit = 100
+): Promise<{ tickets: WorkerRequestTicket[]; total: number }> {
+  const token = await getToken();
+
+  const res = await api.get("/tickets", {
+    params: { type: "to-worker", status: "pending", page, limit },
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const [tickets, total] = res.data;
+
+  return {
+    tickets,
+    total,
+  };
 }
 
 export async function acceptWorkerRequest(ticketId: string, userId: string) {
-  const token = getToken();
-  // 1. Aceptar ticket
-  await fetch(`${API}/tickets/accept/${ticketId}`, {
-    method: "PUT",
+  const token = await getToken();
+
+  // Aceptar ticket
+  await api.put(`/tickets/accept/${ticketId}`, null, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  // 2. Cambiar rol a worker
-  await fetch(`${API}/users/to-worker/${userId}`, {
-    method: "PUT",
+
+  // Cambiar rol
+  await api.put(`/users/to-worker/${userId}`, null, {
     headers: { Authorization: `Bearer ${token}` },
   });
 }
 
 export async function rejectWorkerRequest(ticketId: string) {
-  const token = getToken();
-  await fetch(`${API}/tickets/reject/${ticketId}`, {
-    method: "PUT",
+  const token = await getToken();
+  await api.put(`/tickets/reject/${ticketId}`, null, {
     headers: { Authorization: `Bearer ${token}` },
   });
 }
 
-export async function fetchServiceRequests(): Promise<Ticket[]> {
-  const res = await fetch(`${API}/tickets?type=service&status=pending`, {
-    headers: { Authorization: `Bearer ${getToken()}` },
-    cache: "no-store",
-  });
-  if (!res.ok) throw new Error("Error al obtener solicitudes de servicio");
-  return res.json();
-}
+// ==========================
+// SERVICIOS ACTIVOS
+// ==========================
+export async function fetchActiveServices(
+  page = 1,
+  limit = 10,
+  search = ""
+): Promise<{ services: Servicio[]; total: number }> {
+  const token = await getToken();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const params: any = { status: "active", page, limit };
+  if (search) params.search = search;
 
-export async function acceptServiceRequest(ticketId: string) {
-  const token = getToken();
-  // 1. Aceptar ticket
-  await fetch(`${API}/tickets/accept/${ticketId}`, {
-    method: "PUT",
+  const res = await api.get("/services", {
+    params,
     headers: { Authorization: `Bearer ${token}` },
   });
-  // 2. Aprobar servicio (ajusta la ruta según tu backend)
-  // await fetch(`${API}/services/approve/${serviceId}`, {
-  //   method: "PUT",
-  //   headers: { Authorization: `Bearer ${token}` },
-  // });
-}
 
-export async function rejectServiceRequest(ticketId: string) {
-  const token = getToken();
-  await fetch(`${API}/tickets/reject/${ticketId}`, {
-    method: "PUT",
-    headers: { Authorization: `Bearer ${token}` },
-  });
-}
-
-export async function fetchActiveServices(page = 1, limit = 10, search = ""): Promise<{ services: Servicio[]; total: number }> {
-  const params = new URLSearchParams({ status: "active", page: String(page), limit: String(limit) });
-  if (search) params.append("search", search);
-  const res = await fetch(`${API}/services?${params.toString()}`, {
-    headers: { Authorization: `Bearer ${getToken()}` },
-    cache: "no-store",
-  });
-  if (!res.ok) throw new Error("Error al obtener servicios activos");
-  return res.json();
+  return res.data;
 }
 
 export async function deactivateService(serviceId: string) {
-  const res = await fetch(`${API}/services/deactivate/${serviceId}`, {
-    method: "PUT",
-    headers: { Authorization: `Bearer ${getToken()}` },
+  const token = await getToken();
+  const res = await api.put(`/services/deactivate/${serviceId}`, null, {
+    headers: { Authorization: `Bearer ${token}` },
   });
-  if (!res.ok) throw new Error("Error al dar de baja el servicio");
-  return res.json();
+  return res.data;
 }

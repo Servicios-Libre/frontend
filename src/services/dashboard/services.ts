@@ -25,9 +25,9 @@ axiosInstance.interceptors.request.use((config) => {
   return config;
 });
 
-export async function fetchActiveServices(page = 1, limit = 10, search = ""): Promise<{ services: Servicio[]; total: number }> {
+export async function fetchActiveServices(page = 1, limit = 10, busqueda = ""): Promise<{ services: Servicio[]; total: number }> {
   const params: any = { page, limit };
-  if (search) params.search = search;
+  if (busqueda) params.busqueda = busqueda;
   try {
     const res = await api.get("/services", { params });
     return {

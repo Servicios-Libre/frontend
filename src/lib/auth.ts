@@ -1,12 +1,12 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import NextAuth from "next-auth/next";
+// lib/auth.ts
+import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { jwtDecode } from "jwt-decode";
+import api from "@/services/axiosConfig";
 import { Ticket } from "@/types";
 import { JWT } from "next-auth/jwt";
 import { User } from "next-auth";
-import api from "@/services/axiosConfig";
 
 interface MyUser extends User {
   id: string;
@@ -25,7 +25,7 @@ interface MyJWT extends JWT {
   image?: string;
 }
 
-const handler = NextAuth({
+export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_AUTH_CLIENT_ID!,
@@ -47,6 +47,7 @@ const handler = NextAuth({
           const { token } = res.data;
           if (!token) return null;
 
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const decoded: any = jwtDecode(token);
 
           return {
@@ -98,6 +99,7 @@ const handler = NextAuth({
         }
 
         if (account?.provider === "credentials") {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           myToken.backendJwt = (user as any).accessToken;
         }
       }
@@ -121,6 +123,4 @@ const handler = NextAuth({
       return session;
     },
   },
-});
-
-export { handler as GET, handler as POST };
+};

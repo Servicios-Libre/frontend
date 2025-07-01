@@ -2,9 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { loginUser } from "@/services/authService";
-import axios from "axios"; 
-import { useAuth } from "@/context/AuthContext";
+import { signIn } from "next-auth/react";
 
 type Props = {
   setMessage: (msg: string) => void;
@@ -14,7 +12,6 @@ type Props = {
 export default function LoginForm({ setMessage, setError }: Props) {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const router = useRouter();
-  const auth = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -27,20 +24,24 @@ export default function LoginForm({ setMessage, setError }: Props) {
     setError("");
     setMessage("");
     try {
-      const res = await loginUser(formData.email, formData.password);
-      setMessage("Inicio de sesión exitoso.");
-      if (auth && auth.setToken) {
-        auth.setToken(res.token); // <-- Solo pasa el token
+
+      const result = await signIn("credentials", {
+        redirect: false,
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (result?.error) {
+        setError("Email o contraseña incorrectos");
+      } else if (result?.ok) {
+        setMessage("Inicio de sesión exitoso");
+        setTimeout(() => {
+          router.push("/servicios");
+        }, 1000);
       }
-      setTimeout(() => {
-        router.push("/servicios");
-      }, 1000);
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || "Error al iniciar sesión");
-      } else {
-        setError("Error inesperado al iniciar sesión");
-      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      setError("Error inesperado al iniciar sesión");
     }
   };
 

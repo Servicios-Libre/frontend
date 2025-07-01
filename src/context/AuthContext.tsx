@@ -1,8 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { jwtDecode } from "jwt-decode";
-import { signOut } from "next-auth/react";
+
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
+import { useSession, signOut } from "next-auth/react";
 
 type UserRole = "user" | "worker" | "admin" | null;
 
@@ -16,6 +22,7 @@ interface JwtPayload {
     type: string;
     status: string;
   }>;
+  image?: string;
 }
 
 interface AuthContextType {
@@ -37,34 +44,26 @@ export const useAuth = (): AuthContextType => {
   return context;
 };
 
-const getInitialToken = () => {
-  if (typeof window !== "undefined") {
-    return localStorage.getItem('token');
-  }
-  return null;
-};
-
-const getInitialUser = () => {
-  const token = getInitialToken();
-  if (token) {
-    try {
-      return jwtDecode<JwtPayload>(token);
-    } catch {
-      return null;
-    }
-  }
-  return null;
-};
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [token, setTokenState] = useState<string | null>(getInitialToken());
-  const [user, setUser] = useState<JwtPayload | null>(getInitialUser());
+  const { data: session, status } = useSession();
+  const [token, setTokenState] = useState<string | null>(null);
+  const [user, setUser] = useState<JwtPayload | null>(null);
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
+    if (status === "loading") return;
+
+    if (session?.user) {
+      setUser(session.user as JwtPayload);
+      setTokenState(session.backendJwt ?? null);
+    } else {
+      setUser(null);
+      setTokenState(null);
+    }
+
     setLoading(false);
-  }, []);
+  }, [session, status]);
 
   useEffect(() => {
     if (!token || !user?.id) return;
@@ -101,34 +100,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [token, user]);
 
   const setToken = (newToken: string | null) => {
-    if (newToken) {
-      localStorage.setItem('token', newToken);
-      setTokenState(newToken);
-      try {
-        const decoded = jwtDecode<JwtPayload>(newToken);
-        setUser(decoded);
-      } catch (error) {
-        console.error('Error al decodificar token:', error);
-        setUser(null);
-      }
-    } else {
-      if (token !== null) {
-        localStorage.removeItem('token');
-        setTokenState(null);
-        setUser(null);
-      }
-    }
+    setTokenState(newToken);
   };
 
   const logout = useCallback(() => {
-    localStorage.removeItem('token');
     setTokenState(null);
     setUser(null);
     signOut({ callbackUrl: "/landing" });
   }, []);
 
   return (
-    <AuthContext.Provider value={{ token, user, loading, setToken, logout, unreadCount }}>
+    <AuthContext.Provider
+      value={{ token, user, loading, setToken, logout, unreadCount }}
+    >
       {children}
     </AuthContext.Provider>
   );

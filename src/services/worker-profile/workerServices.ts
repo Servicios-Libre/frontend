@@ -1,9 +1,8 @@
 import api from "@/services/axiosConfig";
 import { User } from "@/types";
 
-export const getWorkerById = async (id: string): Promise<User> => {
-  const token = localStorage.getItem("token");
-
+export const getWorkerById = async (id: string, token?: string): Promise<User> => {
+  console.log("getWorkerById called with id:", id, "token:", token ? "Sí" : "No");
   if (token) {
     try {
       const response = await api.get(`/users/worker/${id}`, {
@@ -11,6 +10,7 @@ export const getWorkerById = async (id: string): Promise<User> => {
           Authorization: `Bearer ${token}`,
         },
       });
+      console.log("Respuesta autenticada:", response.data);
 
       const data = response.data;
       if (data.address_id && !data.address) {
@@ -26,6 +26,7 @@ export const getWorkerById = async (id: string): Promise<User> => {
     // Lógica para usuarios no logueados
     try {
       const response = await api.get(`/services/worker/${id}`);
+      console.log("Respuesta no autenticada:", response.data);
       return response.data;
     } catch (error) {
       console.error("Error no autenticado:", error);
@@ -34,8 +35,8 @@ export const getWorkerById = async (id: string): Promise<User> => {
   }
 };
 
-export const uploadServiceImages = async (serviceId: string, files: File[]) => {
-  const token = localStorage.getItem("token");
+export const uploadServiceImages = async (serviceId: string, files: File[], token: string) => {
+  console.log("uploadServiceImages called with serviceId:", serviceId, "files length:", files.length);
   if (!token) throw new Error("No hay token de autenticación.");
   if (!serviceId) throw new Error("ID de servicio inválido.");
 
@@ -43,7 +44,8 @@ export const uploadServiceImages = async (serviceId: string, files: File[]) => {
 
   const formData = new FormData();
   files.forEach((file) => {
-    formData.append("images", file); // clave correcta
+    console.log("Añadiendo archivo al formData:", file.name, file.size);
+    formData.append("images", file);
   });
 
   try {
@@ -52,6 +54,7 @@ export const uploadServiceImages = async (serviceId: string, files: File[]) => {
         Authorization: `Bearer ${token}`,
       },
     });
+    console.log("Respuesta subida imágenes:", res.data);
     results.push(res.data);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
@@ -63,6 +66,7 @@ export const uploadServiceImages = async (serviceId: string, files: File[]) => {
       throw new Error(error.response.data.message);
     }
 
+    console.error("Error al subir la imagen:", error);
     throw new Error("Error al subir la imagen.");
   }
 
@@ -71,8 +75,10 @@ export const uploadServiceImages = async (serviceId: string, files: File[]) => {
 
 export const addPhotosToService = async (
   serviceId: string,
-  newFiles: FileList | null
+  newFiles: FileList | null,
+  token: string
 ): Promise<{ id: string; photo_url: string }[]> => {
+  console.log("addPhotosToService called with serviceId:", serviceId, "newFiles length:", newFiles?.length);
   if (!newFiles || newFiles.length === 0) {
     return [];
   }
@@ -80,11 +86,13 @@ export const addPhotosToService = async (
   const filesArray = Array.from(newFiles);
 
   try {
-    await uploadServiceImages(serviceId, filesArray);
+    await uploadServiceImages(serviceId, filesArray, token);
     const simulatedUploadedPhotos = filesArray.map((file, index) => ({
       id: `temp-id-${Date.now()}-${index}`,
       photo_url: URL.createObjectURL(file),
     }));
+
+    console.log("Fotos simuladas añadidas:", simulatedUploadedPhotos);
 
     return simulatedUploadedPhotos;
   } catch (error) {

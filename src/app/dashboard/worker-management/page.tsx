@@ -5,7 +5,6 @@ import Sidebar from "@/components/dashboard/Sidebar";
 import {
   acceptWorkerRequest,
   rejectWorkerRequest,
-  fetchWorkerRequests,
 } from "@/services/dashboard/tickets";
 import { downgradeWorker } from "@/services/dashboard/worker";
 import { User, WorkerRequestTicket } from "@/types";
@@ -27,18 +26,19 @@ export default function WorkerManagementPage() {
     loading: usersLoading,
     refreshUsers,
     isReady,
+    workerRequests,
+    workerRequestsCount,
+    workerRequestsPage,
+    setWorkerRequestsPage,
+    refreshWorkerRequests,
   } = useAdminContext();
 
   const { token, user: authUser } = useAuth();
-  const [requests, setRequests] = useState<WorkerRequestTicket[]>([]);
   const [loadingId, setLoadingId] = useState<string | undefined>();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [requestProfile, setRequestProfile] = useState<User | null>(null);
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const { showToast } = useToast();
-
-  const [currentRequestPage, setCurrentRequestPage] = useState(1);
-  const requestsPerPage = 5;
 
   const [currentWorkerPage, setCurrentWorkerPage] = useState(1);
   const workersPerPage = 5;
@@ -53,17 +53,20 @@ export default function WorkerManagementPage() {
     worker.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const totalRequestPages = Math.ceil(requests.length / requestsPerPage);
-  const paginatedRequests = requests.slice(
-    (currentRequestPage - 1) * requestsPerPage,
-    currentRequestPage * requestsPerPage
-  );
-
+  // Paginación local para workers activos
   const totalWorkerPages = Math.ceil(filteredWorkers.length / workersPerPage);
   const paginatedWorkers = filteredWorkers.slice(
     (currentWorkerPage - 1) * workersPerPage,
     currentWorkerPage * workersPerPage
   );
+
+  // Paginación de requests viene del contexto (server paginada)
+  const totalRequestPages = Math.ceil(workerRequestsCount / 5);
+  const paginatedRequests = workerRequests; // ya viene paginada del backend
+
+  useEffect(() => {
+    document.title = "Servicio Libre - Dashboard de trabajadores"
+   }, [])
 
   useEffect(() => {
     setCurrentWorkerPage(1);
@@ -71,13 +74,11 @@ export default function WorkerManagementPage() {
 
   useEffect(() => {
     if (!token || !isAdmin) {
-      setRequests([]);
       return;
     }
-    fetchWorkerRequests()
-      .then(setRequests)
-      .catch(() => showToast("Error al cargar solicitudes", "error"));
-  }, [token, isAdmin, showToast]);
+    // El contexto ya carga las solicitudes, pero acá refrescamos para asegurarnos
+    refreshWorkerRequests().catch(() => showToast("Error al cargar solicitudes", "error"));
+  }, [token, isAdmin, refreshWorkerRequests, showToast, workerRequestsPage]);
 
   const handleViewRequestProfile = (basicUser: User) => {
     const fullUser = users.find((u) => u.id === basicUser.id);
@@ -94,9 +95,9 @@ export default function WorkerManagementPage() {
     setLoadingId(ticket.id);
     try {
       await acceptWorkerRequest(ticket.id, ticket.user.id);
-      setRequests((prev) => prev.filter((t) => t.id !== ticket.id));
       showToast("Solicitud aceptada y usuario promovido a worker", "success");
       await refreshUsers();
+      await refreshWorkerRequests();
     } catch {
       showToast("Error al aceptar solicitud", "error");
     }
@@ -108,8 +109,8 @@ export default function WorkerManagementPage() {
     setLoadingId(ticket.id);
     try {
       await rejectWorkerRequest(ticket.id);
-      setRequests((prev) => prev.filter((t) => t.id !== ticket.id));
       showToast("Solicitud rechazada", "success");
+      await refreshWorkerRequests();
     } catch {
       showToast("Error al rechazar solicitud", "error");
     }
@@ -165,9 +166,9 @@ export default function WorkerManagementPage() {
         <section className="mb-12">
           <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
             <FaUserCheck className="text-emerald-400" /> Solicitudes pendientes
-            {requests.length > 0 && (
+            {workerRequestsCount > 0 && (
               <span className="ml-2 bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full text-sm font-medium">
-                {requests.length} nuevas
+                {workerRequestsCount} nuevas
               </span>
             )}
           </h2>
@@ -179,8 +180,8 @@ export default function WorkerManagementPage() {
 
           <Pagination
             totalPages={totalRequestPages}
-            currentPage={currentRequestPage}
-            onPageChange={setCurrentRequestPage}
+            currentPage={workerRequestsPage}
+            onPageChange={setWorkerRequestsPage}
           />
         </section>
 
@@ -218,11 +219,11 @@ export default function WorkerManagementPage() {
           open={isRequestModalOpen}
           onClose={() => setIsRequestModalOpen(false)}
           onAccept={(userId) => {
-            const ticket = requests.find((t) => t.user.id === userId);
+            const ticket = workerRequests.find((t) => t.user.id === userId);
             if (ticket) handleAccept(ticket);
           }}
           onReject={(userId) => {
-            const ticket = requests.find((t) => t.user.id === userId);
+            const ticket = workerRequests.find((t) => t.user.id === userId);
             if (ticket) handleReject(ticket);
           }}
         />

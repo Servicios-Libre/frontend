@@ -1,9 +1,6 @@
-import axios from "axios";
-import { Categoria } from "@/types/index";
+import api from "@/services/axiosConfig";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL as string;
-
-export const obtenerCategorias = async (): Promise<Categoria[]> => {
-  const response = await axios.get(`${API_URL}/services/categories`);
-  return response.data;
+export const obtenerCategorias = async () => {
+  const res = await api.get("/services/categories");
+  return res.data;
 };
