@@ -5,13 +5,14 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { FaStar, FaRegStar, FaQuoteLeft } from "react-icons/fa";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import Image from "next/image";
 
 type Review = {
   id: string;
   rate: number;
-  comment: string;
+  description: string;
   created_at: string;
-  author: { name: string };
+  author: { name: string; user_pic: string };
 };
 
 type WorkerReviewsProps = {
@@ -31,7 +32,7 @@ export default function WorkerReviews({ workerId }: WorkerReviewsProps) {
 
   useEffect(() => {
     fetchReviews();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sort]);
 
   const fetchReviews = async () => {
@@ -102,7 +103,16 @@ export default function WorkerReviews({ workerId }: WorkerReviewsProps) {
               className="bg-gray-50 p-5 rounded-xl border border-gray-100 shadow group hover:border-blue-400 transition"
             >
               <div className="flex justify-between items-center mb-2">
-                <div className="font-semibold text-gray-800">
+                <div className="flex items-center gap-3 font-semibold text-gray-800">
+                  <div className="w-8 h-8 relative flex-shrink-0">
+                    <Image
+                      src={r.author.user_pic}
+                      alt={`Foto de ${r.author.name}`}
+                      fill
+                      sizes="32px"
+                      className="rounded-full object-cover border border-gray-300"
+                    />
+                  </div>
                   {r.author.name}
                 </div>
                 <div className="flex gap-1">
@@ -117,7 +127,7 @@ export default function WorkerReviews({ workerId }: WorkerReviewsProps) {
               </div>
               <p className="text-sm text-gray-600 italic flex items-start gap-2">
                 <FaQuoteLeft className="text-amber-400 mt-1" />
-                {r.comment}
+                {r.description}
               </p>
               <div className="text-xs text-gray-400 mt-2">
                 {new Date(r.created_at).toLocaleDateString()}
