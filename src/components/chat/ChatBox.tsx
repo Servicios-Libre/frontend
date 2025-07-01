@@ -7,6 +7,7 @@ import ContractView from "./ContractView";
 import { FaPaperPlane } from "react-icons/fa";
 
 interface ChatBoxProps {
+  chatId: string;
   messages: ChatMessage[];
   onSend: (message: string) => Promise<ChatMessage>;
   currentUserId: string;
@@ -30,11 +31,11 @@ const ChatBox = ({
   const [newMessage, setNewMessage] = useState("");
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>(messages);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
-  const messagesContainerRef = useRef<HTMLDivElement | null>(null);
   const [showContractForm, setShowContractForm] = useState(false);
 
   useEffect(() => {
     setLocalMessages(messages);
+    scrollToBottom();
   }, [messages]);
 
   const scrollToBottom = () => {
@@ -48,45 +49,13 @@ const ChatBox = ({
     e.preventDefault();
     if (newMessage.trim() === "") return;
 
-    const msg = await onSend(newMessage.trim());
-    if (msg) {
-      setLocalMessages((prev) => [...prev, msg]);
-    }
-
+    await onSend(newMessage.trim());
     setNewMessage("");
     setTimeout(scrollToBottom, 100);
   };
 
   return (
     <div className="flex flex-col h-full w-full bg-white">
-      {/* Cabecera sticky */}
-      <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-3 bg-[#f0f0f0] border-b shadow-sm">
-        {/* Cliente */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-blue-200 flex items-center justify-center text-blue-800 font-bold text-lg border-2 border-white shadow">
-            {clienteName.charAt(0).toUpperCase()}
-          </div>
-          <div>
-            <span className="font-bold text-gray-800">{clienteName}</span>
-            <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-semibold">
-              Cliente
-            </span>
-          </div>
-        </div>
-        {/* Trabajador */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-lg border-2 border-white shadow">
-            {trabajadorName.charAt(0).toUpperCase()}
-          </div>
-          <div>
-            <span className="font-bold text-gray-800">{trabajadorName}</span>
-            <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded font-semibold">
-              Trabajador
-            </span>
-          </div>
-        </div>
-      </div>
-
       {/* Info de usuario (cards) */}
       <div className="flex gap-6 px-6 py-4 bg-white border-b">
         {/* Card Cliente */}
@@ -97,9 +66,9 @@ const ChatBox = ({
           <div>
             <div className="font-semibold text-gray-800">{clienteName}</div>
             <div className="text-xs text-blue-600 font-bold">Cliente</div>
-            {/* <div className="text-xs text-gray-500">correo@cliente.com</div> */}
           </div>
         </div>
+
         {/* Card Trabajador */}
         <div className="flex-1 flex items-center gap-4 bg-white rounded-xl shadow border border-green-100 p-4">
           <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-xl border-2 border-white shadow">
@@ -108,35 +77,27 @@ const ChatBox = ({
           <div>
             <div className="font-semibold text-gray-800">{trabajadorName}</div>
             <div className="text-xs text-green-600 font-bold">Trabajador</div>
-            {/* <div className="text-xs text-gray-500">correo@trabajador.com</div> */}
           </div>
         </div>
       </div>
 
-      {/* Mensajes con scroll interno */}
-      <div
-        className="flex-1 min-h-0 overflow-y-auto px-6 py-4 space-y-2 bg-[#ece5dd] relative"
-        ref={messagesContainerRef}
-      >
-        {(localMessages || []).map((msg) => {
+      {/* Mensajes */}
+      <div className="flex-1 min-h-0 overflow-y-auto px-6 py-4 space-y-2 bg-[#ece5dd] relative">
+        {(localMessages || []).map((msg, index) => {
           const isOwn = msg.senderId === currentUserId;
           return (
             <div
-              key={msg.id}
-              className={`flex ${
-                isOwn ? "justify-end" : "justify-start"
-              } animate-fade-in`}
+              key={`${msg.id}-${index}`}
+              className={`flex ${isOwn ? "justify-end" : "justify-start"} animate-fade-in`}
             >
               <div
-                className={`
-                relative px-5 py-3 rounded-2xl shadow-sm transition-all duration-200
-                ${
-                  isOwn
-                    ? "bg-gradient-to-br from-blue-500 to-blue-700 text-white rounded-br-[0.75rem]"
-                    : "bg-white border border-gray-200 text-gray-900 rounded-bl-[0.75rem]"
-                }
-                max-w-[70%]
-              `}
+                className={`relative px-5 py-3 rounded-2xl shadow-sm transition-all duration-200
+                  ${
+                    isOwn
+                      ? "bg-gradient-to-br from-blue-500 to-blue-700 text-white rounded-br-[0.75rem]"
+                      : "bg-white border border-gray-200 text-gray-900 rounded-bl-[0.75rem]"
+                  }
+                  max-w-[70%]`}
               >
                 <p className="break-words">{msg.message}</p>
                 <span
@@ -156,7 +117,7 @@ const ChatBox = ({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input sticky abajo */}
+      {/* Input y contrato */}
       <div className="sticky bottom-0 left-0 right-0 px-6 py-2 bg-[#f0f0f0]">
         {contract && !contract.accepted && (
           <ContractView
@@ -182,7 +143,6 @@ const ChatBox = ({
           />
         )}
 
-        {/* Input de mensaje */}
         <form onSubmit={handleSubmit} className="flex gap-2 mt-2 items-center">
           <input
             type="text"
@@ -202,7 +162,8 @@ const ChatBox = ({
           </button>
         </form>
       </div>
-      {/* Animación fade-in para mensajes nuevos */}
+
+      {/* Animación de entrada */}
       <style jsx global>{`
         .animate-fade-in {
           animation: fadeIn 0.4s;

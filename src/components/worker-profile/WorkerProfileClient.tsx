@@ -11,6 +11,7 @@ import WorkerServiceList from "./WorkerServiceList";
 import { jwtDecode } from "jwt-decode";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import WorkerReviews from "./WorkerReviews";
 
 type WorkerProfileClientProps = {
   id: string;
@@ -159,6 +160,7 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
               );
             }}
           />
+          <WorkerReviews workerId={user.id} />
         </section>
       </div>
     </main>
