@@ -16,7 +16,7 @@ export default async function WorkerProfilePage({ params }: Props) {
     redirect("/auth");
   }
 
-  const { id } = params; // ✅ sin await
+  const { id } = params;
 
   return (
     <div className="bg-white min-h-screen">

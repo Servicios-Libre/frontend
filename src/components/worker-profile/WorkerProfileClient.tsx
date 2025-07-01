@@ -27,7 +27,7 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
   const { token, loading: authLoading } = useAuth();
 
   useEffect(() => {
-    if (authLoading || !token) return; // 👈 esperamos a que cargue
+    if (authLoading || !token) return;
     try {
       const decoded = jwtDecode<{ id: string }>(token);
       setIsOwner(decoded.id === id);
@@ -38,7 +38,7 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
   }, [id, token, authLoading]);
 
   useEffect(() => {
-    if (authLoading) return; // 👈 esperamos que cargue el token
+    if (authLoading) return;
     if (!token) {
       setError("No hay token disponible");
       setLoading(false);
@@ -83,21 +83,21 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
       setUser((prev) =>
         prev
           ? {
-            ...prev,
-            services: prev.services.map((s) =>
-              s.id === updatedService.id
-                ? {
-                  ...s,
-                  title: updatedService.title,
-                  description: updatedService.description,
-                  work_photos: [
-                    ...updatedService.work_photos,
-                    ...uploadedPhotos,
-                  ],
-                }
-                : s
-            ),
-          }
+              ...prev,
+              services: prev.services.map((s) =>
+                s.id === updatedService.id
+                  ? {
+                      ...s,
+                      title: updatedService.title,
+                      description: updatedService.description,
+                      work_photos: [
+                        ...updatedService.work_photos,
+                        ...uploadedPhotos,
+                      ],
+                    }
+                  : s
+              ),
+            }
           : prev
       );
     } catch (err) {
@@ -133,9 +133,9 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
               setUser((prev) =>
                 prev
                   ? {
-                    ...prev,
-                    services: prev.services.filter((s) => s.id !== deletedId),
-                  }
+                      ...prev,
+                      services: prev.services.filter((s) => s.id !== deletedId),
+                    }
                   : prev
               );
             }}
