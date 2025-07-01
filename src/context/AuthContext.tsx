@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import {
@@ -48,7 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setTokenState] = useState<string | null>(null);
   const [user, setUser] = useState<JwtPayload | null>(null);
   const [loading, setLoading] = useState(true);
-  const [unreadCount] = useState(0);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -63,6 +64,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     setLoading(false);
   }, [session, status]);
+
+  useEffect(() => {
+    if (!token || !user?.id) return;
+
+    const fetchUnreadMessages = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/inbox`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) throw new Error("Error al obtener chats");
+
+        const chats = await res.json();
+
+        const unread = chats.reduce((count: number, chat: any) => {
+          if (
+            chat.lastMessage &&
+            chat.lastMessage.isRead === false &&
+            chat.lastMessage.senderId !== user.id
+          ) {
+            return count + 1;
+          }
+          return count;
+        }, 0);
+
+        setUnreadCount(unread);
+      } catch (err) {
+        console.error("Error contando mensajes no leídos:", err);
+        setUnreadCount(0);
+      }
+    };
+
+    fetchUnreadMessages();
+  }, [token, user]);
 
   const setToken = (newToken: string | null) => {
     setTokenState(newToken);
