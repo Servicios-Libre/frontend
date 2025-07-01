@@ -1,6 +1,9 @@
 import { Servicio } from "@/types";
 import api from "./axiosConfig";
 
+/**
+ * Obtiene servicios según búsqueda, filtros de categorías, paginación.
+ */
 export const obtenerServicios = async (
   busqueda: string,
   categorias: string[],
@@ -18,11 +21,15 @@ export const obtenerServicios = async (
   return response.data;
 };
 
+/**
+ * Edita un servicio. Requiere token del usuario (admin o propietario).
+ */
 export const editarServicio = async (
   id: string,
   data: { title: string; description: string },
   token: string
 ) => {
+
   const response = await api.put(`/services/edit/${id}`, data, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -32,9 +39,10 @@ export const editarServicio = async (
   return response.data;
 };
 
-export const eliminarServicio = async (id: string) => {
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-
+/**
+ * Elimina un servicio. Requiere token, obtenido desde contexto de autenticación.
+ */
+export const eliminarServicio = async (id: string, token: string) => {
   if (!token) {
     throw new Error("No autorizado: token no disponible");
   }
@@ -46,4 +54,23 @@ export const eliminarServicio = async (id: string) => {
   });
 
   return response.data;
+};
+
+/**
+ * Elimina una imagen de un servicio. Requiere token.
+ */
+export const eliminarFotoDeServicio = async (
+  serviceId: string,
+  photoId: string,
+  token: string
+) => {
+
+  return api.delete(`/files/service/${serviceId}`, {
+    params: {
+      workPhoto_id: photoId,
+    },
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 };
