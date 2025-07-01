@@ -86,6 +86,16 @@ export default function ChatDemo() {
       .then((res) => {
         setMessages(res.data.messages);
 
+        axios
+          .post(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/chat/${chatId}/mark-as-read`,
+            {},
+            { headers: { Authorization: `Bearer ${token}` } }
+          )
+          .catch((err) => {
+            console.error("Error al marcar como leídos:", err);
+          });
+
         const { user1, user2 } = res.data;
 
         if (!user1 || !user2) return;
@@ -187,30 +197,53 @@ export default function ChatDemo() {
             </div>
           ) : (
             <ul className="divide-y divide-gray-100">
-              {chats.map((chat) => (
-                <li
-                  key={chat.id}
-                  className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-blue-50 transition
-                    ${chat.id === chatId ? "bg-blue-100/60" : ""}`}
-                  onClick={() => router.push(`/chat/${chat.id}`)}
-                >
-                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg border border-blue-200">
-                    {chat.otherUsername?.[0]?.toUpperCase() || "?"}
-                  </div>
-                  <div className="text-black flex-1 min-w-0">
-                    <div className="font-semibold truncate">
-                      {chat.otherUsername}
-                    </div>
-                    <div className="text-xs text-gray-500 truncate">
-                      {chat.lastMessage?.message || (
-                        <span className="italic text-gray-400">
-                          Sin mensajes aún
-                        </span>
+              {chats.map((chat) => {
+                const isUnread =
+                  chat.lastMessage &&
+                  !chat.lastMessage.isRead &&
+                  chat.lastMessage.senderId !== user.id;
+
+                return (
+                  <li
+                    key={chat.id}
+                    className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition 
+                ${
+                  chat.id === chatId
+                    ? "bg-blue-100/60"
+                    : isUnread
+                    ? "bg-amber-50"
+                    : ""
+                } 
+                hover:bg-blue-50`}
+                    onClick={() => router.push(`/chat/${chat.id}`)}
+                  >
+                    {/* Avatar + badge si tiene mensajes sin leer */}
+                    <div className="relative w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg border border-blue-200">
+                      {chat.otherUsername?.[0]?.toUpperCase() || "?"}
+                      {isUnread && (
+                        <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-amber-500 rounded-full border border-white shadow-sm animate-pulse"></span>
                       )}
                     </div>
-                  </div>
-                </li>
-              ))}
+
+                    <div className="text-black flex-1 min-w-0">
+                      <div
+                        className={`font-semibold truncate ${
+                          isUnread ? "text-blue-600" : ""
+                        }`}
+                      >
+                        {chat.otherUsername}
+                      </div>
+                      <div className="text-xs text-gray-500 truncate">
+                        {chat.lastMessage?.message || (
+                          <span className="italic text-gray-400">
+                            Sin mensajes aún
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>
