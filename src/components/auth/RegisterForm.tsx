@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import axios, { AxiosError } from "axios";
 import CountryCitySelect from "./CountryCitySelect";
 import { registerUser } from "@/services/authService";
+import { fetchStatesWithCities } from "@/services/profileService";
 
 type Props = {
   setMessage: (msg: string) => void;
@@ -13,6 +14,10 @@ type Props = {
 };
 
 export default function RegisterForm({ setMessage, setError }: Props) {
+  const [statesData, setStatesData] = useState<
+    { id: number; state: string; cities: { id: number; name: string; state: string }[] }[]
+  >([]);
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -29,10 +34,39 @@ export default function RegisterForm({ setMessage, setError }: Props) {
 
   const router = useRouter();
 
+  useEffect(() => {
+    const loadStates = async () => {
+      try {
+        const data = await fetchStatesWithCities();
+        setStatesData(data);
+      } catch (error) {
+        console.error("Error al cargar provincias:", error);
+      }
+    };
+
+    loadStates();
+  }, []);
+
+  const provincias = statesData.map((prov) => prov.state);
+
+  const ciudades =
+    formData.state !== ""
+      ? statesData.find((prov) => prov.state === formData.state)?.cities.map((city) => city.name) || []
+      : [];
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "state"
+        ? value
+        : value,
+      ...(name === "state" ? { city: "" } : {}), // resetear ciudad si cambia provincia
+    }));
+
     setError("");
     setMessage("");
   };
@@ -72,13 +106,14 @@ export default function RegisterForm({ setMessage, setError }: Props) {
       setError("Todos los campos son obligatorios.");
       return;
     }
+
     if (password !== confirmPassword) {
       setError("Las contraseñas no coinciden.");
       return;
     }
 
     try {
-      const fullName = `${firstName} ${lastName}`;
+      const fullName = `${firstName.trim()} ${lastName.trim()}`;
       await registerUser({
         name: fullName,
         email,
@@ -87,12 +122,11 @@ export default function RegisterForm({ setMessage, setError }: Props) {
         phone,
         street,
         house_number: Number(house_number),
-        city,
-        state,
+        city: city.trim(),
+        state: state.trim(),
         zip_code,
       });
 
-      // Login automático con NextAuth Credentials
       const result = await signIn("credentials", {
         redirect: false,
         email,
@@ -101,7 +135,7 @@ export default function RegisterForm({ setMessage, setError }: Props) {
 
       if (result?.error) {
         setError("Error al iniciar sesión después del registro.");
-      } else if (result?.ok) {
+      } else {
         setMessage("¡Registro y login exitosos!");
         setTimeout(() => {
           router.push("/servicios");
@@ -168,22 +202,24 @@ export default function RegisterForm({ setMessage, setError }: Props) {
           required
         />
       </div>
+
       <CountryCitySelect
         state={formData.state}
         city={formData.city}
+        provinces={provincias}
+        cities={ciudades}
         onChange={handleChange}
       />
-      <div className="flex flex-col sm:flex-row gap-2">
-        <input
-          name="zip_code"
-          type="text"
-          placeholder="Código Postal"
-          className="w-full rounded-md border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          value={formData.zip_code}
-          onChange={handleChange}
-          required
-        />
-      </div>
+
+      <input
+        name="zip_code"
+        type="text"
+        placeholder="Código Postal"
+        className="w-full rounded-md border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+        value={formData.zip_code}
+        onChange={handleChange}
+        required
+      />
       <input
         name="email"
         type="email"
