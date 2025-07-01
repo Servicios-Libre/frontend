@@ -50,29 +50,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [unreadCount] = useState(0);
 
-  useEffect(() => {
-    if (status === "loading") return;
-
-    if (session?.user) {
-      setUser(session.user as JwtPayload);
-      setTokenState(session.backendJwt ?? null);
-    } else {
-      setUser(null);
-      setTokenState(null);
-    }
-
-    setLoading(false);
-  }, [session, status]);
-
-  const setToken = (newToken: string | null) => {
-    setTokenState(newToken);
-  };
-
   const logout = useCallback(() => {
     setTokenState(null);
     setUser(null);
     signOut({ callbackUrl: "/landing" });
   }, []);
+
+  useEffect(() => {
+    if (status === "loading") return;
+
+    if (session?.user && session.backendJwt) {
+      setUser(session.user as JwtPayload);
+      setTokenState(session.backendJwt);
+    } else {
+      setUser(null);
+      setTokenState(null);
+
+      if (status === "authenticated") {
+        logout();
+      }
+    }
+
+    setLoading(false);
+  }, [session, status, logout]);
+
+  const setToken = (newToken: string | null) => {
+    setTokenState(newToken);
+  };
 
   return (
     <AuthContext.Provider

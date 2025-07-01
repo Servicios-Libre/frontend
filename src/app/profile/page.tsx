@@ -3,12 +3,12 @@
 
 import LoadingScreen from "@/components/loading-screen/LoadingScreen";
 import { useEffect, useState } from "react";
-import { getProfile, updateProfile, updateProfileImage } from "@/services/profileService";
+import { createSocialLinks, getProfile, updateProfile, updateProfileImage } from "@/services/profileService";
 import { updateSocialLinks } from "@/services/profileService"
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileForm from "@/components/profile/ProfileForm";
 import ProfileActions from "@/components/profile/ProfileActions";
-import { locationOptions, countries } from "@/databauti/locations";
+import { fetchStatesWithCities } from "@/services/profileService";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/context/ToastContext";
@@ -76,6 +76,9 @@ export default function ProfilePage() {
     created_at: "",
     userId: ""
   });
+  const [statesData, setStatesData] = useState<
+    { id: number; state: string; cities: { id: number; name: string; state: string }[] }[]
+  >([]);
 
   const auth = useAuth();
   const user = auth?.user;
@@ -90,6 +93,25 @@ export default function ProfilePage() {
 
   }, []);
 
+  useEffect(() => {
+    const loadStates = async () => {
+      try {
+        const data = await fetchStatesWithCities();
+        setStatesData(data);
+      } catch (error) {
+        console.error("Error al cargar provincias:", error);
+      }
+    };
+
+    loadStates();
+  }, []);
+
+  const provincias = statesData.map((item) => item.state);
+
+  const ciudades = formData.state
+    ? statesData.find((prov) => prov.state === formData.state)?.cities.map((city) => city.name) || []
+    : [];
+
   // Redirección si no hay usuario autenticado
   useEffect(() => {
     if (!loading && !user) {
@@ -102,34 +124,44 @@ export default function ProfilePage() {
     if (user) {
       const fetchProfile = async () => {
         try {
-          const data = await getProfile(token);
-          const ticketData = data.tickets.find((ticket: Ticket) => ticket.status === "pending" && ticket.type === "to-worker");
+          const data = await getProfile();
+          const ticketData = data.tickets.find(
+            (ticket: Ticket) =>
+              ticket.status === "pending" && ticket.type === "to-worker"
+          );
           setTicket(ticketData);
-          setFormData({
-            phone: data.phone?.toString() ?? "",
-            street: data.address_id?.street ?? "",
-            house_number: data.address_id?.house_number?.toString() ?? "",
-            city: data.address_id?.city ?? "",
-            state: data.address_id?.state
-              ? data.address_id.state.trim().charAt(0).toUpperCase() + data.address_id.state.trim().slice(1).toLowerCase()
-              : "",
-            zip_code: data.address_id?.zip_code?.toString() ?? "",
-            user_pic: data.user_pic ?? "",
-            description: data.description ?? "",
-            facebook: data.facebook ?? "",
-            linkedin: data.linkedin ?? "",
-            twitter: data.twitter ?? "",
-            instagram: data.instagram ?? "",
-          });
 
-          setOriginalData({
+          // Normalizar para comparar
+          const normalize = (input: string) =>
+            input.trim().toLowerCase();
+
+          // Buscar la provincia real dentro de statesData
+          const provinciaEncontrada =
+            statesData.find(
+              (prov) =>
+                normalize(prov.state) ===
+                normalize(data.address_id?.state ?? "")
+            )?.state ?? "";
+
+          // Buscar la ciudad real dentro de la provincia encontrada
+          const ciudadEncontrada =
+            statesData
+              .find(
+                (prov) =>
+                  normalize(prov.state) === normalize(provinciaEncontrada)
+              )
+              ?.cities.find(
+                (city) =>
+                  normalize(city.name) ===
+                  normalize(data.address_id?.city ?? "")
+              )?.name ?? "";
+
+          const baseForm = {
             phone: data.phone?.toString() ?? "",
             street: data.address_id?.street ?? "",
             house_number: data.address_id?.house_number?.toString() ?? "",
-            city: data.address_id?.city ?? "",
-            state: data.address_id?.state
-              ? data.address_id.state.trim().charAt(0).toUpperCase() + data.address_id.state.trim().slice(1).toLowerCase()
-              : "",
+            city: ciudadEncontrada,
+            state: provinciaEncontrada,
             zip_code: data.address_id?.zip_code?.toString() ?? "",
             user_pic: data.user_pic ?? "",
             description: data.description ?? "",
@@ -137,7 +169,10 @@ export default function ProfilePage() {
             linkedin: data.linkedin ?? "",
             twitter: data.twitter ?? "",
             instagram: data.instagram ?? "",
-          });
+          };
+
+          setFormData(baseForm);
+          setOriginalData(baseForm);
           setUserName(data.name || data.username || "Usuario");
         } catch (error) {
           console.error("Error al obtener perfil:", error);
@@ -145,7 +180,8 @@ export default function ProfilePage() {
       };
       fetchProfile();
     }
-  }, [user, token]);
+  }, [user, token, statesData]);
+
 
   // Loader pantalla completa mientras no está montado
   if (!mounted) {
@@ -186,6 +222,17 @@ export default function ProfilePage() {
       return;
     }
 
+    // Filtrar socialData para enviar solo los campos no vacíos
+    const socialData = {
+      facebook: formData.facebook?.trim(),
+      linkedin: formData.linkedin?.trim(),
+      twitter: formData.twitter?.trim(),
+      instagram: formData.instagram?.trim(),
+    };
+
+    // Chequear si hay alguna red social no vacía
+    const hasSocialData = Object.values(socialData).some((val) => val && val !== "");
+
     try {
       const dataToSend: any = {
         phone: formData.phone ? Number(formData.phone) : undefined,
@@ -197,18 +244,26 @@ export default function ProfilePage() {
         description: formData.description,
       };
 
-      const socialData = {
-        facebook: formData.facebook,
-        linkedin: formData.linkedin,
-        twitter: formData.twitter,
-        instagram: formData.instagram,
-      };
+      await updateProfile(dataToSend);
 
-      await updateProfile(token, dataToSend);
-      await updateSocialLinks(socialData);
+      if (hasSocialData) {
+        // Decidir si crear o actualizar social links según originalData
+        const hadSocialBefore = originalData && (
+          (originalData.facebook && originalData.facebook.trim() !== "") ||
+          (originalData.instagram && originalData.instagram.trim() !== "") ||
+          (originalData.linkedin && originalData.linkedin.trim() !== "") ||
+          (originalData.twitter && originalData.twitter.trim() !== "")
+        );
+
+        if (hadSocialBefore) {
+          await updateSocialLinks(socialData); // PUT
+        } else {
+          await createSocialLinks(socialData); // POST
+        }
+      }
 
       if (userImageFile) {
-        await updateProfileImage(token, userImageFile);
+        await updateProfileImage(userImageFile);
       }
 
       setOriginalData(formData);
@@ -219,6 +274,7 @@ export default function ProfilePage() {
       showToast("Hubo un error al actualizar el perfil", "error");
     }
   };
+
 
   const handleCancel = () => {
     if (originalData) {
@@ -245,10 +301,6 @@ export default function ProfilePage() {
     JSON.stringify(formData) !== JSON.stringify(originalData);
 
   // Opciones de ciudad según país seleccionado
-  const countryCities =
-    formData.state && locationOptions[formData.state]
-      ? locationOptions[formData.state]
-      : [];
 
   return (
     <div className="min-h-screen bg-gray-100 py-10">
@@ -275,8 +327,9 @@ export default function ProfilePage() {
           handleChange={handleChange}
           handleSelectChange={handleSelectChange}
           setUserPic={setUserPic}
-          countries={countries}
-          countryCities={countryCities}
+          countries={provincias}
+          countryCities={ciudades}
+          isWorker={user?.role === "worker"} // ✅ booleano
         />
       </div>
 
