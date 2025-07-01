@@ -9,6 +9,7 @@ import {
   useCallback,
 } from "react";
 import { useSession, signOut } from "next-auth/react";
+import { fetchUserChats } from "@/services/chat/chatService";
 
 type UserRole = "user" | "worker" | "admin" | null;
 
@@ -80,13 +81,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const fetchUnreadMessages = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/inbox`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const chats = await fetchUserChats();
 
-        if (!res.ok) throw new Error("Error al obtener chats");
-
-        const chats = await res.json();
+        // ⚠️ Validar que chats sea un array
+        if (!Array.isArray(chats)) {
+          setUnreadCount(0);
+          return;
+        }
 
         const unread = chats.reduce((count: number, chat: any) => {
           if (
