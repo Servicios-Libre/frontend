@@ -4,9 +4,7 @@ import { redirect } from "next/navigation";
 import WorkerProfileClient from "@/components/worker-profile/WorkerProfileClient";
 
 type Props = {
-  params: {
-    workerId: string;
-  };
+    params: Promise<{ workerId: string }>;
 };
 
 export default async function WorkerProfilePage({ params }: Props) {
