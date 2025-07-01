@@ -19,6 +19,7 @@ export default function ServicesMenuPage() {
   const [loadingId, setLoadingId] = useState<string | undefined>(undefined);
   const [loadingServiceId, setLoadingServiceId] = useState<string | undefined>(undefined);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { activeServicesCount } = useAdminContext();
 
   const {
     serviceRequests,
@@ -94,7 +95,7 @@ export default function ServicesMenuPage() {
         </h1>
 
         {/* Solicitudes de servicio */}
-        <section>
+        <section className="mb-4">
           <h2 className="text-2xl font-semibold flex items-center gap-2">
             <FaClipboardList className="text-emerald-400" /> Solicitudes pendientes
             {serviceRequests?.length > 0 && (
@@ -114,6 +115,15 @@ export default function ServicesMenuPage() {
 
         {/* Servicios activos */}
         <section>
+          <h2 className="text-2xl font-semibold mb-4 text-purple-300 flex items-center gap-2">
+            Servicios activos
+            {activeServicesCount > 0 && (
+              <span className="ml-2 bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full text-sm font-medium">
+                {activeServicesCount} activos
+              </span>
+            )}
+          </h2>
+
           <ActiveServicesSection
             onDeactivate={handleDeactivate}
             loadingServiceId={loadingServiceId}

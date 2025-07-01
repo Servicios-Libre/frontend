@@ -23,12 +23,14 @@ interface AdminContextProps {
 
   workerRequests: WorkerRequestTicket[];
   workerRequestsCount: number;
+  displayedWorkerRequestsCount: number;
   workerRequestsPage: number;
   setWorkerRequestsPage: (page: number) => void;
   refreshWorkerRequests: () => Promise<void>;
 
   serviceRequests: Ticket[];
   serviceRequestsCount: number;
+  displayedServiceRequestsCount: number;
   serviceRequestsPage: number;
   setServiceRequestsPage: (page: number) => void;
   refreshServiceRequests: () => Promise<void>;
@@ -47,26 +49,28 @@ interface AdminContextProps {
 const AdminContext = createContext<AdminContextProps>({
   users: [],
   loading: true,
-  refreshUsers: async () => { },
+  refreshUsers: async () => {},
   acceptedServiceCount: 0,
-  refreshAcceptedServices: async () => { },
+  refreshAcceptedServices: async () => {},
   workerRequests: [],
   workerRequestsCount: 0,
+  displayedWorkerRequestsCount: 0,
   workerRequestsPage: 1,
-  setWorkerRequestsPage: () => { },
-  refreshWorkerRequests: async () => { },
+  setWorkerRequestsPage: () => {},
+  refreshWorkerRequests: async () => {},
   serviceRequests: [],
   serviceRequestsCount: 0,
+  displayedServiceRequestsCount: 0,
   serviceRequestsPage: 1,
-  setServiceRequestsPage: () => { },
-  refreshServiceRequests: async () => { },
+  setServiceRequestsPage: () => {},
+  refreshServiceRequests: async () => {},
   activeServices: [],
   activeServicesCount: 0,
   activeServicesPage: 1,
-  setActiveServicesPage: () => { },
+  setActiveServicesPage: () => {},
   activeServicesSearch: "",
-  setActiveServicesSearch: () => { },
-  refreshActiveServices: async () => { },
+  setActiveServicesSearch: () => {},
+  refreshActiveServices: async () => {},
   isReady: false,
 });
 
@@ -78,10 +82,12 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
 
   const [workerRequests, setWorkerRequests] = useState<WorkerRequestTicket[]>([]);
   const [workerRequestsCount, setWorkerRequestsCount] = useState(0);
+  const [displayedWorkerRequestsCount, setDisplayedWorkerRequestsCount] = useState(0);
   const [workerRequestsPage, setWorkerRequestsPage] = useState(1);
 
   const [serviceRequests, setServiceRequests] = useState<Ticket[]>([]);
   const [serviceRequestsCount, setServiceRequestsCount] = useState(0);
+  const [displayedServiceRequestsCount, setDisplayedServiceRequestsCount] = useState(0);
   const [serviceRequestsPage, setServiceRequestsPage] = useState(1);
 
   const [activeServices, setActiveServices] = useState<Servicio[]>([]);
@@ -121,6 +127,7 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
       const { tickets, total } = await fetchWorkerRequestsPaginated(workerRequestsPage, 5);
       setWorkerRequests(tickets);
       setWorkerRequestsCount(total);
+      setDisplayedWorkerRequestsCount(total);
     } catch (error) {
       console.error("Error al cargar solicitudes de worker", error);
       setWorkerRequests([]);
@@ -134,6 +141,7 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
       const { tickets, total } = await fetchServiceRequestsPaginated(serviceRequestsPage, 5);
       setServiceRequests(tickets);
       setServiceRequestsCount(total);
+      setDisplayedServiceRequestsCount(total);
     } catch (error) {
       console.error("Error al cargar solicitudes de servicio", error);
       setServiceRequests([]);
@@ -204,6 +212,18 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [loading, isAdmin, refreshServiceRequests]);
 
+  useEffect(() => {
+    if (!token || !isAdmin) return;
+    const delayDebounce = setTimeout(() => {
+      refreshActiveServices();
+    }, 400);
+    return () => clearTimeout(delayDebounce);
+  }, [activeServicesSearch, token, isAdmin, refreshActiveServices]);
+
+  useEffect(() => {
+    setActiveServicesPage(1);
+  }, [activeServicesSearch]);
+
   return (
     <AdminContext.Provider
       value={{
@@ -214,11 +234,13 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
         refreshAcceptedServices,
         workerRequests,
         workerRequestsCount,
+        displayedWorkerRequestsCount,
         workerRequestsPage,
         setWorkerRequestsPage,
         refreshWorkerRequests,
         serviceRequests,
         serviceRequestsCount,
+        displayedServiceRequestsCount,
         serviceRequestsPage,
         setServiceRequestsPage,
         refreshServiceRequests,

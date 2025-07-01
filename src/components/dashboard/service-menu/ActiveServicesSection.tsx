@@ -1,41 +1,41 @@
-"use client";
-
-import { Servicio } from "@/types";
-import ActiveServicesTable from "@/components/dashboard/service-menu/ActiveServicesTable";
-import Pagination from "@/components/dashboard/Pagination";
-import { FaTools } from "react-icons/fa";
+import { SearchInput } from "@/components/dashboard/SearchInput"; // 👈 asegurate que esté este import
+import Pagination from "../Pagination";
+import ActiveServicesTable from "./ActiveServicesTable";
 import { useAdminContext } from "@/context/AdminContext";
 
-interface Props {
-  loadingServiceId?: string;
+import { Servicio } from "@/types";
+
+type Props = {
   onDeactivate: (service: Servicio) => void;
-}
+  loadingServiceId?: string;
+};
 
 export default function ActiveServicesSection({
-  loadingServiceId,
   onDeactivate,
+  loadingServiceId,
 }: Props) {
   const {
     activeServices,
     activeServicesCount,
-    setActiveServicesPage,
     activeServicesPage,
+    setActiveServicesPage,
+    activeServicesSearch,
+    setActiveServicesSearch,
   } = useAdminContext();
 
-  const perPage = 5;
-  const totalPages = Math.ceil(activeServicesCount / perPage);
+  const itemsPerPage = 5;
+  const totalPages = Math.ceil(activeServicesCount / itemsPerPage);
 
   return (
-    <section>
-      <div className="flex items-center gap-2 mb-4 mt-10">
-        <h2 className="text-2xl font-bold text-indigo-100 flex items-center gap-2">
-          <FaTools className="text-indigo-600" /> Servicios activos
-        </h2>
-        {activeServicesCount > 0 && (
-          <span className="ml-2 bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-semibold">
-            {activeServicesCount} activos
-          </span>
-        )}
+    <div className="mt-4">
+
+      {/* 🔍 Buscador */}
+      <div className="mb-4">
+        <SearchInput
+          searchTerm={activeServicesSearch}
+          setSearchTerm={setActiveServicesSearch}
+          placeholder="Buscar servicios por nombre..."
+        />
       </div>
 
       <ActiveServicesTable
@@ -49,6 +49,6 @@ export default function ActiveServicesSection({
         currentPage={activeServicesPage}
         onPageChange={setActiveServicesPage}
       />
-    </section>
+    </div>
   );
 }

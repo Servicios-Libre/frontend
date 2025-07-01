@@ -23,7 +23,11 @@ interface SidebarProps {
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
-  const { workerRequestsCount, serviceRequestsCount, isReady } = useAdminContext();
+  const {
+    displayedWorkerRequestsCount,
+    displayedServiceRequestsCount,
+    isReady
+  } = useAdminContext();
 
   return (
     <>
@@ -71,7 +75,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             href="/dashboard/services-management"
             icon={<FaTools />}
             text="Servicios"
-            notificationCount={isReady ? serviceRequestsCount : undefined}
+            notificationCount={isReady ? displayedServiceRequestsCount : undefined}
             pathname={pathname}
             onClick={onClose}
           />
@@ -80,7 +84,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             href="/dashboard/worker-management"
             icon={<FaUserCog />}
             text="Trabajadores"
-            notificationCount={isReady ? workerRequestsCount : undefined}
+            notificationCount={isReady ? displayedWorkerRequestsCount : undefined}
             pathname={pathname}
             onClick={onClose}
           />
@@ -166,11 +170,10 @@ const NavLink: React.FC<NavLinkProps> = ({
       onClick={onClick}
     >
       <div
-        className={`text-xl ${
-          isActive
-            ? activeIconColor
-            : `${inactiveIconColor} group-hover:scale-110 transition-transform duration-200`
-        }`}
+        className={`text-xl ${isActive
+          ? activeIconColor
+          : `${inactiveIconColor} group-hover:scale-110 transition-transform duration-200`
+          }`}
       >
         {icon}
       </div>

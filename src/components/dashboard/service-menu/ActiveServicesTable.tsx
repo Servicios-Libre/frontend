@@ -1,3 +1,4 @@
+// src/components/dashboard/service-menu/ActiveServicesTable.tsx
 import React from "react";
 import { Servicio } from "@/types";
 import { Trash2 } from "lucide-react";
@@ -27,7 +28,6 @@ export default function ActiveServicesTable({
           key={service.id}
           className="bg-purple-800 rounded-xl p-3 shadow-md flex justify-between items-center hover:bg-purple-700 transition"
         >
-          {/* Bloque título + categoría */}
           <div className="flex flex-col max-w-[80%]">
             <p className="text-white text-base font-semibold break-words">
               {service.title}
@@ -37,7 +37,6 @@ export default function ActiveServicesTable({
             </p>
           </div>
 
-          {/* Botón */}
           <button
             onClick={() => onDeactivate(service)}
             disabled={loadingId === service.id}
