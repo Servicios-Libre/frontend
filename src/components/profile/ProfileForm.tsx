@@ -1,4 +1,5 @@
 import React from "react";
+import SocialLinksForm from "./SocialLinksForm";
 
 interface ProfileFormType {
     phone: string;
@@ -8,16 +9,22 @@ interface ProfileFormType {
     state: string;
     zip_code: string;
     user_pic?: string;
+    description: string;
+    facebook?: string;
+    linkedin?: string;
+    twitter?: string;
+    instagram?: string;
 }
 
 type Props = {
-  formData: ProfileFormType;
-  editMode: boolean;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleSelectChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  setUserPic: (url: string) => void;
-  countries: string[];
-  countryCities: string[];
+    formData: ProfileFormType;
+    editMode: boolean;
+    handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+    handleSelectChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    setUserPic: (url: string) => void;
+    countries: string[];
+    countryCities: string[];
+    isWorker: boolean;
 };
 
 export default function ProfileForm({
@@ -27,13 +34,15 @@ export default function ProfileForm({
     handleSelectChange,
     countries,
     countryCities,
+    isWorker,
 }: Props) {
+
     return (
         <form className="flex flex-col gap-4 bg-white rounded-xl shadow-sm p-8 border border-blue-100">
             <div className="flex flex-col sm:flex-row gap-2">
                 <div className="w-full">
                     <label htmlFor="phone" className="block text-blue-700 font-normal mb-1">
-                        Teléfono
+                        Teléfono {isWorker}
                     </label>
                     <input
                         id="phone"
@@ -82,7 +91,7 @@ export default function ProfileForm({
             <div className="flex flex-col sm:flex-row gap-2">
                 <div className="w-full">
                     <label htmlFor="state" className="block text-blue-700 font-normal mb-1">
-                        Estado
+                        Provincia
                     </label>
                     <select
                         id="state"
@@ -92,9 +101,11 @@ export default function ProfileForm({
                         disabled={!editMode}
                         className="w-full rounded-md border border-gray-300 px-4 py-2 text-base focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:bg-gray-100"
                     >
-                        <option value="">Selecciona un estado</option>
+                        <option value="">Selecciona una provincia</option>
                         {countries.map((country) => (
-                            <option key={country} value={country}>{country}</option>
+                            <option key={country} value={country}>
+                                {country}
+                            </option>
                         ))}
                     </select>
                 </div>
@@ -112,7 +123,9 @@ export default function ProfileForm({
                     >
                         <option value="">Selecciona una ciudad</option>
                         {countryCities.map((city) => (
-                            <option key={city} value={city}>{city}</option>
+                            <option key={city} value={city}>
+                                {city}
+                            </option>
                         ))}
                     </select>
                 </div>
@@ -134,6 +147,31 @@ export default function ProfileForm({
                     />
                 </div>
             </div>
+
+            <div className="w-full">
+                <label htmlFor="description" className="block text-blue-700 font-normal mb-1">
+                    Descripción
+                </label>
+                <textarea
+                    id="description"
+                    name="description"
+                    rows={3}
+                    placeholder="Cuéntanos sobre ti o tus habilidades"
+                    className="w-full rounded-md border border-gray-300 px-4 py-2 text-base focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:bg-gray-100"
+                    value={formData.description}
+                    onChange={handleChange}
+                    disabled={!editMode}
+                />
+            </div>
+
+            {isWorker && (
+                <SocialLinksForm
+                    formData={formData}
+                    editMode={editMode}
+                    handleChange={handleChange}
+                />
+            )}
+
         </form>
     );
 }

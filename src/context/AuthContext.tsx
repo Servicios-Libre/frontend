@@ -51,19 +51,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  const logout = useCallback(() => {
+    setTokenState(null);
+    setUser(null);
+    signOut({ callbackUrl: "/landing" });
+  }, []);
+
   useEffect(() => {
     if (status === "loading") return;
 
-    if (session?.user) {
+    if (session?.user && session.backendJwt) {
       setUser(session.user as JwtPayload);
-      setTokenState(session.backendJwt ?? null);
+      setTokenState(session.backendJwt);
     } else {
       setUser(null);
       setTokenState(null);
+
+      if (status === "authenticated") {
+        logout();
+      }
     }
 
     setLoading(false);
-  }, [session, status]);
+  }, [session, status, logout]);
 
   useEffect(() => {
     if (!token || !user?.id) return;
@@ -102,12 +112,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const setToken = (newToken: string | null) => {
     setTokenState(newToken);
   };
-
-  const logout = useCallback(() => {
-    setTokenState(null);
-    setUser(null);
-    signOut({ callbackUrl: "/landing" });
-  }, []);
 
   return (
     <AuthContext.Provider
