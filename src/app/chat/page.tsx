@@ -12,6 +12,14 @@ export default function ChatInboxPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    document.title = "Servicio Libre - Tus chats"
+
+    return () => {
+      document.title = "Servicio Libre";
+    };
+  }, [])
+
+  useEffect(() => {
     if (!user?.id || !token) return;
     axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/inbox`, {
       headers: { Authorization: `Bearer ${token}` }
