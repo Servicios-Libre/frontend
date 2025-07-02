@@ -163,12 +163,10 @@ export default function ChatDemo() {
 
     const newMsg: ChatMessage = {
       id: response.data.id,
-      message: response.data.message ?? text, // fallback con el texto enviado
+      message: response.data.message ?? text,
       senderId: response.data.senderId ?? user.id,
       timestamp: response.data.timestamp ?? new Date().toISOString(),
     };
-
-    setMessages((prev) => [...prev, newMsg]);
 
     const socket = getSocket();
     socket.emit("sendMessage", {
