@@ -76,7 +76,7 @@ export default function ChatDemo() {
     socket.on("newContract", (updatedContract) => {
       console.log("🧾 Contrato recibido vía socket:", updatedContract);
       setContract(updatedContract);
-      setShowContractForm(false); 
+      setShowContractForm(false);
     });
 
     socket.on("contractUpdated", (updatedContract) => {
@@ -372,6 +372,8 @@ export default function ChatDemo() {
             userRole={userRole}
             trabajadorId={trabajadorId}
             clienteId={clienteId}
+            showContractForm={showContractForm}
+            setShowContractForm={setShowContractForm}
           />
         )}
       </section>
