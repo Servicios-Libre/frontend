@@ -265,6 +265,21 @@ export default function ChatDemo() {
       </div>
     );
 
+  const userRole =
+    user.id === clienteId
+      ? "client"
+      : user.id === trabajadorId
+      ? "worker"
+      : null;
+
+  if (!userRole) {
+    return (
+      <p className="text-center text-red-500">
+        Error: No se pudo determinar el rol del usuario.
+      </p>
+    );
+  }
+
   return (
     <div className="min-h-screen flex bg-[#ece5dd] overflow-x-auto overflow-y-hidden">
       {/* Fondo decorativo tipo WhatsApp */}
@@ -352,7 +367,7 @@ export default function ChatDemo() {
             onConfirmService={handleConfirmService}
             clienteName={clienteName}
             trabajadorName={trabajadorName}
-            userRole={user.role === "user" ? "client" : "worker"}
+            userRole={userRole}
             trabajadorId={trabajadorId}
             clienteId={clienteId}
           />
