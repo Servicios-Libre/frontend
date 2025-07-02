@@ -75,10 +75,15 @@ export default function ChatDemo() {
       console.log("📦 Contrato recibido por socket:", contractData);
       setContract(contractData);
     });
+    socket.on("contractUpdated", (updatedContract) => {
+      console.log("📡 Contrato actualizado vía socket:", updatedContract);
+      setContract(updatedContract);
+    });
 
     return () => {
       socket.off("newMessage", handleNewMessage);
       socket.off("newContract");
+      socket.off("contractUpdated");
       socket.emit("leaveChat", { chatRoom: `chat_${chatId}` });
     };
   }, [chatId, token]);
