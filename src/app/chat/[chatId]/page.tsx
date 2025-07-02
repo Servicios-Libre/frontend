@@ -113,6 +113,23 @@ export default function ChatDemo() {
           setTrabajadorId(user2.id);
           setClienteId(user1.id);
         }
+        axios
+          .get(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/contract`, {
+            params: {
+              worker: user1.role === "worker" ? user1.id : user2.id,
+              client: user1.role === "user" ? user1.id : user2.id,
+            },
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
+          .then((res) => setContract(res.data))
+          .catch((err) => {
+            console.log(
+              "ℹ️ No hay contrato activo:",
+              err?.response?.data?.message || err.message
+            );
+          });
       })
       .finally(() => setLoading(false));
   }, [chatId, token]);
@@ -165,15 +182,19 @@ export default function ChatDemo() {
   const handleContractCreate = async (contractData: ChatContract) => {
     if (!token) return;
 
+    const body = {
+      ...contractData,
+      chatId,
+      workerId: trabajadorId,
+      clientId: clienteId,
+    };
+
+    console.log("🛰 Enviando contrato al backend:", body);
+
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/api/chat/${chatId}/contract`,
-        {
-          ...contractData,
-          chatId,
-          workerId: trabajadorId,
-          clientId: clienteId,
-        },
+        body,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -183,7 +204,7 @@ export default function ChatDemo() {
 
       setContract(response.data);
     } catch (error) {
-      console.error("Error al crear el contrato:", error);
+      console.error("❌ Error al crear contrato:", error);
     }
   };
 
