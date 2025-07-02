@@ -88,8 +88,13 @@ const ChatBox = ({
   };
 
   const alreadyConfirmed =
-    (userRole === "client" && contract?.clientConfirmed) ||
-    (userRole === "worker" && contract?.workerConfirmed);
+    (userRole === "client" && contract?.clientConfirmed === true) ||
+    (userRole === "worker" && contract?.workerConfirmed === true);
+
+  console.log("CLIENTE: userRole:", userRole);
+  console.log("CLIENTE: contract.clientConfirmed:", contract?.clientConfirmed);
+  console.log("CLIENTE: contract.workerConfirmed:", contract?.workerConfirmed);
+  console.log("CLIENTE: alreadyConfirmed:", alreadyConfirmed);
 
   return (
     <div className="flex flex-col h-full w-full bg-white">
@@ -156,13 +161,15 @@ const ChatBox = ({
 
       {/* Input y contrato */}
       <div className="sticky bottom-0 left-0 right-0 px-6 py-2 bg-[#f0f0f0]">
-        {contract && !contract.accepted && currentUserId === clienteId && (
-          <ContractView
-            contract={contract}
-            onAccept={onContractAccept}
-            onCancel={() => setShowContractForm(false)}
-          />
-        )}
+        {contract &&
+          contract.status === "pending" &&
+          currentUserId === clienteId && (
+            <ContractView
+              contract={contract}
+              onAccept={onContractAccept}
+              onCancel={() => setShowContractForm(false)}
+            />
+          )}
 
         {!contract && currentUserId === trabajadorId && (
           <button
@@ -181,7 +188,7 @@ const ChatBox = ({
         )}
 
         {/* Confirmar servicio */}
-        {contract?.accepted && !contract.completed && (
+        {contract && contract.status === "accepted" && !contract.completed && (
           <button
             onClick={onConfirmService}
             disabled={alreadyConfirmed}
