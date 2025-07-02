@@ -57,3 +57,12 @@ export const createSocialLinks = async (socialData: {
     throw error;
   }
 };
+
+export const redirectToPayment = async () => {
+  try {
+    await api.get("/payment/create-order");
+  } catch (error) {
+    console.error("Error al redirigir a la página de pago:", error);
+    throw error
+  }
+}
