@@ -68,18 +68,11 @@ export default function ProfilePage() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [showMissing, setShowMissing] = useState(false);
   const [userImageFile, setUserImageFile] = useState<File | null>(null);
-  const [ticket, setTicket] = useState<Ticket>({
-    id: "",
-    type: "",
-    status: "",
-    created_at: "",
-    userId: ""
-  });
+  const [ticket, setTicket] = useState<Ticket | null>(null);
   const [statesData, setStatesData] = useState<
-  { id: number; state: string; cities: { id: number; name: string; state: string }[] }[]
+    { id: number; state: string; cities: { id: number; name: string; state: string }[] }[]
   >([]);
-  
-  
+
   const auth = useAuth();
   const user = auth?.user;
   const loading = auth?.loading ?? false;
@@ -91,7 +84,6 @@ export default function ProfilePage() {
   useEffect(() => {
     document.title = "Servicio Libre - Mi Perfil";
     setMounted(true);
-
   }, []);
 
   useEffect(() => {
@@ -120,7 +112,7 @@ export default function ProfilePage() {
     }
   }, [user, loading, router]);
 
-  // Cargar perfil al montar o cuando cambia el usuario
+  // Cargar perfil al montar o cuando cambia el usuario o cambia statesData
   useEffect(() => {
     if (user) {
       const fetchProfile = async () => {
@@ -130,13 +122,11 @@ export default function ProfilePage() {
             (ticket: Ticket) =>
               ticket.status === "pending" && ticket.type === "to-worker"
           );
-          setTicket(ticketData);
+          setTicket(ticketData || null);
 
-          // Normalizar para comparar
           const normalize = (input: string) =>
             input.trim().toLowerCase();
 
-          // Buscar la provincia real dentro de statesData
           const provinciaEncontrada =
             statesData.find(
               (prov) =>
@@ -144,7 +134,6 @@ export default function ProfilePage() {
                 normalize(data.address_id?.state ?? "")
             )?.state ?? "";
 
-          // Buscar la ciudad real dentro de la provincia encontrada
           const ciudadEncontrada =
             statesData
               .find(
@@ -183,13 +172,10 @@ export default function ProfilePage() {
     }
   }, [user, token, statesData]);
 
-
-  // Loader pantalla completa mientras no está montado
   if (!mounted) {
     return <LoadingScreen />;
   }
 
-  // Loader pantalla completa mientras carga el usuario
   if (loading || !user) {
     return <LoadingScreen />;
   }
@@ -223,7 +209,6 @@ export default function ProfilePage() {
       return;
     }
 
-    // Filtrar socialData para enviar solo los campos no vacíos
     const socialData = {
       facebook: formData.facebook?.trim(),
       linkedin: formData.linkedin?.trim(),
@@ -231,12 +216,11 @@ export default function ProfilePage() {
       instagram: formData.instagram?.trim(),
     };
 
-    // Chequear si hay alguna red social no vacía
     const hasSocialData = Object.values(socialData).some((val) => val && val !== "");
 
     try {
       const dataToSend: any = {
-        name: userName,
+        name: userName,  // <- acá usás el userName actualizado del estado
         phone: formData.phone ? Number(formData.phone) : undefined,
         street: formData.street,
         house_number: formData.house_number ? Number(formData.house_number) : undefined,
@@ -249,7 +233,6 @@ export default function ProfilePage() {
       await updateProfile(dataToSend);
 
       if (hasSocialData) {
-        // Decidir si crear o actualizar social links según originalData
         const hadSocialBefore = originalData && (
           (originalData.facebook && originalData.facebook.trim() !== "") ||
           (originalData.instagram && originalData.instagram.trim() !== "") ||
@@ -258,9 +241,9 @@ export default function ProfilePage() {
         );
 
         if (hadSocialBefore) {
-          await updateSocialLinks(socialData); // PUT
+          await updateSocialLinks(socialData);
         } else {
-          await createSocialLinks(socialData); // POST
+          await createSocialLinks(socialData);
         }
       }
 
@@ -277,7 +260,6 @@ export default function ProfilePage() {
     }
   };
 
-
   const handleCancel = () => {
     if (originalData) {
       setFormData(originalData);
@@ -286,11 +268,10 @@ export default function ProfilePage() {
   };
 
   const handlePremiumSubscription = async () => {
-  if (token) {
-    console.log("redireccionando para mp......")
-    await redirectToPayment()
-  }
-};
+    if (token) {
+      await redirectToPayment();
+    }
+  };
 
   const getMissingFields = () => {
     return requiredFields.filter((field) => {
@@ -308,8 +289,6 @@ export default function ProfilePage() {
   const isComplete = completion === 100;
   const hasUnsavedChanges =
     JSON.stringify(formData) !== JSON.stringify(originalData);
-
-  // Opciones de ciudad según país seleccionado
 
   return (
     <div className="min-h-screen bg-gray-100 py-10">
@@ -340,7 +319,7 @@ export default function ProfilePage() {
           setUserPic={setUserPic}
           countries={provincias}
           countryCities={ciudades}
-          isWorker={user?.role === "worker"} // ✅ booleano
+          isWorker={user?.role === "worker"}
         />
       </div>
 
