@@ -48,7 +48,7 @@ export function UserDropdown({
 
   if (!mounted) return null;
 
-    if (user && user.name) {
+    if (user && userName) {
         return (
             <div className="relative ml-6" ref={dropdownRef}>
                 <button
@@ -59,7 +59,7 @@ export function UserDropdown({
                     }}
                 > 
                 {user.premium && <Crown className="w-6 h-6 text-orange-400" />}
-                    {user.name}
+                    {userName}
                     <FontAwesomeIcon
                         icon={faChevronDown}
                         className={`text-xs transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""}`}
