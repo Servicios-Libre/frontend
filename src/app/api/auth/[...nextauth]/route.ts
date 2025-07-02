@@ -72,11 +72,8 @@ const handler = NextAuth({
       if (user) {
         const myUser = user as MyUser;
 
-        myToken.id = myUser.id;
         myToken.name = myUser.name;
         myToken.email = myUser.email;
-        myToken.role = myUser.role;
-        myToken.tickets = myUser.tickets;
         myToken.image = myUser.image;
 
         if (account?.provider === "google") {
@@ -87,10 +84,15 @@ const handler = NextAuth({
               image: myUser.image,
             });
 
-            myToken.backendJwt = res.data.token;
-            myToken.id = res.data.id;
-            myToken.role = res.data.role;
-            myToken.tickets = res.data.tickets;
+            const backendJwt = res.data.token;
+            const decoded: any = jwtDecode(backendJwt);
+
+            myToken.backendJwt = backendJwt;
+            myToken.id = decoded.id;
+            myToken.role = decoded.role;
+            myToken.tickets = decoded.tickets ?? [];
+            myToken.name = decoded.name;
+            myToken.email = decoded.email;
           } catch (err) {
             console.error("Error al autenticar con Google:", err);
             myToken.backendJwt = null;

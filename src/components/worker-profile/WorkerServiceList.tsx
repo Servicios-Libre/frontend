@@ -8,6 +8,7 @@ import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import { eliminarServicio } from "@/services/serviciosService";
 import { useToast } from "@/context/ToastContext";
 import { useAuth } from "@/context/AuthContext";
+import EmptyState from "@/components/ui/empty-state/EmptyState";
 
 export default function WorkerServiceList({
   services,
@@ -85,7 +86,17 @@ export default function WorkerServiceList({
             />
           ))
         ) : (
-          <p className="text-gray-500">Este trabajador aún no ha publicado servicios.</p>
+          <EmptyState
+            message={
+              isOwner
+                ? "Aún no has publicado servicios. ¡Crea uno para comenzar!"
+                : "Este trabajador aún no ha publicado servicios."
+            }
+            bgColor={isOwner ? "bg-blue-50" : "bg-gray-100"}
+            textColor={isOwner ? "text-blue-500" : "text-gray-500"}
+            borderColor={isOwner ? "border-blue-300" : "border-gray-300"}
+            icon="tools"
+          />
         )}
       </div>
 
