@@ -7,6 +7,7 @@ import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { getSocket } from "@/services/chat/socket";
+import Image from "next/image";
 
 export default function ChatDemo() {
   const params = useParams();
@@ -25,8 +26,10 @@ export default function ChatDemo() {
   const [trabajadorName, setTrabajadorName] = useState("Trabajador");
   const [trabajadorId, setTrabajadorId] = useState("");
   const [clienteId, setClienteId] = useState("");
-
+  const [clientePic, setClientePic] = useState<string>("");
+  const [trabajadorPic, setTrabajadorPic] = useState<string>("");
   const [showContractForm, setShowContractForm] = useState(false);
+  const [trabajadorPremium, setTrabajadorPremium] = useState<boolean>(false);
 
   useEffect(() => {
     document.title = "Servicio Libre - Chat";
@@ -121,11 +124,17 @@ export default function ChatDemo() {
           setClienteName(user2.name);
           setTrabajadorId(user1.id);
           setClienteId(user2.id);
+          setTrabajadorPic(user1.user_pic || "");
+          setClientePic(user2.user_pic || "");
+          setTrabajadorPremium(!!user1.premium);
         } else if (user2.role === "worker" && user1.role === "user") {
           setTrabajadorName(user2.name);
           setClienteName(user1.name);
           setTrabajadorId(user2.id);
           setClienteId(user1.id);
+          setTrabajadorPic(user2.user_pic || "");
+          setClientePic(user1.user_pic || "");
+          setTrabajadorPremium(!!user2.premium);
         }
         axios
           .get(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/contract`, {
@@ -282,6 +291,8 @@ export default function ChatDemo() {
     );
   }
 
+  console.log(chats);
+
   return (
     <div className="min-h-screen flex bg-[#ece5dd] overflow-x-auto overflow-y-hidden">
       {/* Fondo decorativo tipo WhatsApp */}
@@ -323,19 +334,35 @@ export default function ChatDemo() {
                 hover:bg-blue-50`}
                     onClick={() => router.push(`/chat/${chat.id}`)}
                   >
-                    {/* Avatar + badge si tiene mensajes sin leer */}
                     <div className="relative w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg border border-blue-200">
-                      {chat.otherUsername?.[0]?.toUpperCase() || "?"}
+                      {chat.otherUserPic ? (
+                        <Image
+                          src={chat.otherUserPic}
+                          alt="avatar"
+                          width={40}
+                          height={40}
+                          className="object-cover w-10 h-10 rounded-full"
+                        />
+                      ) : (
+                        chat.otherUsername?.[0]?.toUpperCase() || "?"
+                      )}
                       {isUnread && (
                         <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-amber-500 rounded-full border border-white shadow-sm animate-pulse"></span>
                       )}
                     </div>
 
-                    <div className="text-black flex-1 min-w-0">
+                    <div
+                      className={`${
+                        chat.otherUserId === trabajadorId &&
+                        chat.otherUserPremium
+                          ? "bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-500 bg-clip-text text-transparent"
+                          : "text-black"
+                      } flex-1 min-w-0`}
+                    >
                       <div
                         className={`font-semibold truncate ${
                           isUnread ? "text-blue-600" : ""
-                        }`}
+                        } `}
                       >
                         {chat.otherUsername}
                       </div>
@@ -374,6 +401,9 @@ export default function ChatDemo() {
             clienteId={clienteId}
             showContractForm={showContractForm}
             setShowContractForm={setShowContractForm}
+            clientePic={clientePic}
+            trabajadorPic={trabajadorPic}
+            trabajadorPremium={trabajadorPremium}
           />
         )}
       </section>
