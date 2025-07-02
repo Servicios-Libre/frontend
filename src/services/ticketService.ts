@@ -9,7 +9,6 @@ export interface TicketPayload {
 }
 
 export const createTicket = async (userId: string, payload: TicketPayload) => {
-  console.log("[Datos a enviar]:", userId, payload);
   
   const response = await api.post(`/tickets/new/${userId}`, payload);
   return response.data;

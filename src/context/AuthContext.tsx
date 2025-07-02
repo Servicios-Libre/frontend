@@ -33,8 +33,8 @@ interface AuthContextType {
   setToken: (token: string | null) => void;
   logout: () => void;
   unreadCount: number;
-  userName: string;                     // 👈 NUEVO
-  setUserName: (name: string) => void; // 👈 NUEVO
+  userName: string;
+  setUserName: (name: string) => void;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -51,14 +51,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const [token, setTokenState] = useState<string | null>(null);
   const [user, setUser] = useState<JwtPayload | null>(null);
-  const [userName, setUserName] = useState<string>(""); // 👈 NUEVO
+  const [userName, setUserName] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
 
   const logout = useCallback(() => {
     setTokenState(null);
     setUser(null);
-    setUserName(""); // 👈 Limpiar nombre también al salir
+    setUserName("");
     signOut({ callbackUrl: "/landing" });
   }, []);
 
@@ -128,8 +128,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setToken,
         logout,
         unreadCount,
-        userName,     // 👈 Exportar el nombre
-        setUserName,  // 👈 Exportar setter
+        userName,
+        setUserName,
       }}
     >
       {children}

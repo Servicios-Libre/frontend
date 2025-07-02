@@ -1,102 +1,73 @@
+// services/workerService.ts
 import api from "@/services/axiosConfig";
 import { User } from "@/types";
 
-export const getWorkerById = async (id: string, token?: string): Promise<User> => {
-  console.log("getWorkerById called with id:", id, "token:", token ? "Sí" : "No");
-  if (token) {
-    try {
-      const response = await api.get(`/users/worker/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      console.log("Respuesta autenticada:", response.data);
+// ✅ Para usuario logueado (con token automático del interceptor)
+export const getWorkerById = async (id: string): Promise<User> => {
+  try {
+    const { data } = await api.get(`/users/worker/${id}`);
 
-      const data = response.data;
-      if (data.address_id && !data.address) {
-        data.address = data.address_id;
-      }
+    if (data.address_id && !data.address) {
+      data.address = data.address_id;
+    }
 
-      return data;
-    } catch (error) {
-      console.error("Error autenticado:", error);
-      throw new Error("Error al obtener datos del trabajador.");
-    }
-  } else {
-    // Lógica para usuarios no logueados
-    try {
-      const response = await api.get(`/services/worker/${id}`);
-      console.log("Respuesta no autenticada:", response.data);
-      return response.data;
-    } catch (error) {
-      console.error("Error no autenticado:", error);
-      throw new Error("Error al obtener servicios públicos del trabajador.");
-    }
+    return data;
+  } catch (error) {
+    console.error("Error al obtener datos del trabajador:", error);
+    throw new Error("No se pudo obtener el perfil del trabajador.");
   }
 };
 
-export const uploadServiceImages = async (serviceId: string, files: File[], token: string) => {
-  console.log("uploadServiceImages called with serviceId:", serviceId, "files length:", files.length);
-  if (!token) throw new Error("No hay token de autenticación.");
-  if (!serviceId) throw new Error("ID de servicio inválido.");
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getPublicWorkerServices = async (id: string): Promise<any> => {
+  try {
+    const { data } = await api.get(`/services/worker/${id}`);
+    return data;
+  } catch (error) {
+    console.error("Error al obtener servicios públicos del trabajador:", error);
+    throw new Error("No se pudo obtener servicios públicos.");
+  }
+};
 
-  const results = [];
+// services/imageService.ts
+
+export const uploadServiceImages = async (serviceId: string, files: File[]) => {
+  if (!serviceId) throw new Error("ID de servicio inválido.");
+  if (!files.length) return;
 
   const formData = new FormData();
-  files.forEach((file) => {
-    console.log("Añadiendo archivo al formData:", file.name, file.size);
-    formData.append("images", file);
-  });
+  files.forEach((file) => formData.append("images", file));
 
   try {
-    const res = await api.post(`/files/service/${serviceId}`, formData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    console.log("Respuesta subida imágenes:", res.data);
-    results.push(res.data);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const res = await api.post(`/files/service/${serviceId}`, formData);
+    return res.data;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     if (error.response?.status === 413) {
       throw new Error("La imagen es demasiado grande. Máximo 2MB.");
     }
-
-    if (error.response?.data?.message) {
-      throw new Error(error.response.data.message);
-    }
-
-    console.error("Error al subir la imagen:", error);
-    throw new Error("Error al subir la imagen.");
+    throw new Error(error.response?.data?.message || "Error al subir imagen.");
   }
-
-  return results;
 };
 
 export const addPhotosToService = async (
   serviceId: string,
-  newFiles: FileList | null,
-  token: string
+  newFiles: FileList | null
 ): Promise<{ id: string; photo_url: string }[]> => {
-  console.log("addPhotosToService called with serviceId:", serviceId, "newFiles length:", newFiles?.length);
-  if (!newFiles || newFiles.length === 0) {
-    return [];
-  }
+  if (!newFiles || newFiles.length === 0) return [];
 
   const filesArray = Array.from(newFiles);
 
   try {
-    await uploadServiceImages(serviceId, filesArray, token);
-    const simulatedUploadedPhotos = filesArray.map((file, index) => ({
-      id: `temp-id-${Date.now()}-${index}`,
+    await uploadServiceImages(serviceId, filesArray);
+
+    // Simulación de URLs temporales
+    return filesArray.map((file, i) => ({
+      id: `temp-${Date.now()}-${i}`,
       photo_url: URL.createObjectURL(file),
     }));
-
-    console.log("Fotos simuladas añadidas:", simulatedUploadedPhotos);
-
-    return simulatedUploadedPhotos;
   } catch (error) {
-    console.error("Error al añadir fotos al servicio:", error);
+    console.error("Error al añadir fotos:", error);
     throw error;
   }
 };

@@ -9,7 +9,7 @@ import { User, WorkerService } from "@/types";
 import WorkerHeader from "./WorkerHeader";
 import WorkerServiceList from "./WorkerServiceList";
 import { jwtDecode } from "jwt-decode";
-import {  useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import WorkerReviews from "./WorkerReviews";
 
@@ -54,9 +54,11 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
       return;
     }
 
-    getWorkerById(id, token)
+    getWorkerById(id)
       .then((data) => {
         setUser(data);
+        console.log(data);
+        
         setLoading(false);
 
         if (serviceIdFromQuery) {
@@ -92,7 +94,6 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
         uploadedPhotos = await addPhotosToService(
           updatedService.id,
           newFiles,
-          token!
         );
       }
 
