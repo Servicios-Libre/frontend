@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { ChatContract } from '@/types';
-import { useState } from 'react';
+import { ChatContract } from "@/types";
+import { useState } from "react";
 
 interface ContractFormProps {
   onSubmit: (contract: ChatContract) => void;
@@ -10,31 +10,36 @@ interface ContractFormProps {
 
 const ContractForm = ({ onSubmit, onCancel }: ContractFormProps) => {
   const [formValues, setFormValues] = useState({
-    description: '',
-    startDate: '',
-    endDate: '',
-    payment: ''
+    description: "",
+    startDate: "",
+    endDate: "",
+    payment: "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({
-      id: '',
-      workerId: '', // Se completará en el componente padre
-      clientId: '', // Se completará en el componente padre
+      id: "",
+      workerId: "",
+      clientId: "",
       description: formValues.description,
       startDate: formValues.startDate,
       endDate: formValues.endDate,
       payment: Number(formValues.payment),
-      accepted: false
+      accepted: false,
+      clientConfirmed: false,
+      workerConfirmed: false,
+      completed: false,
     });
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormValues(prev => ({
+    setFormValues((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 

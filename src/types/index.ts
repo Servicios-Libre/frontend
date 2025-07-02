@@ -63,9 +63,9 @@ export interface Servicio {
 }
 
 export enum TicketStatus {
-  PENDING = 'pending',
-  ACCEPTED = 'accepted',
-  REJECTED = 'rejected',
+  PENDING = "pending",
+  ACCEPTED = "accepted",
+  REJECTED = "rejected",
 }
 
 export type IconName =
@@ -169,17 +169,17 @@ export interface ServiceContractFormValues {
   termsAccepted: boolean;
 }
 
-
 // Chats Worker y User
 export interface ChatMessage {
   id: string;
   senderId: string;
   message: string;
   timestamp: string;
-  receiverId?: string; // <-- Hacelo opcional
+  receiverId?: string;
 }
 
-export interface ChatContract {
+
+export type ChatContract = {
   id: string;
   workerId: string;
   clientId: string;
@@ -188,4 +188,7 @@ export interface ChatContract {
   endDate: string;
   payment: number;
   accepted: boolean;
-}
+  clientConfirmed?: boolean;
+  workerConfirmed?: boolean;
+  completed?: boolean;
+};
