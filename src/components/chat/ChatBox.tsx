@@ -87,9 +87,10 @@ const ChatBox = ({
     setTimeout(scrollToBottom, 100);
   };
 
-  const alreadyConfirmed =
+  const alreadyConfirmed = !!(
     (userRole === "client" && contract?.clientConfirmed) ||
-    (userRole === "worker" && contract?.workerConfirmed);
+    (userRole === "worker" && contract?.workerConfirmed)
+  );
 
   console.log("Contrato:", contract);
   console.log("userRole:", userRole);
@@ -187,7 +188,7 @@ const ChatBox = ({
         )}
 
         {/* Confirmar servicio */}
-        {contract?.status === "accepted" && !contract.completed && (
+        {contract && contract.status === "accepted" && !contract.completed && (
           <button
             onClick={onConfirmService}
             disabled={alreadyConfirmed}
