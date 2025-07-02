@@ -4,7 +4,7 @@ import { User } from "@/types";
 export async function searchUserByEmail(email: string): Promise<User | null> {
 
     console.log(email);
-    
+
     const res = await api.get("/users", {
         params: {
             search: email,
@@ -15,7 +15,7 @@ export async function searchUserByEmail(email: string): Promise<User | null> {
     });
 
     console.log(res.data.users);
-    
+
     return res.data.users[0] || null;
 }
 
@@ -27,3 +27,11 @@ export async function fetchAdmins(): Promise<User[]> {
     const res = await api.get("/users?role=admin");
     return res.data.users || [];
 }
+
+export const promoteToAdmin = async (userId: string): Promise<void> => {
+    await api.put(`/users/to-admin/${userId}`);
+};
+
+export const downgradeAdmin = async (userId: string): Promise<void> => {
+    await api.put(`/users/downgrade-admin/${userId}`);
+};

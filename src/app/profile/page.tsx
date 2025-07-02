@@ -81,7 +81,7 @@ export default function ProfilePage() {
   const [userImageFile, setUserImageFile] = useState<File | null>(null);
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [statesData, setStatesData] = useState<
-      {
+    {
       id: number;
       state: string;
       cities: { id: number; name: string; state: string }[];
@@ -120,18 +120,15 @@ export default function ProfilePage() {
 
   const ciudades = formData.state
     ? statesData
-        .find((prov) => prov.state === formData.state)
-        ?.cities.map((city) => city.name) || []
+      .find((prov) => prov.state === formData.state)
+      ?.cities.map((city) => city.name) || []
     : [];
 
-  // Redirección si no hay usuario autenticado
   useEffect(() => {
     if (!loading && !user) {
       router.replace("/auth");
     }
   }, [user, loading, router]);
-
-  // Cargar perfil al montar o cuando cambia el usuario o cambia statesData
 
   useEffect(() => {
     if (user) {
@@ -141,9 +138,9 @@ export default function ProfilePage() {
 
           setPremium(data.premium);
           const ticketData = data.tickets.find(
-            (ticket: Ticket) =>
-              ticket.status === "pending" && ticket.type === "to-worker"
+            (ticket: Ticket) => ticket.type === "to-worker"
           );
+
           setTicket(ticketData || null);
 
           const normalize = (input: string) => input.trim().toLowerCase();

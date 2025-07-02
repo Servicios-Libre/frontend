@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { searchUserByEmail, fetchAdmins } from "@/services/dashboard/adminService";
+import { searchUserByEmail, fetchAdmins, promoteToAdmin, downgradeAdmin } from "@/services/dashboard/adminService";
 import { User } from "@/types";
 
 import Sidebar from "@/components/dashboard/Sidebar";
@@ -71,8 +71,7 @@ export default function AdminUsersPage() {
 
         setLoadingAction(true);
         try {
-            // await updateUserRole(user.id, "admin");
-            console.log("Se debería hacer admin: ", user);
+            await promoteToAdmin(user.id);
             setFoundUser(null);
             setSearchEmail("");
             await loadAdmins();
@@ -88,8 +87,7 @@ export default function AdminUsersPage() {
         if (!isGod) return;
 
         try {
-            // await updateUserRole(user.id, "user");
-            console.log("Se debería quitar el admin: ", user);
+            await downgradeAdmin(user.id);
             showToast("Administrador revocado con éxito", "success");
             await loadAdmins();
         } catch {
