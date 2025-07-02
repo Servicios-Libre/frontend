@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import Sidebar from '@/components/dashboard/Sidebar';
+import Sidebar from "@/components/dashboard/Sidebar";
 import {
   FaUserPlus,
   FaTools,
@@ -9,51 +9,45 @@ import {
   FaUserShield,
   FaUserTie,
   FaArrowRight,
-  FaClock,
-  FaInfoCircle,
-} from 'react-icons/fa';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { useAdminContext } from '@/context/AdminContext';
-import { LoadingScreen } from '@/components/dashboard/LoadingScreen';
+} from "react-icons/fa";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useAdminContext } from "@/context/AdminContext";
+import { LoadingScreen } from "@/components/dashboard/LoadingScreen";
 import MobileHeader from "@/components/dashboard/MobileHeader";
+import RoleDistributionChart from "@/components/dashboard/charts/RoleDistributionChart";
+import SystemActivityChart from "@/components/dashboard/charts/SystemActivityChart";
+import StatsBarChart from "@/components/dashboard/charts/ServicesCategoryChart";
 
 export default function DashboardPage() {
   const { users, loading, acceptedServiceCount } = useAdminContext();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
-    document.title = "Servicio Libre - Dashboard"
-  }, [])
+    document.title = "Servicio Libre - Dashboard";
+  }, []);
 
-  const activities = [
-    { id: 1, text: 'Usuario 3 fue dado de alta como trabajador.' },
-    { id: 2, text: 'Usuario 2 actualizó su perfil.' },
-    { id: 3, text: 'Usuario 1 aprobó un servicio.' },
-  ];
 
   if (loading) {
     return <LoadingScreen />;
   }
 
   // Filtrados con seguridad para evitar errores si users es null o vacío
-  const totalAdmins = users?.filter((u) => u.role === 'admin').length ?? 0;
-  const totalWorkers = users?.filter((u) => u.role === 'worker').length ?? 0;
-  const totalRegularUsers = users?.filter((u) => u.role === 'user').length ?? 0;
+  const totalAdmins = users?.filter((u) => u.role === "admin").length ?? 0;
+  const totalWorkers = users?.filter((u) => u.role === "worker").length ?? 0;
+  const totalRegularUsers = users?.filter((u) => u.role === "user").length ?? 0;
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-indigo-950">
-      <Sidebar
-        isOpen={isSidebarOpen}
-        onClose={() => setIsSidebarOpen(false)}
-      />
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
       <div className="flex-1 flex flex-col">
-
         <MobileHeader onOpenSidebar={() => setIsSidebarOpen(true)} />
 
         <main className="flex-1 p-8 text-white">
-          <h1 className="hidden lg:block text-3xl font-bold mb-8 tracking-wide">Panel de Administración</h1>
+          <h1 className="hidden lg:block text-3xl font-bold mb-8 tracking-wide">
+            Panel de Administración
+          </h1>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             <StatCard
@@ -114,24 +108,14 @@ export default function DashboardPage() {
             />
           </div>
 
-          <div className="relative bg-indigo-800 rounded-xl shadow-2xl p-8 mb-12 overflow-hidden">
-            <h2 className="text-2xl font-semibold text-white mb-6 flex items-center gap-3">
-              <FaClock className="text-amber-400" /> Últimas actividades
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {activities.map((act) => (
-                <div
-                  key={act.id}
-                  className="bg-purple-900/60 backdrop-blur-sm rounded-lg p-4 flex items-start space-x-3 border border-purple-700/50"
-                >
-                  <span className="flex-shrink-0 text-amber-300 text-xl mt-1">
-                    <FaInfoCircle />
-                  </span>
-                  <p className="text-gray-100 text-base flex-1">{act.text}</p>
-                </div>
-              ))}
-            </div>
-            <div className="hidden lg:block absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-indigo-800 to-transparent pointer-events-none"></div>
+          {/* Nueva sección de gráficas */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
+            <RoleDistributionChart />
+            <StatsBarChart />
+          </div>
+
+          <div className="mb-12">
+            <SystemActivityChart />
           </div>
         </main>
       </div>
@@ -160,8 +144,12 @@ const StatCard: React.FC<StatCardProps> = ({
     className={`${bgColor} rounded-xl shadow-xl p-6 flex flex-col items-center justify-center transform transition-all duration-300 hover:scale-[1.02] cursor-pointer`}
   >
     <div className={`${iconColor} text-5xl mb-3`}>{icon}</div>
-    <span className={`${valueColor} text-5xl font-extrabold mb-2`}>{value}</span>
-    <span className="text-gray-200 text-lg font-medium text-center">{label}</span>
+    <span className={`${valueColor} text-5xl font-extrabold mb-2`}>
+      {value}
+    </span>
+    <span className="text-gray-200 text-lg font-medium text-center">
+      {label}
+    </span>
   </div>
 );
 
@@ -186,7 +174,9 @@ const QuickAccessCard: React.FC<QuickAccessCardProps> = ({
   >
     <div>
       <div className="flex items-center gap-3 mb-2">
-        <div className="text-white text-3xl group-hover:scale-110 transition-transform duration-200">{icon}</div>
+        <div className="text-white text-3xl group-hover:scale-110 transition-transform duration-200">
+          {icon}
+        </div>
         <span className="font-bold text-xl text-white">{title}</span>
       </div>
       <span className="text-gray-300 text-base">{description}</span>
