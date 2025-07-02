@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import ContractForm from "./ContractForm";
 import ContractView from "./ContractView";
 import { FaPaperPlane } from "react-icons/fa";
+import ReviewForm from "../reviews/ReviewForm";
 
 interface ChatBoxProps {
   chatId: string;
@@ -17,6 +18,8 @@ interface ChatBoxProps {
   onConfirmService: () => Promise<void>;
   clienteName: string;
   trabajadorName: string;
+  trabajadorId: string;
+  clienteId: string;
   userRole: "client" | "worker";
 }
 
@@ -30,12 +33,37 @@ const ChatBox = ({
   onConfirmService,
   clienteName,
   trabajadorName,
+  trabajadorId,
   userRole,
 }: ChatBoxProps) => {
   const [newMessage, setNewMessage] = useState("");
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>(messages);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const [showContractForm, setShowContractForm] = useState(false);
+  const [alreadyReviewed, setAlreadyReviewed] = useState(false);
+
+  useEffect(() => {
+    const checkReview = async () => {
+      if (contract?.completed && userRole === "client") {
+        try {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/check?contractId=${contract.id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );
+          const data = await response.json();
+          setAlreadyReviewed(data.reviewExists);
+        } catch (error) {
+          console.error("Error al verificar reseña:", error);
+        }
+      }
+    };
+
+    checkReview();
+  }, [contract, userRole]);
 
   useEffect(() => {
     setLocalMessages(messages);
@@ -96,7 +124,9 @@ const ChatBox = ({
           return (
             <div
               key={`${msg.id}-${index}`}
-              className={`flex ${isOwn ? "justify-end" : "justify-start"} animate-fade-in`}
+              className={`flex ${
+                isOwn ? "justify-end" : "justify-start"
+              } animate-fade-in`}
             >
               <div
                 className={`relative px-5 py-3 rounded-2xl shadow-sm transition-all duration-200 ${
@@ -133,7 +163,7 @@ const ChatBox = ({
           />
         )}
 
-        {!contract && userRole === "worker" && (
+        {!contract && currentUserId === trabajadorId && (
           <button
             onClick={() => setShowContractForm(true)}
             className="w-full mb-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md font-semibold transition"
@@ -174,6 +204,16 @@ const ChatBox = ({
           <p className="text-green-600 text-center font-semibold mt-2">
             ✅ Servicio completado
           </p>
+        )}
+        {contract?.completed && userRole === "client" && !alreadyReviewed && (
+          <ReviewForm
+            workerId={trabajadorId}
+            contractId={contract.id}
+            token={localStorage.getItem("token") || ""}
+            onReviewSubmitted={() => {
+              setAlreadyReviewed(true);
+            }}
+          />
         )}
 
         <form onSubmit={handleSubmit} className="flex gap-2 mt-2 items-center">
