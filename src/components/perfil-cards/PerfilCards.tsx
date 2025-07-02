@@ -7,22 +7,28 @@ interface PerfilCardProps {
 
 export default function PerfilCard({ perfil }: PerfilCardProps) {
     return (
-        <div className="w-64 mx-8 flex flex-col items-center transition-all duration-500 ease-in-out cursor-pointer">
-            <div className="w-42 h-42 mb-4 overflow-hidden rounded-md shadow-md border border-gray-200">
-                <Image
-                    src={perfil.imagen}
-                    alt={perfil.nombre}
-                    width={200}
-                    height={200}
-                    className="object-cover w-full h-full"
-                />
-            </div>
+     <div className="bg-white rounded-2xl p-6 shadow-lg w-80 h-96 text-center flex flex-col transition-all duration-300 hover:shadow-xl hover:scale-105">
+      {/* Imagen con tamaño fijo */}
+      <div className="w-24 h-24 bg-gray-300 mx-auto mb-4 flex-shrink-0">
+        <Image
+          src={perfil.imagen || "/placeholder.svg"}
+          alt={perfil.nombre}
+          width={200}
+          height={200}
+          className="object-cover w-full h-full rounded-xl"
+        />
+      </div>
 
-            <div className="text-center px-4 py-4">
-                <h3 className="text-lg font-semibold text-gray-800">{perfil.nombre}</h3>
-                <p className="text-blue-600 text-sm mt-1">{perfil.profesion}</p>
-                <p className="text-gray-600 text-sm mt-2">{perfil.descripcion}</p>
-            </div>
+      {/* Contenido con flexbox para distribución uniforme */}
+      <div className="flex flex-col flex-grow">
+        <h3 className="font-bold text-lg text-gray-800 mb-1">{perfil.nombre}</h3>
+        <p className="text-blue-600 text-sm mb-3">{perfil.profesion}</p>
+
+        {/* Descripción con altura controlada */}
+        <div className="flex-grow flex items-start">
+          <p className="text-gray-600 text-sm leading-relaxed line-clamp-4 overflow-hidden">{perfil.descripcion}</p>
         </div>
+      </div>
+    </div>
     );
 }
