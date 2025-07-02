@@ -9,7 +9,7 @@ import { User, WorkerService } from "@/types";
 import WorkerHeader from "./WorkerHeader";
 import WorkerServiceList from "./WorkerServiceList";
 import { jwtDecode } from "jwt-decode";
-import { useSearchParams } from "next/navigation";
+import {  useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import WorkerReviews from "./WorkerReviews";
 
@@ -29,7 +29,6 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
 
   const searchParams = useSearchParams();
   const serviceIdFromQuery = searchParams.get("serviceId");
-
   const { token, loading: authLoading } = useAuth();
 
   useEffect(() => {
@@ -138,7 +137,9 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-12 gap-6 px-4 sm:px-8">
         <aside className="sm:col-span-4 lg:col-span-3">
           <div className="bg-gradient-to-b from-blue-800 via-blue-700 to-blue-600 shadow-md rounded-b-lg p-6 sticky top-20">
-            <WorkerHeader user={user} />
+            <WorkerHeader
+              user={user}
+            />
           </div>
         </aside>
 

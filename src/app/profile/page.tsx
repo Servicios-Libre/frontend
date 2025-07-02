@@ -3,7 +3,7 @@
 
 import LoadingScreen from "@/components/loading-screen/LoadingScreen";
 import { useEffect, useState } from "react";
-import { createSocialLinks, getProfile, updateProfile, updateProfileImage } from "@/services/profileService";
+import { createSocialLinks, getProfile, redirectToPayment, updateProfile, updateProfileImage } from "@/services/profileService";
 import { updateSocialLinks } from "@/services/profileService"
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileForm from "@/components/profile/ProfileForm";
@@ -65,7 +65,6 @@ export default function ProfilePage() {
     instagram: "",
   });
   const [originalData, setOriginalData] = useState<ProfileFormType | null>(null);
-  const [userName, setUserName] = useState<string>("");
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [showMissing, setShowMissing] = useState(false);
   const [userImageFile, setUserImageFile] = useState<File | null>(null);
@@ -77,15 +76,17 @@ export default function ProfilePage() {
     userId: ""
   });
   const [statesData, setStatesData] = useState<
-    { id: number; state: string; cities: { id: number; name: string; state: string }[] }[]
+  { id: number; state: string; cities: { id: number; name: string; state: string }[] }[]
   >([]);
-
+  
+  
   const auth = useAuth();
   const user = auth?.user;
   const loading = auth?.loading ?? false;
   const token = auth?.token;
   const router = useRouter();
   const { showToast } = useToast();
+  const [userName, setUserName] = useState<string>("");
 
   useEffect(() => {
     document.title = "Servicio Libre - Mi Perfil";
@@ -235,6 +236,7 @@ export default function ProfilePage() {
 
     try {
       const dataToSend: any = {
+        name: userName,
         phone: formData.phone ? Number(formData.phone) : undefined,
         street: formData.street,
         house_number: formData.house_number ? Number(formData.house_number) : undefined,
@@ -283,6 +285,14 @@ export default function ProfilePage() {
     setEditMode(false);
   };
 
+  const handlePremiumSubscription = async () => {
+  if (token) {
+    console.log("redireccionando para mp......")
+    const url = await redirectToPayment()
+    window.location.href = url
+  }
+};
+
   const getMissingFields = () => {
     return requiredFields.filter((field) => {
       return !formData[field.key as keyof ProfileFormType] || formData[field.key as keyof ProfileFormType] === "";
@@ -320,6 +330,8 @@ export default function ProfilePage() {
           userId={user.id ?? ""}
           setUserImageFile={setUserImageFile}
           ticket={ticket}
+          setUserName={setUserName}
+          handlePremiumSubscription={handlePremiumSubscription}
         />
         <ProfileForm
           formData={formData}

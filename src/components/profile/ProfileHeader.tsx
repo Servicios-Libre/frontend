@@ -5,6 +5,9 @@ import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
 import Link from "next/link";
 import { Ticket } from "@/app/profile/page";
+import EditNameModal from "@/components/profile/EditNameModal";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPen } from "@fortawesome/free-solid-svg-icons";
 
 interface Props {
   userName: string;
@@ -22,10 +25,13 @@ interface Props {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setUserImageFile: any;
   ticket: Ticket | null;
+  setUserName: (name: string) => void;
+  handlePremiumSubscription: () => void;
 }
 
 export default function ProfileHeader({
   userName,
+  setUserName,
   userPic,
   setUserPic,
   editMode,
@@ -38,16 +44,14 @@ export default function ProfileHeader({
   setShowMissing,
   userId,
   setUserImageFile,
-  ticket
+  ticket,
+  handlePremiumSubscription,
 }: Props) {
   const { showToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleChangePhotoClick = () => {
     setEditMode(true);
-    setTimeout(() => {
-      fileInputRef.current?.click();
-    }, 0);
   };
 
   const [loadingTicket, setLoadingTicket] = useState(false);
@@ -55,6 +59,7 @@ export default function ProfileHeader({
   const [ticketError, setTicketError] = useState<string | null>(null);
   const [hasPendingRequest, setHasPendingRequest] = useState(false);
   const [hasAcceptedTicket, setHasAcceptedTicket] = useState(false);
+  const [nameModalOpen, setNameModalOpen] = useState(false);
 
   const auth = useAuth();
   const user = auth?.user;
@@ -78,9 +83,10 @@ export default function ProfileHeader({
     }
   }, [ticket]);
 
-
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   if (!mounted) {
     return (
       <div className="flex flex-col sm:flex-row items-center sm:items-start sm:justify-between gap-6 sm:gap-8 p-6 rounded-lg bg-blue-500 shadow-md mb-6 text-center sm:text-left">
@@ -97,12 +103,13 @@ export default function ProfileHeader({
 
   const handleRequestWorker = async () => {
     if (!isComplete) {
-      showToast("Completa tu perfil antes de solicitar ser trabajador.", "error");
+      showToast(
+        "Completa tu perfil antes de solicitar ser trabajador.",
+        "error"
+      );
       setShowMissing(true);
       return;
     }
-    console.log("Hola, ",userId);
-    
     if (!user?.id) {
       setTicketError("Usuario no autenticado");
       return;
@@ -116,7 +123,7 @@ export default function ProfileHeader({
       });
       setTicketSuccess(true);
       setHasPendingRequest(true);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setTicketError(error?.response?.data?.message || "No se pudo enviar la solicitud.");
     } finally {
@@ -138,30 +145,42 @@ export default function ProfileHeader({
           />
         </div>
         <div className="mt-2 w-full sm:w-auto">
-          {!editMode ? (
-            <button
-              className="text-white bg-blue-700 hover:bg-blue-600 px-3 py-1 rounded transition w-full sm:w-auto cursor-pointer"
-              onClick={handleChangePhotoClick}
-            >
-              Cambiar foto
-            </button>
-          ) : (
-            // Espacio reservado para mantener el layout cuando está en modo edición
-            <div className="px-3 py-1 rounded w-full sm:w-auto opacity-0 pointer-events-none select-none">
-              Cambiar foto
-            </div>
-          )}
+          <button
+            className={`text-white bg-blue-700 hover:bg-blue-600 px-3 py-1 rounded transition w-full sm:w-auto cursor-pointer
+      ${editMode ? "invisible" : ""}`}
+            onClick={handleChangePhotoClick}
+          >
+            Cambiar foto
+          </button>
         </div>
+
       </div>
 
       {/* Info y progreso */}
       <div className="flex-1 w-full flex flex-col items-center sm:items-start">
-        <p className="text-xl font-bold text-white mb-1 break-words">{userName}</p>
+        <button
+          onClick={() => editMode && setNameModalOpen(true)}
+          className={`flex items-center text-xl font-bold mb-1 gap-2
+            ${editMode ? "text-white hover:text-blue-200 cursor-pointer" : "text-white cursor-default"}`}
+          aria-label="Editar nombre"
+          title={editMode ? "Editar nombre" : undefined}
+          type="button"
+          style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+        >
+          {userName}
+          <FontAwesomeIcon
+            icon={faPen}
+            className={`transition-colors ${editMode ? "text-white hover:text-blue-200" : "text-transparent"}`}
+            style={{ fontSize: "1.25rem" }}
+          />
+        </button>
         <p className="text-blue-100 text-sm mb-2">Puedes editar tu información personal</p>
 
         <div className="flex flex-col items-center sm:items-start gap-3 w-full">
           <div className="flex items-center gap-2">
-            <span className="text-white text-sm font-medium">Perfil completo:</span>
+            <span className="text-white text-sm font-medium">
+              Perfil completo:
+            </span>
             <span className="text-white font-bold">{completion}%</span>
             <div className="w-24 h-2 bg-blue-200 rounded overflow-hidden">
               <div
@@ -184,29 +203,34 @@ export default function ProfileHeader({
           {userRole !== "worker" && !hasAcceptedTicket && (
             <button
               className={`px-4 py-2 rounded-md font-semibold transition-colors mt-2 sm:mt-0 cursor-pointer
-                ${!editMode && !hasUnsavedChanges
-                  ? isComplete
-                    ? hasPendingRequest
-                      ? "bg-yellow-300 text-yellow-900 cursor-not-allowed"
-                      : "bg-green-500 hover:bg-green-600 text-white cursor-pointer"
-                    : "bg-gray-300 hover:bg-gray-400 text-gray-700 cursor-not-allowed"
-                  : "bg-gray-300 text-gray-400 cursor-not-allowed"
+                ${
+                  !editMode && !hasUnsavedChanges
+                    ? isComplete
+                      ? hasPendingRequest
+                        ? "bg-yellow-300 text-yellow-900 cursor-not-allowed"
+                        : "bg-green-500 hover:bg-green-600 text-white cursor-pointer"
+                      : "bg-gray-300 hover:bg-gray-400 text-gray-700 cursor-not-allowed"
+                    : "bg-gray-300 text-gray-400 cursor-not-allowed"
                 }`}
-              disabled={!isComplete || editMode || hasUnsavedChanges || loadingTicket || hasPendingRequest}
+              disabled={
+                !isComplete ||
+                editMode ||
+                hasUnsavedChanges ||
+                loadingTicket ||
+                hasPendingRequest
+              }
               onClick={handleRequestWorker}
             >
               {loadingTicket
                 ? "Enviando..."
                 : ticketSuccess
-                  ? "Solicitud enviada"
-                  : hasPendingRequest
-                    ? "Solicitud pendiente"
-                    : "Solicitar ser trabajador"}
+                ? "Solicitud enviada"
+                : hasPendingRequest
+                ? "Solicitud pendiente"
+                : "Solicitar ser trabajador"}
             </button>
           )}
-          {ticketError && (
-            <p className="text-red-200 mt-2">{ticketError}</p>
-          )}
+          {ticketError && <p className="text-red-200 mt-2">{ticketError}</p>}
         </div>
       </div>
 
@@ -235,7 +259,21 @@ export default function ProfileHeader({
             Editar perfil
           </button>
         )}
+        <button
+          className="px-4 py-2 rounded-md bg-blue-700 hover:bg-blue-600 text-white font-semibold transition w-full sm:w-auto cursor-pointer"
+          onClick={handlePremiumSubscription}
+        >
+          Subscribirse a premium
+        </button>
       </div>
-    </div >
+
+      {nameModalOpen && (
+        <EditNameModal
+          initialName={userName}
+          onSave={(newName) => setUserName(newName)}
+          onClose={() => setNameModalOpen(false)}
+        />
+      )}
+    </div>
   );
 }
