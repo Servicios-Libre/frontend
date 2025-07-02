@@ -21,16 +21,29 @@ export default function ChatInboxPage() {
       .get(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/inbox`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => setChats(res.data))
+      .then((res) => {
+        const chatsData = Array.isArray(res.data) ? res.data : [];
+        console.log(res.data);
+        setChats(chatsData);
+      })
       .catch((error) => {
-        console.error("Error fetching chats:", error.response?.data || error.message);
+        console.error(
+          "Error fetching chats:",
+          error.response?.data || error.message
+        );
         setChats([]);
       })
       .finally(() => setLoading(false));
   }, [user, token]);
 
-  if (!user) return <div className="pt-24 text-center">Debes iniciar sesión para ver tus chats.</div>;
-  if (loading) return <div className="pt-24 text-center">Cargando chats...</div>;
+  if (!user)
+    return (
+      <div className="pt-24 text-center">
+        Debes iniciar sesión para ver tus chats.
+      </div>
+    );
+  if (loading)
+    return <div className="pt-24 text-center">Cargando chats...</div>;
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-start pt-32 pb-16">
@@ -54,7 +67,11 @@ export default function ChatInboxPage() {
                 <li
                   key={chat.id}
                   className={`rounded-xl shadow flex items-center justify-between p-4 transition group border 
-                    ${isUnread ? "bg-amber-50 border-blue-400" : "bg-gray-50 border-gray-100"}
+                    ${
+                      isUnread
+                        ? "bg-amber-50 border-blue-400"
+                        : "bg-gray-50 border-gray-100"
+                    }
                     hover:shadow-lg hover:border-blue-500`}
                 >
                   <div className="flex items-center gap-4">
@@ -66,12 +83,18 @@ export default function ChatInboxPage() {
                       )}
                     </div>
                     <div>
-                      <div className={`font-semibold text-lg transition ${isUnread ? "text-blue-600" : "text-black"}`}>
+                      <div
+                        className={`font-semibold text-lg transition ${
+                          isUnread ? "text-blue-600" : "text-black"
+                        }`}
+                      >
                         {chat.otherUsername}
                       </div>
                       <div className="text-sm text-gray-500 truncate max-w-xs">
                         {chat.lastMessage?.message || (
-                          <span className="italic text-gray-400">Sin mensajes aún</span>
+                          <span className="italic text-gray-400">
+                            Sin mensajes aún
+                          </span>
                         )}
                       </div>
                     </div>
