@@ -100,7 +100,15 @@ const handler = NextAuth({
         }
 
         if (account?.provider === "credentials") {
+          const myUser = user as MyUser;
+
           myToken.backendJwt = (user as any).accessToken;
+          myToken.id = myUser.id;
+          myToken.role = myUser.role;
+          myToken.tickets = myUser.tickets ?? [];
+          myToken.name = myUser.name;
+          myToken.email = myUser.email;
+          myToken.image = myUser.image;
         }
       }
 
