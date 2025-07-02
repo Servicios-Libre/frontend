@@ -7,7 +7,7 @@ import StoryCard from "../../components/landing/StoryCard";
 import ReviewCard from "../../components/landing/ReviewCard";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import type { Job } from "@/types";
+import type { Job, Review } from "@/types";
 
 /* Temporal Data */
 const historias = [
@@ -23,62 +23,28 @@ const historias = [
   },
 ];
 
-const opiniones = [
-  {
-    name: "Lucía Gómez",
-    rating: 5,
-    comment:
-      "Conseguí trabajo en mi barrio en menos de 24 horas. ¡Servicio Libre es una excelente herramienta para trabajadores independientes!",
-  },
-  {
-    name: "Carlos Méndez",
-    rating: 4,
-    comment:
-      "Fácil de usar y encontré a alguien muy confiable para arreglar mi baño. Las reseñas me dieron mucha seguridad.",
-  },
-  {
-    name: "Sofía Ramírez",
-    rating: 5,
-    comment:
-      "Gracias a esta plataforma, ahora tengo más clientes y mi agenda está siempre llena. Ha cambiado mi forma de trabajar.",
-  },
-  {
-    name: "Roberto Días",
-    rating: 5,
-    comment:
-      "¡Increíble la rapidez para encontrar profesionales! Mi lavarropas volvió a la vida gracias a un técnico de Servicio Libre.",
-  },
-  {
-    name: "Ana Laura Perez",
-    rating: 4,
-    comment:
-      "Al principio dudé, pero el proceso de contacto fue muy sencillo y la calidad del servicio superó mis expectativas.",
-  },
-];
-
 export default function LandingPage() {
   const router = useRouter();
 
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loadingJobs, setLoadingJobs] = useState(true);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loadingReviews, setLoadingReviews] = useState(true);
 
   useEffect(() => {
     document.title = "Servicio Libre - inicio";
 
-    const fetchJobs = async () => {
-      try {
-        const res = await axios.get<Job[]>(
-          `${process.env.NEXT_PUBLIC_API_URL}/services/premium`
-        );
-        setJobs(res.data.slice(0, 6));
-      } catch (err) {
-        console.error("Error al cargar trabajos destacados:", err);
-      } finally {
-        setLoadingJobs(false);
-      }
-    };
+    axios
+      .get<Job[]>(`${process.env.NEXT_PUBLIC_API_URL}/services/premium`)
+      .then((res) => setJobs(res.data))
+      .catch((err) => console.error("Error al cargar servicios:", err))
+      .finally(() => setLoadingJobs(false));
 
-    fetchJobs();
+    axios
+      .get<Review[]>(`${process.env.NEXT_PUBLIC_API_URL}/reviews/random`)
+      .then((res) => setReviews(res.data))
+      .catch((err) => console.error("Error al cargar reviews:", err))
+      .finally(() => setLoadingReviews(false));
   }, []);
 
   useEffect(() => {
@@ -285,11 +251,28 @@ export default function LandingPage() {
             Lo que dicen nuestros usuarios
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {" "}
-            {/* Reducido gap */}
-            {opiniones.map((opinion, index) => (
-              <ReviewCard key={index} {...opinion} />
-            ))}
+            {loadingReviews ? (
+              [...Array(3)].map((_, i) => (
+                <div
+                  key={i}
+                  className="bg-gray-200 animate-pulse rounded-xl h-40"
+                />
+              ))
+            ) : reviews.length === 0 ? (
+              <p className="text-center col-span-full text-gray-500">
+                No hay opiniones disponibles.
+              </p>
+            ) : (
+              reviews.map((review) => (
+                <ReviewCard
+                  key={review.id}
+                  name={review.author.name}
+                  rating={review.rate}
+                  comment={review.description}
+                  avatarUrl={review.author.user_pic}
+                />
+              ))
+            )}
           </div>
         </div>
       </section>

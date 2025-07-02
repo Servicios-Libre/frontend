@@ -194,6 +194,19 @@ export type Job = {
   };
 };
 
+export type Review = {
+  id: string;
+  description: string;
+  rate: number;
+  created_at: string;
+  author: {
+    id: string;
+    name: string;
+    user_pic?: string;
+  };
+};
+
+
 
 
 // Chats Worker y User
