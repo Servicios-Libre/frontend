@@ -65,7 +65,6 @@ export default function ProfilePage() {
     instagram: "",
   });
   const [originalData, setOriginalData] = useState<ProfileFormType | null>(null);
-  const [userName, setUserName] = useState<string>("");
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [showMissing, setShowMissing] = useState(false);
   const [userImageFile, setUserImageFile] = useState<File | null>(null);
@@ -87,6 +86,7 @@ export default function ProfilePage() {
   const token = auth?.token;
   const router = useRouter();
   const { showToast } = useToast();
+  const [userName, setUserName] = useState<string>("");
 
   useEffect(() => {
     document.title = "Servicio Libre - Mi Perfil";
@@ -236,6 +236,7 @@ export default function ProfilePage() {
 
     try {
       const dataToSend: any = {
+        name: userName,
         phone: formData.phone ? Number(formData.phone) : undefined,
         street: formData.street,
         house_number: formData.house_number ? Number(formData.house_number) : undefined,
@@ -329,6 +330,7 @@ export default function ProfilePage() {
           userId={user.id ?? ""}
           setUserImageFile={setUserImageFile}
           ticket={ticket}
+          setUserName={setUserName}
           handlePremiumSubscription={handlePremiumSubscription}
         />
         <ProfileForm
