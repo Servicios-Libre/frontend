@@ -4,11 +4,13 @@ import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faUser, faFileInvoice, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
+import { Crown } from "lucide-react";
 
 interface User {
     id?: string;
     name?: string;
     role?: "user" | "worker" | "admin" | null;
+    premium?: boolean
 }
 
 export function UserDropdown({
@@ -47,12 +49,13 @@ export function UserDropdown({
         return (
             <div className="relative ml-6" ref={dropdownRef}>
                 <button
-                    className="bg-blue-300 text-white font-normal px-4 py-2 rounded transition flex items-center gap-2 cursor-pointer hover:bg-blue-400 hover:shadow-sm"
+                    className={`${user.premium ? "bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-300" : "bg-blue-300 text-white  hover:bg-blue-400 " } font-normal px-4 py-2 rounded transition flex items-center gap-2 cursor-pointerhover:shadow-sm`}
                     onClick={(e) => {
                         e.stopPropagation();
                         setDropdownOpen((open) => !open);
                     }}
-                >
+                > 
+                {user.premium && <Crown className="w-6 h-6 text-orange-400" />}
                     {user.name}
                     <FontAwesomeIcon
                         icon={faChevronDown}

@@ -8,6 +8,7 @@ import { Ticket } from "@/app/profile/page";
 import EditNameModal from "@/components/profile/EditNameModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen } from "@fortawesome/free-solid-svg-icons";
+import { Crown } from "lucide-react";
 
 interface Props {
   userName: string;
@@ -181,6 +182,7 @@ export default function ProfileHeader({
             textOverflow: "ellipsis",
           }}
         >
+          {premium && <Crown className="w-6 h-6 text-orange-300" />}
           {userName}
           <FontAwesomeIcon
             icon={faPen}
