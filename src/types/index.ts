@@ -191,4 +191,5 @@ export type ChatContract = {
   clientConfirmed?: boolean;
   workerConfirmed?: boolean;
   completed?: boolean;
+  status: "pending" | "accepted" | "rejected" | "completed";
 };

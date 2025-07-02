@@ -156,13 +156,15 @@ const ChatBox = ({
 
       {/* Input y contrato */}
       <div className="sticky bottom-0 left-0 right-0 px-6 py-2 bg-[#f0f0f0]">
-        {contract && !contract.accepted && currentUserId === clienteId && (
-          <ContractView
-            contract={contract}
-            onAccept={onContractAccept}
-            onCancel={() => setShowContractForm(false)}
-          />
-        )}
+        {contract &&
+          contract.status === "pending" &&
+          currentUserId === clienteId && (
+            <ContractView
+              contract={contract}
+              onAccept={onContractAccept}
+              onCancel={() => setShowContractForm(false)}
+            />
+          )}
 
         {!contract && currentUserId === trabajadorId && (
           <button

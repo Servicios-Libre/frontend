@@ -227,7 +227,7 @@ export default function ChatDemo() {
         }
       );
 
-      setContract(response.data); // ✅ actualizás el estado con la respuesta del backend
+      setContract(response.data);
     } catch (error) {
       console.error("❌ Error al aceptar el contrato:", error);
     }
