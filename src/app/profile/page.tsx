@@ -102,6 +102,7 @@ export default function ProfilePage() {
   const router = useRouter();
   const { showToast } = useToast();
   const [userName, setUserName] = useState<string>("");
+  const [premium, setPremium] = useState<boolean>(false);
 
   useEffect(() => {
     document.title = "Servicio Libre - Mi Perfil";
@@ -137,11 +138,14 @@ export default function ProfilePage() {
   }, [user, loading, router]);
 
   // Cargar perfil al montar o cuando cambia el usuario
+
   useEffect(() => {
     if (user) {
       const fetchProfile = async () => {
         try {
           const data = await getProfile();
+
+          setPremium(data.premium);
           const ticketData = data.tickets.find(
             (ticket: Ticket) =>
               ticket.status === "pending" && ticket.type === "to-worker"
@@ -309,21 +313,21 @@ export default function ProfilePage() {
 
   const handleToMercadoPago = async () => {
     if (token) {
-      const url = await redirectToMercadoPago()
+      const url = await redirectToMercadoPago();
       window.location.href = url;
     } else {
       router.push("/login");
     }
-  }
+  };
 
   const handleToStripe = async () => {
     if (token) {
-      const url = await redirectToStripe()
+      const url = await redirectToStripe();
       window.location.href = url;
     } else {
       router.push("/login");
     }
-  }
+  };
 
   const getMissingFields = () => {
     return requiredFields.filter((field) => {
@@ -366,21 +370,63 @@ export default function ProfilePage() {
           setUserImageFile={setUserImageFile}
           ticket={ticket}
           setUserName={setUserName}
+          premium={premium}
         />
         {/* Boton para redireccionar si no es premium */}
-        <div className="flex justify-center my-6">
-          <button
-            className="relative px-8 py-4 rounded-2xl bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 hover:from-yellow-500 hover:via-yellow-600 hover:to-yellow-700 text-white font-bold text-lg transition-all duration-300 w-full sm:w-auto cursor-pointer flex items-center justify-center gap-3 shadow-2xl transform 
+        {premium ? (
+          <div className="flex justify-center my-6">
+            <div className="relative px-8 py-4 rounded-2xl bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-white font-bold text-lg w-full sm:w-auto flex items-center justify-center gap-3 shadow-2xl border-2 border-yellow-300 overflow-hidden group">
+              {/* Efecto de brillo animado */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 animate-pulse"></div>
+
+              {/* Partículas flotantes */}
+              <div className="absolute top-1 left-4 w-1 h-1 bg-white rounded-full animate-ping"></div>
+              <div className="absolute top-3 right-6 w-1 h-1 bg-yellow-200 rounded-full animate-ping animation-delay-300"></div>
+              <div className="absolute bottom-2 left-8 w-1 h-1 bg-white rounded-full animate-ping animation-delay-700"></div>
+
+              {/* Contenido principal */}
+              <svg
+                className="w-6 h-6 relative z-10"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732L14.146 12.8l-1.179 4.456a1 1 0 01-1.934 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732L9.854 7.2l1.179-4.456A1 1 0 0112 2z"
+                  clipRule="evenodd"
+                />
+              </svg>
+
+              <span className="relative z-10 bg-gradient-to-r from-white to-yellow-100 bg-clip-text text-transparent font-extrabold">
+                ¡Ya eres Premium!
+              </span>
+
+              <div className="relative z-10 flex items-center gap-1">
+                <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
+                <div className="w-2 h-2 bg-yellow-200 rounded-full animate-bounce animation-delay-150"></div>
+                <div className="w-2 h-2 bg-white rounded-full animate-bounce animation-delay-300"></div>
+              </div>
+
+              {/* Borde brillante animado */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 rounded-2xl blur opacity-75 animate-pulse"></div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex justify-center my-6">
+            <button
+              className="relative px-8 py-4 rounded-2xl bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 hover:from-yellow-500 hover:via-yellow-600 hover:to-yellow-700 text-white font-bold text-lg transition-all duration-300 w-full sm:w-auto cursor-pointer flex items-center justify-center gap-3 shadow-2xl transform 
               border-2 border-yellow-300"
-            onClick={handlePremiumSubscription}
-          >
-            <Crown className="w-6 h-6" />
-            <span className="bg-gradient-to-r from-white to-yellow-100 bg-clip-text text-transparent">
-              Suscribirse a Premium
-            </span>
-            <Sparkles className="w-5 h-5 animate-pulse" />
-          </button>
-        </div>
+              onClick={handlePremiumSubscription}
+            >
+              <Crown className="w-6 h-6" />
+              <span className="bg-gradient-to-r from-white to-yellow-100 bg-clip-text text-transparent">
+                Suscribirse a Premium
+              </span>
+              <Sparkles className="w-5 h-5 animate-pulse" />
+            </button>
+          </div>
+        )}
+
         <ProfileForm
           formData={formData}
           editMode={editMode}

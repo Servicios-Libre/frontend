@@ -26,6 +26,7 @@ interface Props {
   setUserImageFile: any;
   ticket: Ticket | null;
   setUserName: (name: string) => void;
+  premium: boolean;
 }
 
 export default function ProfileHeader({
@@ -44,6 +45,7 @@ export default function ProfileHeader({
   userId,
   setUserImageFile,
   ticket,
+  premium,
 }: Props) {
   const { showToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -142,6 +144,7 @@ export default function ProfileHeader({
             editable={editMode}
             fileInputRef={fileInputRef}
             setUserImageFile={setUserImageFile}
+            premium={premium}
           />
         </div>
         <div className="mt-2 w-full sm:w-auto">
@@ -161,8 +164,12 @@ export default function ProfileHeader({
           onClick={() => editMode && setNameModalOpen(true)}
           className={`flex items-center text-xl font-bold mb-1 gap-2
             ${
-              editMode
-                ? "text-white hover:text-blue-200 cursor-pointer"
+              premium && editMode
+                ? "text-amber-300 hover:text-amber-200 cursor-pointer"
+                : editMode
+                ? "text-white hover:text-blu-200 cursor-pointer"
+                : premium
+                ? "text-amber-300"
                 : "text-white cursor-default"
             }`}
           aria-label="Editar nombre"
@@ -209,9 +216,6 @@ export default function ProfileHeader({
               </button>
             </Link>
           )}
-
-          
-          
 
           {/* Botón de solicitar ser trabajador */}
           {userRole !== "worker" && !hasAcceptedTicket && (
