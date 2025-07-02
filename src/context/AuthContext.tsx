@@ -76,8 +76,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(false);
   }, [session, status, logout]);
 
-  console.log("session.user", session?.user);
-
   useEffect(() => {
     if (!token || !user?.id) return;
 

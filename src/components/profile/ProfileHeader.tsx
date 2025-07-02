@@ -5,6 +5,9 @@ import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
 import Link from "next/link";
 import { Ticket } from "@/app/profile/page";
+import EditNameModal from "@/components/profile/EditNameModal";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPen } from "@fortawesome/free-solid-svg-icons";
 
 interface Props {
   userName: string;
@@ -22,11 +25,13 @@ interface Props {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setUserImageFile: any;
   ticket: Ticket | null;
+  setUserName: (name: string) => void;
   handlePremiumSubscription: () => void;
 }
 
 export default function ProfileHeader({
   userName,
+  setUserName,
   userPic,
   setUserPic,
   editMode,
@@ -47,9 +52,6 @@ export default function ProfileHeader({
 
   const handleChangePhotoClick = () => {
     setEditMode(true);
-    setTimeout(() => {
-      fileInputRef.current?.click();
-    }, 0);
   };
 
   const [loadingTicket, setLoadingTicket] = useState(false);
@@ -57,6 +59,7 @@ export default function ProfileHeader({
   const [ticketError, setTicketError] = useState<string | null>(null);
   const [hasPendingRequest, setHasPendingRequest] = useState(false);
   const [hasAcceptedTicket, setHasAcceptedTicket] = useState(false);
+  const [nameModalOpen, setNameModalOpen] = useState(false);
 
   const auth = useAuth();
   const user = auth?.user;
@@ -79,7 +82,6 @@ export default function ProfileHeader({
       setHasAcceptedTicket(false);
     }
   }, [ticket]);
-
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -108,8 +110,6 @@ export default function ProfileHeader({
       setShowMissing(true);
       return;
     }
-    console.log("Hola, ",userId);
-    
     if (!user?.id) {
       setTicketError("Usuario no autenticado");
       return;
@@ -123,7 +123,7 @@ export default function ProfileHeader({
       });
       setTicketSuccess(true);
       setHasPendingRequest(true);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setTicketError(error?.response?.data?.message || "No se pudo enviar la solicitud.");
     } finally {
@@ -145,30 +145,36 @@ export default function ProfileHeader({
           />
         </div>
         <div className="mt-2 w-full sm:w-auto">
-          {!editMode ? (
-            <button
-              className="text-white bg-blue-700 hover:bg-blue-600 px-3 py-1 rounded transition w-full sm:w-auto cursor-pointer"
-              onClick={handleChangePhotoClick}
-            >
-              Cambiar foto
-            </button>
-          ) : (
-            // Espacio reservado para mantener el layout cuando está en modo edición
-            <div className="px-3 py-1 rounded w-full sm:w-auto opacity-0 pointer-events-none select-none">
-              Cambiar foto
-            </div>
-          )}
+          <button
+            className={`text-white bg-blue-700 hover:bg-blue-600 px-3 py-1 rounded transition w-full sm:w-auto cursor-pointer
+      ${editMode ? "invisible" : ""}`}
+            onClick={handleChangePhotoClick}
+          >
+            Cambiar foto
+          </button>
         </div>
+
       </div>
 
       {/* Info y progreso */}
       <div className="flex-1 w-full flex flex-col items-center sm:items-start">
-        <p className="text-xl font-bold text-white mb-1 break-words">
+        <button
+          onClick={() => editMode && setNameModalOpen(true)}
+          className={`flex items-center text-xl font-bold mb-1 gap-2
+            ${editMode ? "text-white hover:text-blue-200 cursor-pointer" : "text-white cursor-default"}`}
+          aria-label="Editar nombre"
+          title={editMode ? "Editar nombre" : undefined}
+          type="button"
+          style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+        >
           {userName}
-        </p>
-        <p className="text-blue-100 text-sm mb-2">
-          Puedes editar tu información personal
-        </p>
+          <FontAwesomeIcon
+            icon={faPen}
+            className={`transition-colors ${editMode ? "text-white hover:text-blue-200" : "text-transparent"}`}
+            style={{ fontSize: "1.25rem" }}
+          />
+        </button>
+        <p className="text-blue-100 text-sm mb-2">Puedes editar tu información personal</p>
 
         <div className="flex flex-col items-center sm:items-start gap-3 w-full">
           <div className="flex items-center gap-2">
@@ -260,6 +266,14 @@ export default function ProfileHeader({
           Subscribirse a premium
         </button>
       </div>
+
+      {nameModalOpen && (
+        <EditNameModal
+          initialName={userName}
+          onSave={(newName) => setUserName(newName)}
+          onClose={() => setNameModalOpen(false)}
+        />
+      )}
     </div>
   );
 }
