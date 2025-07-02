@@ -3,8 +3,15 @@
 
 import LoadingScreen from "@/components/loading-screen/LoadingScreen";
 import { useEffect, useState } from "react";
-import { createSocialLinks, getProfile, redirectToPayment, updateProfile, updateProfileImage } from "@/services/profileService";
-import { updateSocialLinks } from "@/services/profileService"
+import {
+  createSocialLinks,
+  getProfile,
+  redirectToMercadoPago,
+  redirectToStripe,
+  updateProfile,
+  updateProfileImage,
+} from "@/services/profileService";
+import { updateSocialLinks } from "@/services/profileService";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileForm from "@/components/profile/ProfileForm";
 import ProfileActions from "@/components/profile/ProfileActions";
@@ -12,6 +19,8 @@ import { fetchStatesWithCities } from "@/services/profileService";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/context/ToastContext";
+import { Crown, Sparkles } from "lucide-react";
+import PremiumModal from "@/components/profile/ProfilePremiumModal";
 
 const requiredFields = [
   { key: "phone", label: "Teléfono" },
@@ -40,12 +49,12 @@ type ProfileFormType = {
 };
 
 export type Ticket = {
-  id: string,
-  type: string,
-  status: string,
-  created_at: string,
-  userId: string
-}
+  id: string;
+  type: string;
+  status: string;
+  created_at: string;
+  userId: string;
+};
 
 export default function ProfilePage() {
   const [mounted, setMounted] = useState(false);
@@ -64,7 +73,9 @@ export default function ProfilePage() {
     twitter: "",
     instagram: "",
   });
-  const [originalData, setOriginalData] = useState<ProfileFormType | null>(null);
+  const [originalData, setOriginalData] = useState<ProfileFormType | null>(
+    null
+  );
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [showMissing, setShowMissing] = useState(false);
   const [userImageFile, setUserImageFile] = useState<File | null>(null);
@@ -73,13 +84,17 @@ export default function ProfilePage() {
     type: "",
     status: "",
     created_at: "",
-    userId: ""
+    userId: "",
   });
   const [statesData, setStatesData] = useState<
-  { id: number; state: string; cities: { id: number; name: string; state: string }[] }[]
+    {
+      id: number;
+      state: string;
+      cities: { id: number; name: string; state: string }[];
+    }[]
   >([]);
-  
-  
+  const [modalOpen, setModalOpen] = useState(false);
+
   const auth = useAuth();
   const user = auth?.user;
   const loading = auth?.loading ?? false;
@@ -91,7 +106,6 @@ export default function ProfilePage() {
   useEffect(() => {
     document.title = "Servicio Libre - Mi Perfil";
     setMounted(true);
-
   }, []);
 
   useEffect(() => {
@@ -110,7 +124,9 @@ export default function ProfilePage() {
   const provincias = statesData.map((item) => item.state);
 
   const ciudades = formData.state
-    ? statesData.find((prov) => prov.state === formData.state)?.cities.map((city) => city.name) || []
+    ? statesData
+        .find((prov) => prov.state === formData.state)
+        ?.cities.map((city) => city.name) || []
     : [];
 
   // Redirección si no hay usuario autenticado
@@ -133,8 +149,7 @@ export default function ProfilePage() {
           setTicket(ticketData);
 
           // Normalizar para comparar
-          const normalize = (input: string) =>
-            input.trim().toLowerCase();
+          const normalize = (input: string) => input.trim().toLowerCase();
 
           // Buscar la provincia real dentro de statesData
           const provinciaEncontrada =
@@ -183,7 +198,6 @@ export default function ProfilePage() {
     }
   }, [user, token, statesData]);
 
-
   // Loader pantalla completa mientras no está montado
   if (!mounted) {
     return <LoadingScreen />;
@@ -219,7 +233,10 @@ export default function ProfilePage() {
 
   const handleSave = async () => {
     if (!formData.description || formData.description.trim() === "") {
-      showToast("Agrega una descripción a tu perfil antes de solicitar ser trabajador.", "error");
+      showToast(
+        "Agrega una descripción a tu perfil antes de solicitar ser trabajador.",
+        "error"
+      );
       return;
     }
 
@@ -232,14 +249,18 @@ export default function ProfilePage() {
     };
 
     // Chequear si hay alguna red social no vacía
-    const hasSocialData = Object.values(socialData).some((val) => val && val !== "");
+    const hasSocialData = Object.values(socialData).some(
+      (val) => val && val !== ""
+    );
 
     try {
       const dataToSend: any = {
         name: userName,
         phone: formData.phone ? Number(formData.phone) : undefined,
         street: formData.street,
-        house_number: formData.house_number ? Number(formData.house_number) : undefined,
+        house_number: formData.house_number
+          ? Number(formData.house_number)
+          : undefined,
         city: formData.city,
         state: formData.state,
         zip_code: formData.zip_code ? String(formData.zip_code) : undefined,
@@ -250,12 +271,12 @@ export default function ProfilePage() {
 
       if (hasSocialData) {
         // Decidir si crear o actualizar social links según originalData
-        const hadSocialBefore = originalData && (
-          (originalData.facebook && originalData.facebook.trim() !== "") ||
-          (originalData.instagram && originalData.instagram.trim() !== "") ||
-          (originalData.linkedin && originalData.linkedin.trim() !== "") ||
-          (originalData.twitter && originalData.twitter.trim() !== "")
-        );
+        const hadSocialBefore =
+          originalData &&
+          ((originalData.facebook && originalData.facebook.trim() !== "") ||
+            (originalData.instagram && originalData.instagram.trim() !== "") ||
+            (originalData.linkedin && originalData.linkedin.trim() !== "") ||
+            (originalData.twitter && originalData.twitter.trim() !== ""));
 
         if (hadSocialBefore) {
           await updateSocialLinks(socialData); // PUT
@@ -277,7 +298,6 @@ export default function ProfilePage() {
     }
   };
 
-
   const handleCancel = () => {
     if (originalData) {
       setFormData(originalData);
@@ -285,17 +305,32 @@ export default function ProfilePage() {
     setEditMode(false);
   };
 
-  const handlePremiumSubscription = async () => {
-  if (token) {
-    console.log("redireccionando para mp......")
-    const url = await redirectToPayment()
-    window.location.href = url
+  const handlePremiumSubscription = () => setModalOpen(true);
+
+  const handleToMercadoPago = async () => {
+    if (token) {
+      const url = await redirectToMercadoPago()
+      window.location.href = url;
+    } else {
+      router.push("/login");
+    }
   }
-};
+
+  const handleToStripe = async () => {
+    if (token) {
+      const url = await redirectToStripe()
+      window.location.href = url;
+    } else {
+      router.push("/login");
+    }
+  }
 
   const getMissingFields = () => {
     return requiredFields.filter((field) => {
-      return !formData[field.key as keyof ProfileFormType] || formData[field.key as keyof ProfileFormType] === "";
+      return (
+        !formData[field.key as keyof ProfileFormType] ||
+        formData[field.key as keyof ProfileFormType] === ""
+      );
     });
   };
 
@@ -331,8 +366,21 @@ export default function ProfilePage() {
           setUserImageFile={setUserImageFile}
           ticket={ticket}
           setUserName={setUserName}
-          handlePremiumSubscription={handlePremiumSubscription}
         />
+        {/* Boton para redireccionar si no es premium */}
+        <div className="flex justify-center my-6">
+          <button
+            className="relative px-8 py-4 rounded-2xl bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 hover:from-yellow-500 hover:via-yellow-600 hover:to-yellow-700 text-white font-bold text-lg transition-all duration-300 w-full sm:w-auto cursor-pointer flex items-center justify-center gap-3 shadow-2xl transform 
+              border-2 border-yellow-300"
+            onClick={handlePremiumSubscription}
+          >
+            <Crown className="w-6 h-6" />
+            <span className="bg-gradient-to-r from-white to-yellow-100 bg-clip-text text-transparent">
+              Suscribirse a Premium
+            </span>
+            <Sparkles className="w-5 h-5 animate-pulse" />
+          </button>
+        </div>
         <ProfileForm
           formData={formData}
           editMode={editMode}
@@ -348,6 +396,13 @@ export default function ProfilePage() {
       <div className="px-8">
         <ProfileActions />
       </div>
+
+      <PremiumModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onToMercadoPago={handleToMercadoPago}
+        onToStripe={handleToStripe}
+      />
     </div>
   );
 }

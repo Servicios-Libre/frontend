@@ -26,7 +26,6 @@ interface Props {
   setUserImageFile: any;
   ticket: Ticket | null;
   setUserName: (name: string) => void;
-  handlePremiumSubscription: () => void;
 }
 
 export default function ProfileHeader({
@@ -45,7 +44,6 @@ export default function ProfileHeader({
   userId,
   setUserImageFile,
   ticket,
-  handlePremiumSubscription,
 }: Props) {
   const { showToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -125,7 +123,9 @@ export default function ProfileHeader({
       setHasPendingRequest(true);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      setTicketError(error?.response?.data?.message || "No se pudo enviar la solicitud.");
+      setTicketError(
+        error?.response?.data?.message || "No se pudo enviar la solicitud."
+      );
     } finally {
       setLoadingTicket(false);
     }
@@ -153,7 +153,6 @@ export default function ProfileHeader({
             Cambiar foto
           </button>
         </div>
-
       </div>
 
       {/* Info y progreso */}
@@ -161,20 +160,32 @@ export default function ProfileHeader({
         <button
           onClick={() => editMode && setNameModalOpen(true)}
           className={`flex items-center text-xl font-bold mb-1 gap-2
-            ${editMode ? "text-white hover:text-blue-200 cursor-pointer" : "text-white cursor-default"}`}
+            ${
+              editMode
+                ? "text-white hover:text-blue-200 cursor-pointer"
+                : "text-white cursor-default"
+            }`}
           aria-label="Editar nombre"
           title={editMode ? "Editar nombre" : undefined}
           type="button"
-          style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+          style={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
         >
           {userName}
           <FontAwesomeIcon
             icon={faPen}
-            className={`transition-colors ${editMode ? "text-white hover:text-blue-200" : "text-transparent"}`}
+            className={`transition-colors ${
+              editMode ? "text-white hover:text-blue-200" : "text-transparent"
+            }`}
             style={{ fontSize: "1.25rem" }}
           />
         </button>
-        <p className="text-blue-100 text-sm mb-2">Puedes editar tu información personal</p>
+        <p className="text-blue-100 text-sm mb-2">
+          Puedes editar tu información personal
+        </p>
 
         <div className="flex flex-col items-center sm:items-start gap-3 w-full">
           <div className="flex items-center gap-2">
@@ -198,6 +209,9 @@ export default function ProfileHeader({
               </button>
             </Link>
           )}
+
+          
+          
 
           {/* Botón de solicitar ser trabajador */}
           {userRole !== "worker" && !hasAcceptedTicket && (
@@ -259,14 +273,7 @@ export default function ProfileHeader({
             Editar perfil
           </button>
         )}
-        <button
-          className="px-4 py-2 rounded-md bg-blue-700 hover:bg-blue-600 text-white font-semibold transition w-full sm:w-auto cursor-pointer"
-          onClick={handlePremiumSubscription}
-        >
-          Subscribirse a premium
-        </button>
       </div>
-
       {nameModalOpen && (
         <EditNameModal
           initialName={userName}

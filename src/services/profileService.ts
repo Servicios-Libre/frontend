@@ -8,7 +8,7 @@ export const getProfile = async () => {
 
 export const updateProfile = async (data: object): Promise<void> => {
   console.log("[datos para actualizar el usuario]:", data);
-  
+
   await api.put(`/users/update/`, data);
 };
 
@@ -60,12 +60,24 @@ export const createSocialLinks = async (socialData: {
   }
 };
 
-export const redirectToPayment = async () => {
+export const redirectToMercadoPago = async () => {
   try {
     const res = await api.post("/payment/create-order");
     return res.data.init_point;
   } catch (error) {
     console.error("Error al redirigir a la página de pago:", error);
-    throw error
+    throw error;
   }
-}
+};
+
+export const redirectToStripe = async () => {
+  try {
+    const res = await api.post("/stripe/create-checkout-session", {
+      lookup_key: "premium_monthly",
+    });
+    return res.data.url;
+  } catch (error) {
+    console.error("Error al redirigir a la página de pago:", error);
+    throw error;
+  }
+};
