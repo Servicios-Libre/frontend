@@ -14,18 +14,22 @@ import {
 import { deactivateService } from "@/services/dashboard/services";
 import { useToast } from "@/context/ToastContext";
 import { FaTools, FaClipboardList } from "react-icons/fa"; // Íconos para títulos
+import { useAuth } from "@/context/AuthContext";
 
 export default function ServicesMenuPage() {
+  const { user: authUser } = useAuth();
   const [loadingId, setLoadingId] = useState<string | undefined>(undefined);
   const [loadingServiceId, setLoadingServiceId] = useState<string | undefined>(undefined);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { activeServicesCount } = useAdminContext();
+  const isAdmin = authUser?.role === "admin";
 
   const {
     serviceRequests,
     refreshServiceRequests,
     refreshActiveServices,
     isReady,
+    totalActiveServices,
   } = useAdminContext();
 
   const { showToast } = useToast();
@@ -69,7 +73,7 @@ export default function ServicesMenuPage() {
 
   useEffect(() => {
     document.title = "Servicio Libre - Dashboard de servicios"
-   }, [])
+  }, [])
 
   useEffect(() => {
     if (isReady) {
@@ -78,6 +82,14 @@ export default function ServicesMenuPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isReady]);
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white bg-indigo-950">
+        <h2>No tienes permiso para acceder a esta página.</h2>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-indigo-950 text-white">
@@ -99,7 +111,7 @@ export default function ServicesMenuPage() {
         </h1>
 
         {/* Solicitudes de servicio */}
-        <section className="mb-4">
+        <section className="mb-12">
           <h2 className="text-2xl font-semibold flex items-center gap-2">
             <FaClipboardList className="text-emerald-400" /> Solicitudes pendientes
             {serviceRequests?.length > 0 && (
@@ -119,11 +131,11 @@ export default function ServicesMenuPage() {
 
         {/* Servicios activos */}
         <section>
-          <h2 className="text-2xl font-semibold mb-4 text-purple-300 flex items-center gap-2">
-            Servicios activos
+          <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+            <FaClipboardList className="text-emerald-400" /> Servicios activos
             {activeServicesCount > 0 && (
               <span className="ml-2 bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full text-sm font-medium">
-                {activeServicesCount} activos
+                {activeServicesCount} coincidencias de {totalActiveServices}
               </span>
             )}
           </h2>

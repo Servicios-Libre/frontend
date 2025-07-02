@@ -15,6 +15,7 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import { useAdminContext } from "@/context/AdminContext";
+import { useEffect, useState } from "react";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -26,8 +27,24 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const {
     displayedWorkerRequestsCount,
     displayedServiceRequestsCount,
-    isReady
+    isReady,
   } = useAdminContext();
+
+  // Estado local para mantener el último valor visible y evitar parpadeo
+  const [stableServiceCount, setStableServiceCount] = useState<number>(displayedServiceRequestsCount);
+  const [stableWorkerCount, setStableWorkerCount] = useState<number>(displayedWorkerRequestsCount);
+
+  useEffect(() => {
+    if (isReady && displayedServiceRequestsCount !== undefined) {
+      setStableServiceCount(displayedServiceRequestsCount);
+    }
+  }, [displayedServiceRequestsCount, isReady]);
+
+  useEffect(() => {
+    if (isReady && displayedWorkerRequestsCount !== undefined) {
+      setStableWorkerCount(displayedWorkerRequestsCount);
+    }
+  }, [displayedWorkerRequestsCount, isReady]);
 
   return (
     <>
@@ -75,7 +92,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             href="/dashboard/services-management"
             icon={<FaTools />}
             text="Servicios"
-            notificationCount={isReady ? displayedServiceRequestsCount : undefined}
+            notificationCount={stableServiceCount}
             pathname={pathname}
             onClick={onClose}
           />
@@ -84,7 +101,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             href="/dashboard/worker-management"
             icon={<FaUserCog />}
             text="Trabajadores"
-            notificationCount={isReady ? displayedWorkerRequestsCount : undefined}
+            notificationCount={stableWorkerCount}
             pathname={pathname}
             onClick={onClose}
           />

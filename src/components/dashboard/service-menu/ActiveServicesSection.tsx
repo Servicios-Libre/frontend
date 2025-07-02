@@ -1,8 +1,8 @@
-import { SearchInput } from "@/components/dashboard/SearchInput"; // 👈 asegurate que esté este import
+import { useEffect } from "react";
+import { SearchInput } from "@/components/dashboard/SearchInput";
 import Pagination from "../Pagination";
 import ActiveServicesTable from "./ActiveServicesTable";
 import { useAdminContext } from "@/context/AdminContext";
-
 import { Servicio } from "@/types";
 
 type Props = {
@@ -16,7 +16,6 @@ export default function ActiveServicesSection({
 }: Props) {
   const {
     activeServices,
-    activeServicesCount,
     activeServicesPage,
     setActiveServicesPage,
     activeServicesSearch,
@@ -24,13 +23,28 @@ export default function ActiveServicesSection({
   } = useAdminContext();
 
   const itemsPerPage = 5;
-  const totalPages = Math.ceil(activeServicesCount / itemsPerPage);
-
   const isFiltered = activeServicesSearch.trim().length > 0;
+
+
+  const filteredServices = activeServices.filter((service) =>
+    service.title.toLowerCase().includes(activeServicesSearch.toLowerCase())
+  );
+
+
+  const paginatedServices = filteredServices.slice(
+    (activeServicesPage - 1) * itemsPerPage,
+    activeServicesPage * itemsPerPage
+  );
+
+  const totalPages = Math.ceil(filteredServices.length / itemsPerPage);
+
+
+  useEffect(() => {
+    setActiveServicesPage(1);
+  }, [activeServicesSearch, setActiveServicesPage]);
 
   return (
     <div className="mt-4">
-
       {/* 🔍 Buscador */}
       <div className="mb-4">
         <SearchInput
@@ -40,13 +54,15 @@ export default function ActiveServicesSection({
         />
       </div>
 
+      {/* 🧾 Tabla de servicios paginada */}
       <ActiveServicesTable
-        services={activeServices}
+        services={paginatedServices}
         onDeactivate={onDeactivate}
         loadingId={loadingServiceId}
         isFiltered={isFiltered}
       />
 
+      {/* 📄 Controles de paginación */}
       <Pagination
         totalPages={totalPages}
         currentPage={activeServicesPage}
