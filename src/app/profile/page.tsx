@@ -288,7 +288,8 @@ export default function ProfilePage() {
   const handlePremiumSubscription = async () => {
   if (token) {
     console.log("redireccionando para mp......")
-    await redirectToPayment()
+    const url = await redirectToPayment()
+    window.location.href = url
   }
 };
 
