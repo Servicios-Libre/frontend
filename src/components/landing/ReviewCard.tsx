@@ -1,46 +1,57 @@
 import Image from "next/image";
+import { FaStar, FaRegStar, FaQuoteLeft } from "react-icons/fa";
 
 type ReviewCardProps = {
   name: string;
   rating: number;
   comment: string;
-  avatarUrl?: string;
+  avatarUrl?: string; // el signo de pregunta la vuelve opcional
+  createdAt?: string;
 };
 
-export default function ReviewCard({ name, rating, comment, avatarUrl }: ReviewCardProps) {
-  const stars = Array(5)
-    .fill(0)
-    .map((_, index) => (
-      <span
-        key={index}
-        className={index < rating ? "text-yellow-400" : "text-gray-300"}
-      >
-        ★
-      </span>
-    ));
-
+export default function ReviewCard({
+  name,
+  rating,
+  comment,
+  avatarUrl,
+  createdAt,
+}: ReviewCardProps) {
   return (
-    <div className="bg-white rounded-xl shadow-lg p-5 space-y-2 flex flex-col h-full">
-      <div className="flex items-center gap-3">
-        {avatarUrl ? (
-          <Image
-            src={avatarUrl}
-            alt={`Foto de ${name}`}
-            width={40}
-            height={40}
-            className="rounded-full object-cover"
-          />
-        ) : (
-          <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold text-sm">
-            {name.charAt(0).toUpperCase()}
+    <div className="bg-gray-50 p-5 rounded-xl border border-gray-100 shadow group hover:border-blue-400 transition">
+      <div className="flex justify-between items-center mb-2">
+        <div className="flex items-center gap-3 font-semibold text-gray-800">
+          <div className="w-8 h-8 relative flex-shrink-0">
+            <Image
+              src={avatarUrl || "/images/default-avatar.png"} // Ruta a tu imagen de fallback
+              alt={`Foto de ${name}`}
+              fill
+              sizes="32px"
+              className="rounded-full object-cover border border-gray-300"
+            />
           </div>
-        )}
-        <div>
-          <p className="text-sm text-gray-900 font-semibold">{name}</p>
-          <div className="flex text-sm">{stars}</div>
+          {name}
+        </div>
+        <div className="flex gap-1">
+          {Array.from({ length: 5 }).map((_, i) =>
+            i < rating ? (
+              <FaStar key={i} className="text-yellow-400" />
+            ) : (
+              <FaRegStar key={i} className="text-gray-300" />
+            )
+          )}
         </div>
       </div>
-      <p className="text-sm text-gray-700 leading-normal flex-grow">{comment}</p>
+
+      <p className="text-sm text-gray-600 italic flex items-start gap-2">
+        <FaQuoteLeft className="text-amber-400 mt-1" />
+        {comment}
+      </p>
+
+      {createdAt && (
+        <div className="text-xs text-gray-400 mt-2">
+          {new Date(createdAt).toLocaleDateString()}
+        </div>
+      )}
     </div>
   );
 }

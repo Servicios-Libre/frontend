@@ -270,6 +270,7 @@ export default function LandingPage() {
                   rating={review.rate}
                   comment={review.description}
                   avatarUrl={review.author.user_pic}
+                  createdAt={review.created_at} 
                 />
               ))
             )}
