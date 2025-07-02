@@ -180,6 +180,7 @@ const ChatBox = ({
           <ContractForm
             onSubmit={onContractCreate}
             onCancel={() => setShowContractForm(false)}
+            setShowContractForm={setShowContractForm}
           />
         )}
 
