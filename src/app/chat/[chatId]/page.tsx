@@ -242,7 +242,7 @@ export default function ChatDemo() {
     if (!contract || !token || !user) return;
 
     try {
-      const role = user.role === "user" ? "user" : "worker";
+      const role = user.id === clienteId ? "user" : "worker";
 
       const response = await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/api/chat/contract/${contract.id}/confirm`,
