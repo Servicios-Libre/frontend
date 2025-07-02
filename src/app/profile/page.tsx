@@ -3,8 +3,15 @@
 
 import LoadingScreen from "@/components/loading-screen/LoadingScreen";
 import { useEffect, useState } from "react";
-import { createSocialLinks, getProfile, redirectToPayment, updateProfile, updateProfileImage } from "@/services/profileService";
-import { updateSocialLinks } from "@/services/profileService"
+import {
+  createSocialLinks,
+  getProfile,
+  redirectToMercadoPago,
+  redirectToStripe,
+  updateProfile,
+  updateProfileImage,
+} from "@/services/profileService";
+import { updateSocialLinks } from "@/services/profileService";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileForm from "@/components/profile/ProfileForm";
 import ProfileActions from "@/components/profile/ProfileActions";
@@ -12,6 +19,8 @@ import { fetchStatesWithCities } from "@/services/profileService";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/context/ToastContext";
+import { Crown, Sparkles } from "lucide-react";
+import PremiumModal from "@/components/profile/ProfilePremiumModal";
 
 const requiredFields = [
   { key: "phone", label: "Teléfono" },
@@ -40,12 +49,12 @@ type ProfileFormType = {
 };
 
 export type Ticket = {
-  id: string,
-  type: string,
-  status: string,
-  created_at: string,
-  userId: string
-}
+  id: string;
+  type: string;
+  status: string;
+  created_at: string;
+  userId: string;
+};
 
 export default function ProfilePage() {
   const [mounted, setMounted] = useState(false);
@@ -64,14 +73,21 @@ export default function ProfilePage() {
     twitter: "",
     instagram: "",
   });
-  const [originalData, setOriginalData] = useState<ProfileFormType | null>(null);
+  const [originalData, setOriginalData] = useState<ProfileFormType | null>(
+    null
+  );
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [showMissing, setShowMissing] = useState(false);
   const [userImageFile, setUserImageFile] = useState<File | null>(null);
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [statesData, setStatesData] = useState<
-    { id: number; state: string; cities: { id: number; name: string; state: string }[] }[]
+      {
+      id: number;
+      state: string;
+      cities: { id: number; name: string; state: string }[];
+    }[]
   >([]);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const auth = useAuth();
   const user = auth?.user;
@@ -80,6 +96,7 @@ export default function ProfilePage() {
   const router = useRouter();
   const { showToast } = useToast();
   const [userName, setUserName] = useState<string>("");
+  const [premium, setPremium] = useState<boolean>(false);
 
   useEffect(() => {
     document.title = "Servicio Libre - Mi Perfil";
@@ -102,7 +119,9 @@ export default function ProfilePage() {
   const provincias = statesData.map((item) => item.state);
 
   const ciudades = formData.state
-    ? statesData.find((prov) => prov.state === formData.state)?.cities.map((city) => city.name) || []
+    ? statesData
+        .find((prov) => prov.state === formData.state)
+        ?.cities.map((city) => city.name) || []
     : [];
 
   // Redirección si no hay usuario autenticado
@@ -113,19 +132,21 @@ export default function ProfilePage() {
   }, [user, loading, router]);
 
   // Cargar perfil al montar o cuando cambia el usuario o cambia statesData
+
   useEffect(() => {
     if (user) {
       const fetchProfile = async () => {
         try {
           const data = await getProfile();
+
+          setPremium(data.premium);
           const ticketData = data.tickets.find(
             (ticket: Ticket) =>
               ticket.status === "pending" && ticket.type === "to-worker"
           );
           setTicket(ticketData || null);
 
-          const normalize = (input: string) =>
-            input.trim().toLowerCase();
+          const normalize = (input: string) => input.trim().toLowerCase();
 
           const provinciaEncontrada =
             statesData.find(
@@ -171,7 +192,6 @@ export default function ProfilePage() {
       fetchProfile();
     }
   }, [user, token, statesData]);
-
   if (!mounted) {
     return <LoadingScreen />;
   }
@@ -205,7 +225,10 @@ export default function ProfilePage() {
 
   const handleSave = async () => {
     if (!formData.description || formData.description.trim() === "") {
-      showToast("Agrega una descripción a tu perfil antes de solicitar ser trabajador.", "error");
+      showToast(
+        "Agrega una descripción a tu perfil antes de solicitar ser trabajador.",
+        "error"
+      );
       return;
     }
 
@@ -216,14 +239,18 @@ export default function ProfilePage() {
       instagram: formData.instagram?.trim(),
     };
 
-    const hasSocialData = Object.values(socialData).some((val) => val && val !== "");
+    const hasSocialData = Object.values(socialData).some(
+      (val) => val && val !== ""
+    );
 
     try {
       const dataToSend: any = {
         name: userName,  // <- acá usás el userName actualizado del estado
         phone: formData.phone ? Number(formData.phone) : undefined,
         street: formData.street,
-        house_number: formData.house_number ? Number(formData.house_number) : undefined,
+        house_number: formData.house_number
+          ? Number(formData.house_number)
+          : undefined,
         city: formData.city,
         state: formData.state,
         zip_code: formData.zip_code ? String(formData.zip_code) : undefined,
@@ -233,12 +260,12 @@ export default function ProfilePage() {
       await updateProfile(dataToSend);
 
       if (hasSocialData) {
-        const hadSocialBefore = originalData && (
-          (originalData.facebook && originalData.facebook.trim() !== "") ||
-          (originalData.instagram && originalData.instagram.trim() !== "") ||
-          (originalData.linkedin && originalData.linkedin.trim() !== "") ||
-          (originalData.twitter && originalData.twitter.trim() !== "")
-        );
+        const hadSocialBefore =
+          originalData &&
+          ((originalData.facebook && originalData.facebook.trim() !== "") ||
+            (originalData.instagram && originalData.instagram.trim() !== "") ||
+            (originalData.linkedin && originalData.linkedin.trim() !== "") ||
+            (originalData.twitter && originalData.twitter.trim() !== ""));
 
         if (hadSocialBefore) {
           await updateSocialLinks(socialData);
@@ -267,16 +294,32 @@ export default function ProfilePage() {
     setEditMode(false);
   };
 
-  const handlePremiumSubscription = async () => {
+  const handlePremiumSubscription = () => setModalOpen(true);
+
+  const handleToMercadoPago = async () => {
     if (token) {
-      const url = await redirectToPayment();
-      window.location.href = url
+      const url = await redirectToMercadoPago();
+      window.location.href = url;
+    } else {
+      router.push("/login");
+    }
+  };
+
+  const handleToStripe = async () => {
+    if (token) {
+      const url = await redirectToStripe();
+      window.location.href = url;
+    } else {
+      router.push("/login");
     }
   };
 
   const getMissingFields = () => {
     return requiredFields.filter((field) => {
-      return !formData[field.key as keyof ProfileFormType] || formData[field.key as keyof ProfileFormType] === "";
+      return (
+        !formData[field.key as keyof ProfileFormType] ||
+        formData[field.key as keyof ProfileFormType] === ""
+      );
     });
   };
 
@@ -310,8 +353,63 @@ export default function ProfilePage() {
           setUserImageFile={setUserImageFile}
           ticket={ticket}
           setUserName={setUserName}
-          handlePremiumSubscription={handlePremiumSubscription}
+          premium={premium}
         />
+        {/* Boton para redireccionar si no es premium */}
+        {premium ? (
+          <div className="flex justify-center my-6">
+            <div className="relative px-8 py-4 rounded-2xl bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-white font-bold text-lg w-full sm:w-auto flex items-center justify-center gap-3 shadow-2xl border-2 border-yellow-300 overflow-hidden group">
+              {/* Efecto de brillo animado */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 animate-pulse"></div>
+
+              {/* Partículas flotantes */}
+              <div className="absolute top-1 left-4 w-1 h-1 bg-white rounded-full animate-ping"></div>
+              <div className="absolute top-3 right-6 w-1 h-1 bg-yellow-200 rounded-full animate-ping animation-delay-300"></div>
+              <div className="absolute bottom-2 left-8 w-1 h-1 bg-white rounded-full animate-ping animation-delay-700"></div>
+
+              {/* Contenido principal */}
+              <svg
+                className="w-6 h-6 relative z-10"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732L14.146 12.8l-1.179 4.456a1 1 0 01-1.934 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732L9.854 7.2l1.179-4.456A1 1 0 0112 2z"
+                  clipRule="evenodd"
+                />
+              </svg>
+
+              <span className="relative z-10 bg-gradient-to-r from-white to-yellow-100 bg-clip-text text-transparent font-extrabold">
+                ¡Ya eres Premium!
+              </span>
+
+              <div className="relative z-10 flex items-center gap-1">
+                <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
+                <div className="w-2 h-2 bg-yellow-200 rounded-full animate-bounce animation-delay-150"></div>
+                <div className="w-2 h-2 bg-white rounded-full animate-bounce animation-delay-300"></div>
+              </div>
+
+              {/* Borde brillante animado */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 rounded-2xl blur opacity-75 animate-pulse"></div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex justify-center my-6">
+            <button
+              className="relative px-8 py-4 rounded-2xl bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 hover:from-yellow-500 hover:via-yellow-600 hover:to-yellow-700 text-white font-bold text-lg transition-all duration-300 w-full sm:w-auto cursor-pointer flex items-center justify-center gap-3 shadow-2xl transform 
+              border-2 border-yellow-300"
+              onClick={handlePremiumSubscription}
+            >
+              <Crown className="w-6 h-6" />
+              <span className="bg-gradient-to-r from-white to-yellow-100 bg-clip-text text-transparent">
+                Suscribirse a Premium
+              </span>
+              <Sparkles className="w-5 h-5 animate-pulse" />
+            </button>
+          </div>
+        )}
+
         <ProfileForm
           formData={formData}
           editMode={editMode}
@@ -327,6 +425,13 @@ export default function ProfilePage() {
       <div className="px-8">
         <ProfileActions />
       </div>
+
+      <PremiumModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onToMercadoPago={handleToMercadoPago}
+        onToStripe={handleToStripe}
+      />
     </div>
   );
 }

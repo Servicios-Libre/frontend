@@ -24,6 +24,7 @@ interface JwtPayload {
     status: string;
   }>;
   image?: string;
+  premium?: boolean;
 }
 
 interface AuthContextType {
