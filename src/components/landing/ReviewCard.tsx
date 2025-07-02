@@ -1,29 +1,57 @@
-// src/components/landing/ReviewCard.tsx
+import Image from "next/image";
+import { FaStar, FaRegStar, FaQuoteLeft } from "react-icons/fa";
+
 type ReviewCardProps = {
   name: string;
   rating: number;
   comment: string;
+  avatarUrl?: string; // el signo de pregunta la vuelve opcional
+  createdAt?: string;
 };
 
-export default function ReviewCard({ name, rating, comment }: ReviewCardProps) {
-  const stars = Array(5)
-    .fill(0)
-    .map((_, index) => (
-      <span
-        key={index}
-        className={index < rating ? "text-yellow-400" : "text-gray-300"}
-      >
-        ★
-      </span>
-    ));
-
+export default function ReviewCard({
+  name,
+  rating,
+  comment,
+  avatarUrl,
+  createdAt,
+}: ReviewCardProps) {
   return (
-    <div className="bg-white rounded-xl shadow-lg p-5 space-y-2 flex flex-col h-full"> {/* Reducido padding */}
-      <div className="flex justify-start text-lg"> {/* Reducido texto */}
-        {stars}
+    <div className="bg-gray-50 p-5 rounded-xl border border-gray-100 shadow group hover:border-blue-400 transition">
+      <div className="flex justify-between items-center mb-2">
+        <div className="flex items-center gap-3 font-semibold text-gray-800">
+          <div className="w-8 h-8 relative flex-shrink-0">
+            <Image
+              src={avatarUrl || "/images/default-avatar.png"} // Ruta a tu imagen de fallback
+              alt={`Foto de ${name}`}
+              fill
+              sizes="32px"
+              className="rounded-full object-cover border border-gray-300"
+            />
+          </div>
+          {name}
+        </div>
+        <div className="flex gap-1">
+          {Array.from({ length: 5 }).map((_, i) =>
+            i < rating ? (
+              <FaStar key={i} className="text-yellow-400" />
+            ) : (
+              <FaRegStar key={i} className="text-gray-300" />
+            )
+          )}
+        </div>
       </div>
-      <p className="text-sm text-gray-700 flex-grow leading-normal">{comment}</p> {/* Reducido texto y leading */}
-      <p className="text-gray-900 font-semibold mt-2 border-t pt-2 border-gray-100">– {name}</p> {/* Reducido pt */}
+
+      <p className="text-sm text-gray-600 italic flex items-start gap-2">
+        <FaQuoteLeft className="text-amber-400 mt-1" />
+        {comment}
+      </p>
+
+      {createdAt && (
+        <div className="text-xs text-gray-400 mt-2">
+          {new Date(createdAt).toLocaleDateString()}
+        </div>
+      )}
     </div>
   );
 }

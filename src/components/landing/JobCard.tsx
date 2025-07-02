@@ -1,4 +1,3 @@
-// src/components/landing/JobCard.tsx
 import Image from "next/image";
 import Link from 'next/link';
 
@@ -6,25 +5,28 @@ type JobCardProps = {
   image: string;
   title: string;
   description: string;
+  workerId: string;
+  serviceId: string;
 };
 
-// Define el límite de caracteres para la descripción
-const DESCRIPTION_LIMIT = 70; // Puedes ajustar este valor a tu gusto
+const DESCRIPTION_LIMIT = 70;
 
-export default function JobCard({ image, title, description }: JobCardProps) {
-  const slug = title.toLowerCase().replace(/á/g, 'a').replace(/é/g, 'e').replace(/í/g, 'i').replace(/ó/g, 'o').replace(/ú/g, 'u').replace(/\s+/g, '-');
-
-  // Recorta la descripción si es demasiado larga
+export default function JobCard({
+  image,
+  title,
+  description,
+  workerId,
+  serviceId, // 🧠 este era el que faltaba desestructurar
+}: JobCardProps) {
   const truncatedDescription =
     description.length > DESCRIPTION_LIMIT
       ? description.substring(0, DESCRIPTION_LIMIT) + '...'
       : description;
 
-  // Determina si necesitamos aplicar el difuminado
   const needsFade = description.length > DESCRIPTION_LIMIT;
 
   return (
-    <Link href={`/servicios?q=${slug}`}>
+    <Link href={`/worker-profile/${workerId}?serviceId=${serviceId}`}>
       <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer">
         <div className="relative w-full h-44">
           <Image
@@ -36,12 +38,11 @@ export default function JobCard({ image, title, description }: JobCardProps) {
             className="rounded-t-xl"
           />
         </div>
-        <div className="p-5 relative"> {/* Añadido 'relative' para posicionar el gradiente */}
+        <div className="p-5 relative">
           <h3 className="text-lg font-bold text-gray-900 mb-1">{title}</h3>
           <p className="text-sm text-gray-700 leading-normal">
             {truncatedDescription}
           </p>
-          {/* Capa de difuminado condicional */}
           {needsFade && (
             <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent"></div>
           )}

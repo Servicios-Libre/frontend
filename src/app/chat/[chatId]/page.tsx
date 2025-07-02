@@ -26,6 +26,8 @@ export default function ChatDemo() {
   const [trabajadorId, setTrabajadorId] = useState("");
   const [clienteId, setClienteId] = useState("");
 
+  const [showContractForm, setShowContractForm] = useState(false);
+
   useEffect(() => {
     document.title = "Servicio Libre - Chat";
   }, []);
@@ -71,10 +73,12 @@ export default function ChatDemo() {
     };
 
     socket.on("newMessage", handleNewMessage);
-    socket.on("newContract", (contractData) => {
-      console.log("📦 Contrato recibido por socket:", contractData);
-      setContract(contractData);
+    socket.on("newContract", (updatedContract) => {
+      console.log("🧾 Contrato recibido vía socket:", updatedContract);
+      setContract(updatedContract);
+      setShowContractForm(false);
     });
+
     socket.on("contractUpdated", (updatedContract) => {
       console.log("📡 Contrato actualizado vía socket:", updatedContract);
       setContract(updatedContract);
@@ -368,6 +372,8 @@ export default function ChatDemo() {
             userRole={userRole}
             trabajadorId={trabajadorId}
             clienteId={clienteId}
+            showContractForm={showContractForm}
+            setShowContractForm={setShowContractForm}
           />
         )}
       </section>
