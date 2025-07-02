@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FaRegComments } from "react-icons/fa";
@@ -11,9 +11,29 @@ import { UserDropdown, MobileUserSection } from "./UserSections";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const auth = useAuth();
+  const { user, logout, unreadCount, loading } = useAuth();
 
-  const { user, logout, unreadCount, loading } = auth;
+  const [userName, setUserName] = useState("");
+
+  useEffect(() => {
+    if (user?.name) {
+      setUserName(user.name);
+    } else {
+      setUserName("Usuario");
+    }
+  }, [user]);
+
+  useEffect(() => {
+    const handleUserNameChanged = (e: CustomEvent) => {
+      setUserName(e.detail);
+    };
+
+    window.addEventListener("userNameChanged", handleUserNameChanged as EventListener);
+
+    return () => {
+      window.removeEventListener("userNameChanged", handleUserNameChanged as EventListener);
+    };
+  }, []);
 
   return (
     <>
@@ -56,7 +76,7 @@ export default function Navbar() {
             <div className="ml-6">
               {!loading ? (
                 user ? (
-                  <UserDropdown user={user} logout={logout} />
+                  <UserDropdown userName={userName} user={user} logout={logout} />
                 ) : (
                   <Link
                     href="/auth"
@@ -111,7 +131,7 @@ export default function Navbar() {
         <hr className="mb-6 border-gray-200 sm:mx-auto" />
 
         {!loading ? (
-          <MobileUserSection user={user} logout={logout} setIsOpen={setIsOpen} />
+          <MobileUserSection user={user} userName={userName} logout={logout} setIsOpen={setIsOpen} />
         ) : (
           <div className="h-10 w-24 bg-gray-200 rounded animate-pulse" />
         )}
