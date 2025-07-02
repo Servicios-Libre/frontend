@@ -11,7 +11,12 @@ interface ReviewFormProps {
   token: string;
 }
 
-const ReviewForm = ({ workerId, contractId, onReviewSubmitted, token }: ReviewFormProps) => {
+const ReviewForm = ({
+  workerId,
+  contractId,
+  onReviewSubmitted,
+  token,
+}: ReviewFormProps) => {
   const [description, setDescription] = useState("");
   const [rate, setRate] = useState(0);
   const [hover, setHover] = useState(0);
@@ -25,12 +30,17 @@ const ReviewForm = ({ workerId, contractId, onReviewSubmitted, token }: ReviewFo
 
     try {
       await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/${workerId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/new/${workerId}`,
         { description, rate, contractId },
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
       );
       onReviewSubmitted();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err.response?.data?.message || "Error al enviar la reseña");
     } finally {
@@ -43,10 +53,14 @@ const ReviewForm = ({ workerId, contractId, onReviewSubmitted, token }: ReviewFo
       onSubmit={handleSubmit}
       className="mt-8 bg-white border border-gray-200 rounded-2xl shadow-xl p-8 max-w-xl mx-auto"
     >
-      <h2 className="text-2xl font-extrabold text-gray-800 mb-6">¿Cómo fue tu experiencia?</h2>
+      <h2 className="text-2xl font-extrabold text-gray-800 mb-6">
+        ¿Cómo fue tu experiencia?
+      </h2>
 
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-600 mb-2">Tu puntuación:</label>
+        <label className="block text-sm font-medium text-gray-600 mb-2">
+          Tu puntuación:
+        </label>
         <div className="flex items-center gap-2">
           {[...Array(5)].map((_, i) => {
             const rating = i + 1;
@@ -61,7 +75,9 @@ const ReviewForm = ({ workerId, contractId, onReviewSubmitted, token }: ReviewFo
                 <FaStar
                   size={28}
                   className={
-                    rating <= (hover || rate) ? "text-yellow-400" : "text-gray-300"
+                    rating <= (hover || rate)
+                      ? "text-yellow-400"
+                      : "text-gray-300"
                   }
                 />
               </button>
@@ -71,7 +87,9 @@ const ReviewForm = ({ workerId, contractId, onReviewSubmitted, token }: ReviewFo
       </div>
 
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-600 mb-2">Comentario:</label>
+        <label className="block text-sm font-medium text-gray-600 mb-2">
+          Comentario:
+        </label>
         <textarea
           className="w-full border border-gray-300 rounded-lg p-3 shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none text-gray-800"
           placeholder="¿Qué te pareció el servicio?"
@@ -82,7 +100,9 @@ const ReviewForm = ({ workerId, contractId, onReviewSubmitted, token }: ReviewFo
           required
           rows={5}
         />
-        <p className="text-xs text-gray-400 mt-1">Mínimo 20 y máximo 400 caracteres.</p>
+        <p className="text-xs text-gray-400 mt-1">
+          Mínimo 20 y máximo 400 caracteres.
+        </p>
       </div>
 
       {error && <p className="text-sm text-red-500 mb-4">{error}</p>}
