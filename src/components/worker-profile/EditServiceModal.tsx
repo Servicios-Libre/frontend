@@ -17,10 +17,17 @@ type Props = {
   onSave: (updatedService: WorkerService, newFiles: FileList | null) => void;
 };
 
-export default function EditServiceModal({ service, isOpen, onClose, onSave }: Props) {
+export default function EditServiceModal({
+  service,
+  isOpen,
+  onClose,
+  onSave,
+}: Props) {
   const [title, setTitle] = useState(service.title);
   const [description, setDescription] = useState(service.description);
-  const [previewImages, setPreviewImages] = useState<{ id?: string; photo_url: string }[]>(service.work_photos);
+  const [previewImages, setPreviewImages] = useState<
+    { id?: string; photo_url: string }[]
+  >(service.work_photos);
   const [newFilesArray, setNewFilesArray] = useState<File[]>([]);
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -51,13 +58,39 @@ export default function EditServiceModal({ service, isOpen, onClose, onSave }: P
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
-    const filesArray = Array.from(files);
-    const newPreviews = filesArray.map((file) => ({
-      photo_url: URL.createObjectURL(file),
-    }));
 
-    setPreviewImages((prev) => [...prev, ...newPreviews]);
-    setNewFilesArray((prev) => [...prev, ...filesArray]);
+    const MAX_SIZE_MB = 5;
+    const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
+    const validFiles: File[] = [];
+    let rejected = false;
+
+    for (const file of files) {
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        showToast(`Formato no permitido: ${file.name}`, "error");
+        rejected = true;
+        continue;
+      }
+      if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+        showToast(
+          `La imagen "${file.name}" supera los ${MAX_SIZE_MB}MB.`,
+          "error"
+        );
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        rejected = true;
+        continue;
+      }
+      validFiles.push(file);
+    }
+
+    if (validFiles.length > 0) {
+      const newPreviews = validFiles.map((file) => ({
+        photo_url: URL.createObjectURL(file),
+      }));
+      setPreviewImages((prev) => [...prev, ...newPreviews]);
+      setNewFilesArray((prev) => [...prev, ...validFiles]);
+    }
+
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -117,7 +150,8 @@ export default function EditServiceModal({ service, isOpen, onClose, onSave }: P
           title,
           description,
           work_photos: previewImages.filter(
-            (img): img is { id: string; photo_url: string } => typeof img.id === "string"
+            (img): img is { id: string; photo_url: string } =>
+              typeof img.id === "string"
           ),
         },
         finalNewFilesList
@@ -149,7 +183,10 @@ export default function EditServiceModal({ service, isOpen, onClose, onSave }: P
 
         <div className="space-y-5">
           <div>
-            <label htmlFor="title" className="block text-gray-700 font-semibold mb-2">
+            <label
+              htmlFor="title"
+              className="block text-gray-700 font-semibold mb-2"
+            >
               Título
             </label>
             <input
@@ -159,13 +196,18 @@ export default function EditServiceModal({ service, isOpen, onClose, onSave }: P
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Ej: Plomería de emergencia"
               className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:outline-none transition text-gray-800 ${
-                title.trim() === "" ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-500"
+                title.trim() === ""
+                  ? "border-red-500 focus:ring-red-400"
+                  : "border-gray-300 focus:ring-blue-500"
               }`}
             />
           </div>
 
           <div>
-            <label htmlFor="description" className="block text-gray-700 font-semibold mb-2">
+            <label
+              htmlFor="description"
+              className="block text-gray-700 font-semibold mb-2"
+            >
               Descripción
             </label>
             <textarea
@@ -175,7 +217,9 @@ export default function EditServiceModal({ service, isOpen, onClose, onSave }: P
               rows={4}
               placeholder="Describe el servicio..."
               className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:outline-none transition resize-y text-gray-800 ${
-                description.trim() === "" ? "border-red-500 focus:ring-red-400" : "border-gray-300 focus:ring-blue-500"
+                description.trim() === ""
+                  ? "border-red-500 focus:ring-red-400"
+                  : "border-gray-300 focus:ring-blue-500"
               }`}
             />
           </div>
@@ -209,7 +253,10 @@ export default function EditServiceModal({ service, isOpen, onClose, onSave }: P
                 onClick={() => fileInputRef.current?.click()}
                 className="cursor-pointer flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:text-blue-500 transition-colors aspect-square"
               >
-                <FontAwesomeIcon icon={faPlus} className="text-2xl text-gray-400" />
+                <FontAwesomeIcon
+                  icon={faPlus}
+                  className="text-2xl text-gray-400"
+                />
               </div>
               <input
                 type="file"
