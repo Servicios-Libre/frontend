@@ -10,6 +10,7 @@ declare module "next-auth" {
       email: string;
       role: string;
       image?: string;
+      premium: boolean;
       tickets?: Ticket[];
     };
   }
@@ -20,6 +21,7 @@ declare module "next-auth" {
     email: string;
     role: string;
     image?: string;
+    premium: boolean;
     tickets?: Ticket[];
   }
 }
@@ -31,6 +33,7 @@ declare module "next-auth/jwt" {
     name?: string;
     email?: string;
     role?: string;
+    premium?: boolean;
     image?: string;
     tickets?: Ticket[];
   }

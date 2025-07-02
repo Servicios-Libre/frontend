@@ -137,7 +137,7 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
     <main className="min-h-screen bg-[#f6f8fa] pt-20">
       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-12 gap-6 px-4 sm:px-8">
         <aside className="sm:col-span-4 lg:col-span-3">
-          <div className="bg-gradient-to-b from-blue-800 via-blue-700 to-blue-600 shadow-md rounded-b-lg p-6 sticky top-20">
+          <div className={`${user.premium ? "bg-gradient-to-b from-amber-400 to-amber-500": "bg-gradient-to-b from-blue-800 via-blue-700 to-blue-600"} shadow-md rounded-b-lg p-6 sticky top-20`}>
             <WorkerHeader
               user={user}
             />

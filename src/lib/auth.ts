@@ -13,6 +13,7 @@ interface MyUser extends User {
   role: string;
   tickets?: Ticket[];
   image?: string;
+  premium: boolean; // <-- Añadido
 }
 
 interface MyJWT extends JWT {
@@ -23,6 +24,7 @@ interface MyJWT extends JWT {
   name?: string;
   email?: string;
   image?: string;
+  premium?: boolean; // <-- Añadido
 }
 
 export const authOptions: NextAuthOptions = {
@@ -57,7 +59,9 @@ export const authOptions: NextAuthOptions = {
             email: decoded.email,
             role: decoded.role,
             tickets: decoded.tickets,
-          };
+            image: decoded.image,
+            premium: decoded.premium, // <-- Añadido aquí
+          } as MyUser;
         } catch (error) {
           console.error("Error en login:", error);
           return null;
@@ -79,6 +83,7 @@ export const authOptions: NextAuthOptions = {
         myToken.role = myUser.role;
         myToken.tickets = myUser.tickets;
         myToken.image = myUser.image;
+        myToken.premium = myUser.premium; // <-- Añadido aquí
 
         if (account?.provider === "google") {
           try {
@@ -92,6 +97,7 @@ export const authOptions: NextAuthOptions = {
             myToken.id = res.data.id;
             myToken.role = res.data.role;
             myToken.tickets = res.data.tickets;
+            myToken.premium = res.data.premium; // <-- Añadido aquí
           } catch (err) {
             console.error("Error al autenticar con Google:", err);
             myToken.backendJwt = null;
@@ -118,6 +124,7 @@ export const authOptions: NextAuthOptions = {
         role: myToken.role ?? "",
         tickets: myToken.tickets,
         image: myToken.image,
+        premium: myToken.premium ?? false, // <-- Añadido aquí
       };
 
       return session;

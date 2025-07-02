@@ -10,6 +10,7 @@ import PerfilesDestacados from "@/components/servicios/perfiles-destacados/Perfi
 import { Servicio, ServicioGrid } from "@/types";
 import { obtenerServicios } from "@/services/serviciosService";
 import ServiciosSkeleton from "@/components/ui/serviciosSkeleton/ServiciosSkeleton";
+import PremiumSection from "@/components/servicios/premium-section/PremiumSection";
 
 export default function ServiciosPage() {
 
@@ -25,6 +26,7 @@ export default function ServiciosPage() {
     const [servicios, setServicios] = useState<ServicioGrid[]>([]);
     const [totalServicios, setTotalServicios] = useState(0);
     const [loading, setLoading] = useState(false);
+
 
     // Efecto para actualizar la cantidad al redimensionar la ventana
     useEffect(() => {
@@ -133,6 +135,8 @@ export default function ServiciosPage() {
             </div>
 
             <PerfilesDestacados />
+
+            <PremiumSection />
 
             <InformacionServicios />
         </div>

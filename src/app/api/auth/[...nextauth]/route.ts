@@ -11,6 +11,7 @@ import api from "@/services/axiosConfig";
 interface MyUser extends User {
   id: string;
   role: string;
+  premium: boolean;
   tickets?: Ticket[];
   image?: string;
 }
@@ -22,6 +23,7 @@ interface MyJWT extends JWT {
   tickets?: Ticket[];
   name?: string;
   email?: string;
+  premium?: boolean;
   image?: string;
 }
 
@@ -56,6 +58,7 @@ const handler = NextAuth({
             email: decoded.email,
             role: decoded.role,
             tickets: decoded.tickets,
+            premium: decoded.premium, // <-- Añadido aquí
           };
         } catch (error) {
           console.error("Error en login:", error);
@@ -93,6 +96,7 @@ const handler = NextAuth({
             myToken.tickets = decoded.tickets ?? [];
             myToken.name = decoded.name;
             myToken.email = decoded.email;
+            myToken.premium = decoded.premium; // <-- Añadido aquí
           } catch (err) {
             console.error("Error al autenticar con Google:", err);
             myToken.backendJwt = null;
@@ -109,6 +113,7 @@ const handler = NextAuth({
           myToken.name = myUser.name;
           myToken.email = myUser.email;
           myToken.image = myUser.image;
+          myToken.premium = myUser.premium; // <-- Añadido aquí
         }
       }
 
@@ -126,6 +131,7 @@ const handler = NextAuth({
         role: myToken.role ?? "",
         tickets: myToken.tickets,
         image: myToken.image,
+        premium: myToken.premium ?? false, // <-- Añadido aquí
       };
 
       return session;

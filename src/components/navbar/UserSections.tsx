@@ -5,11 +5,13 @@ import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faUser, faFileInvoice, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
+import { Crown } from "lucide-react";
 
 interface User {
-  id?: string;
-  name?: string;
-  role?: "user" | "worker" | "admin" | null;
+    id?: string;
+    name?: string;
+    role?: "user" | "worker" | "admin" | null;
+    premium?: boolean
 }
 
 export function UserDropdown({
@@ -46,71 +48,72 @@ export function UserDropdown({
 
   if (!mounted) return null;
 
-  if (user && userName) {
-    return (
-      <div className="relative ml-6" ref={dropdownRef}>
-        <button
-          className="bg-blue-300 text-white font-normal px-4 py-2 rounded transition flex items-center gap-2 cursor-pointer hover:bg-blue-400 hover:shadow-sm"
-          onClick={(e) => {
-            e.stopPropagation();
-            setDropdownOpen((open) => !open);
-          }}
-        >
-          {userName}
-          <FontAwesomeIcon
-            icon={faChevronDown}
-            className={`text-xs transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""}`}
-          />
-        </button>
-        {dropdownOpen && (
-          <div className="absolute right-0 mt-2 w-40 bg-white text-gray-800 rounded shadow-lg z-50 border border-blue-100">
-            <Link
-              href="/profile"
-              onClick={() => setDropdownOpen(false)}
-              className="block px-4 py-2 hover:bg-blue-100 hover:text-blue-700 rounded-t transition-colors duration-150 cursor-pointer"
-            >
-              Perfil
-            </Link>
-            {user.role === "worker" && user.id && (
-              <Link
-                href={`/worker-profile/${user.id}`}
-                onClick={() => setDropdownOpen(false)}
-                className="block px-4 py-2 hover:bg-blue-100 hover:text-blue-700 transition-colors duration-150 cursor-pointer"
-              >
-                Perfil de trabajador
-              </Link>
-            )}
-            {user.role === "admin" && (
-              <Link
-                href="/dashboard"
-                onClick={() => setDropdownOpen(false)}
-                className="block px-4 py-2 hover:bg-blue-100 hover:text-blue-700 transition-colors duration-150 cursor-pointer"
-              >
-                Panel de administrador
-              </Link>
-            )}
-            <Link
-              href="/facturas"
-              onClick={() => setDropdownOpen(false)}
-              className="block px-4 py-2 hover:bg-blue-100 hover:text-blue-700 transition-colors duration-150 cursor-pointer"
-            >
-              Facturas
-            </Link>
-            <button
-              onClick={() => {
-                logout();
-                setDropdownOpen(false);
-                router.push("/landing");
-              }}
-              className="w-full text-left px-4 py-2 hover:bg-red-100 hover:text-red-600 rounded-b transition-colors duration-150 cursor-pointer"
-            >
-              Cerrar Sesión
-            </button>
-          </div>
-        )}
-      </div>
-    );
-  }
+    if (user && userName) {
+        return (
+            <div className="relative ml-6" ref={dropdownRef}>
+                <button
+                    className={`${user.premium ? "bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-300" : "bg-blue-300 text-white  hover:bg-blue-400 " } font-normal px-4 py-2 rounded transition flex items-center gap-2 cursor-pointerhover:shadow-sm`}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setDropdownOpen((open) => !open);
+                    }}
+                > 
+                {user.premium && <Crown className="w-6 h-6 text-orange-400" />}
+                    {userName}
+                    <FontAwesomeIcon
+                        icon={faChevronDown}
+                        className={`text-xs transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""}`}
+                    />
+                </button>
+                {dropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-40 bg-white text-gray-800 rounded shadow-lg z-50 border border-blue-100 animate-fade-in">
+                        <Link
+                            href="/profile"
+                            onClick={() => setDropdownOpen(false)}
+                            className="block px-4 py-2 hover:bg-blue-100 hover:text-blue-700 rounded-t transition-colors duration-150 cursor-pointer"
+                        >
+                            Perfil
+                        </Link>
+                        {user.role === "worker" && user.id && (
+                            <Link
+                                href={`/worker-profile/${user.id}`}
+                                onClick={() => setDropdownOpen(false)}
+                                className="block px-4 py-2 hover:bg-blue-100 hover:text-blue-700 transition-colors duration-150 cursor-pointer"
+                            >
+                                Perfil de trabajador
+                            </Link>
+                        )}
+                        {user.role === "admin" && (
+                            <Link
+                                href="/dashboard"
+                                onClick={() => setDropdownOpen(false)}
+                                className="block px-4 py-2 hover:bg-blue-100 hover:text-blue-700 transition-colors duration-150 cursor-pointer"
+                            >
+                                Panel de administrador
+                            </Link>
+                        )}
+                        <Link
+                            href="/facturas"
+                            onClick={() => setDropdownOpen(false)}
+                            className="block px-4 py-2 hover:bg-blue-100 hover:text-blue-700 transition-colors duration-150 cursor-pointer"
+                        >
+                            Facturas
+                        </Link>
+                        <button
+                            onClick={() => {
+                                logout();
+                                setDropdownOpen(false);
+                                router.push("/landing");
+                            }}
+                            className="w-full text-left px-4 py-2 hover:bg-red-100 hover:text-red-600 rounded-b transition-colors duration-150 cursor-pointer"
+                        >
+                            Cerrar Sesión
+                        </button>
+                    </div>
+                )}
+            </div>
+        );
+    }
 
   return (
     <Link
