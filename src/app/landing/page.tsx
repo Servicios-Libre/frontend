@@ -7,8 +7,7 @@ import StoryCard from "../../components/landing/StoryCard";
 import ReviewCard from "../../components/landing/ReviewCard";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import type { Job } from '@/types';
-
+import type { Job } from "@/types";
 
 /* Temporal Data */
 const historias = [
@@ -155,6 +154,8 @@ export default function LandingPage() {
                   }
                   title={job.title}
                   description={job.description}
+                  workerId={job.worker.id}
+                  serviceId={job.id}
                 />
               ))
             )}

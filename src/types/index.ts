@@ -187,7 +187,13 @@ export type Job = {
     id: string;
     photo_url: string;
   }[];
+  worker: {
+    id: string;
+    user_pic?: string;
+    name: string;
+  };
 };
+
 
 
 // Chats Worker y User
