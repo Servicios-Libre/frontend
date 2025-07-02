@@ -356,7 +356,7 @@ export default function ProfilePage() {
           premium={premium}
         />
         {/* Boton para redireccionar si no es premium */}
-        {premium ? (
+        {user.role === "worker" && (premium ? (
           <div className="flex justify-center my-6">
             <div className="relative px-8 py-4 rounded-2xl bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-white font-bold text-lg w-full sm:w-auto flex items-center justify-center gap-3 shadow-2xl border-2 border-yellow-300 overflow-hidden group">
               {/* Efecto de brillo animado */}
@@ -408,7 +408,7 @@ export default function ProfilePage() {
               <Sparkles className="w-5 h-5 animate-pulse" />
             </button>
           </div>
-        )}
+        ))}
 
         <ProfileForm
           formData={formData}
