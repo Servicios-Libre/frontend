@@ -14,8 +14,10 @@ interface ChatBoxProps {
   contract: ChatContract | null;
   onContractCreate: (contract: ChatContract) => void;
   onContractAccept: () => void;
+  onConfirmService: () => Promise<void>;
   clienteName: string;
   trabajadorName: string;
+  userRole: "client" | "worker";
 }
 
 const ChatBox = ({
@@ -25,8 +27,10 @@ const ChatBox = ({
   contract,
   onContractCreate,
   onContractAccept,
+  onConfirmService,
   clienteName,
   trabajadorName,
+  userRole,
 }: ChatBoxProps) => {
   const [newMessage, setNewMessage] = useState("");
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>(messages);
@@ -54,11 +58,15 @@ const ChatBox = ({
     setTimeout(scrollToBottom, 100);
   };
 
+  const alreadyConfirmed =
+    (userRole === "client" && contract?.clientConfirmed) ||
+    (userRole === "worker" && contract?.workerConfirmed);
+
   return (
     <div className="flex flex-col h-full w-full bg-white">
-      {/* Info de usuario (cards) */}
+      {/* Info de usuario */}
       <div className="flex gap-6 px-6 py-4 bg-white border-b">
-        {/* Card Cliente */}
+        {/* Cliente */}
         <div className="flex-1 flex items-center gap-4 bg-white rounded-xl shadow border border-blue-100 p-4">
           <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xl border-2 border-white shadow">
             {clienteName.charAt(0).toUpperCase()}
@@ -69,7 +77,7 @@ const ChatBox = ({
           </div>
         </div>
 
-        {/* Card Trabajador */}
+        {/* Trabajador */}
         <div className="flex-1 flex items-center gap-4 bg-white rounded-xl shadow border border-green-100 p-4">
           <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-xl border-2 border-white shadow">
             {trabajadorName.charAt(0).toUpperCase()}
@@ -83,7 +91,7 @@ const ChatBox = ({
 
       {/* Mensajes */}
       <div className="flex-1 min-h-0 overflow-y-auto px-6 py-4 space-y-2 bg-[#ece5dd] relative">
-        {(localMessages || []).map((msg, index) => {
+        {localMessages.map((msg, index) => {
           const isOwn = msg.senderId === currentUserId;
           return (
             <div
@@ -91,13 +99,11 @@ const ChatBox = ({
               className={`flex ${isOwn ? "justify-end" : "justify-start"} animate-fade-in`}
             >
               <div
-                className={`relative px-5 py-3 rounded-2xl shadow-sm transition-all duration-200
-                  ${
-                    isOwn
-                      ? "bg-gradient-to-br from-blue-500 to-blue-700 text-white rounded-br-[0.75rem]"
-                      : "bg-white border border-gray-200 text-gray-900 rounded-bl-[0.75rem]"
-                  }
-                  max-w-[70%]`}
+                className={`relative px-5 py-3 rounded-2xl shadow-sm transition-all duration-200 ${
+                  isOwn
+                    ? "bg-gradient-to-br from-blue-500 to-blue-700 text-white rounded-br-[0.75rem]"
+                    : "bg-white border border-gray-200 text-gray-900 rounded-bl-[0.75rem]"
+                } max-w-[70%]`}
               >
                 <p className="break-words">{msg.message}</p>
                 <span
@@ -127,7 +133,7 @@ const ChatBox = ({
           />
         )}
 
-        {!contract && (
+        {!contract && userRole === "worker" && (
           <button
             onClick={() => setShowContractForm(true)}
             className="w-full mb-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md font-semibold transition"
@@ -141,6 +147,33 @@ const ChatBox = ({
             onSubmit={onContractCreate}
             onCancel={() => setShowContractForm(false)}
           />
+        )}
+
+        {/* Confirmar servicio */}
+        {contract?.accepted && !contract.completed && (
+          <button
+            onClick={onConfirmService}
+            disabled={alreadyConfirmed}
+            className={`w-full mt-2 mb-3 py-2 rounded-md font-semibold transition ${
+              alreadyConfirmed
+                ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                : "bg-amber-500 hover:bg-amber-600 text-white"
+            }`}
+          >
+            {userRole === "client"
+              ? contract.clientConfirmed
+                ? "Esperando al trabajador..."
+                : "Concretar Servicio"
+              : contract.workerConfirmed
+              ? "Esperando al cliente..."
+              : "Concretar Servicio"}
+          </button>
+        )}
+
+        {contract?.completed && (
+          <p className="text-green-600 text-center font-semibold mt-2">
+            ✅ Servicio completado
+          </p>
         )}
 
         <form onSubmit={handleSubmit} className="flex gap-2 mt-2 items-center">
@@ -163,7 +196,6 @@ const ChatBox = ({
         </form>
       </div>
 
-      {/* Animación de entrada */}
       <style jsx global>{`
         .animate-fade-in {
           animation: fadeIn 0.4s;

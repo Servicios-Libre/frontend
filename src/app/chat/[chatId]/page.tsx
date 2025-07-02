@@ -50,9 +50,9 @@ export default function ChatDemo() {
     const handleNewMessage = (msg: any) => {
       const formatted: ChatMessage = {
         id: msg.id,
-        message: msg.content,
-        senderId: msg.sender,
-        timestamp: msg.createdAt,
+        message: msg.message ?? msg.content ?? "", // fallback por si el backend devuelve "message" o "content"
+        senderId: msg.senderId ?? msg.sender,
+        timestamp: msg.timestamp ?? msg.createdAt ?? new Date().toISOString(),
       };
 
       setMessages((prev) => {
@@ -133,15 +133,13 @@ export default function ChatDemo() {
 
     const newMsg: ChatMessage = {
       id: response.data.id,
-      message: response.data.message,
-      senderId: response.data.senderId,
-      timestamp: response.data.timestamp,
+      message: response.data.message ?? text, // fallback con el texto enviado
+      senderId: response.data.senderId ?? user.id,
+      timestamp: response.data.timestamp ?? new Date().toISOString(),
     };
 
-    // ✅ Agregamos al estado local
     setMessages((prev) => [...prev, newMsg]);
 
-    // ✅ Emitimos por socket
     const socket = getSocket();
     socket.emit("sendMessage", {
       id: newMsg.id,
@@ -166,7 +164,30 @@ export default function ChatDemo() {
   };
 
   const handleContractAccept = () => {
-    if (contract) setContract((prev) => prev && { ...prev, accepted: true });
+    if (contract) {
+      setContract((prev) => ({
+        ...prev!,
+        accepted: true,
+      }));
+    }
+  };
+
+  const handleConfirmService = async () => {
+    if (!contract || !token) return;
+
+    try {
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/chat/contract/${contract.id}/confirm`,
+        { role: user!.role }, // "user" o "worker"
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setContract(response.data); // actualiza el estado local
+    } catch (error) {
+      console.error("Error al confirmar servicio:", error);
+    }
   };
 
   if (!user)
@@ -260,8 +281,10 @@ export default function ChatDemo() {
             contract={contract}
             onContractCreate={handleContractCreate}
             onContractAccept={handleContractAccept}
+            onConfirmService={handleConfirmService}
             clienteName={clienteName}
             trabajadorName={trabajadorName}
+            userRole={user.role === "user" ? "client" : "worker"}
           />
         )}
       </section>
