@@ -54,18 +54,30 @@ export default function ProfileHeader({
   const [ticketSuccess, setTicketSuccess] = useState(false);
   const [ticketError, setTicketError] = useState<string | null>(null);
   const [hasPendingRequest, setHasPendingRequest] = useState(false);
+  const [hasAcceptedTicket, setHasAcceptedTicket] = useState(false);
 
   const auth = useAuth();
   const user = auth?.user;
   const userRole = user?.role;
 
   useEffect(() => {
-    if (ticket) {
-      setHasPendingRequest(true);
+    if (ticket?.type === "to-worker") {
+      if (ticket.status === "pending") {
+        setHasPendingRequest(true);
+        setHasAcceptedTicket(false);
+      } else if (ticket.status === "accepted") {
+        setHasPendingRequest(false);
+        setHasAcceptedTicket(true);
+      } else {
+        setHasPendingRequest(false);
+        setHasAcceptedTicket(false);
+      }
     } else {
       setHasPendingRequest(false);
+      setHasAcceptedTicket(false);
     }
-  }, [user, ticket]);
+  }, [ticket]);
+
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
@@ -89,17 +101,24 @@ export default function ProfileHeader({
       setShowMissing(true);
       return;
     }
+    console.log("Hola, ",userId);
+    
+    if (!user?.id) {
+      setTicketError("Usuario no autenticado");
+      return;
+    }
     setLoadingTicket(true);
     setTicketError(null);
     try {
-      await createTicket(userId, {
+      await createTicket(user.id, {
         type: "to-worker",
-        status: "pending"
+        status: "pending",
       });
       setTicketSuccess(true);
       setHasPendingRequest(true);
-    } catch {
-      setTicketError("No se pudo enviar la solicitud.");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      setTicketError(error?.response?.data?.message || "No se pudo enviar la solicitud.");
     } finally {
       setLoadingTicket(false);
     }
@@ -162,7 +181,7 @@ export default function ProfileHeader({
           )}
 
           {/* Botón de solicitar ser trabajador */}
-          {userRole !== "worker" && (
+          {userRole !== "worker" && !hasAcceptedTicket && (
             <button
               className={`px-4 py-2 rounded-md font-semibold transition-colors mt-2 sm:mt-0 cursor-pointer
                 ${!editMode && !hasUnsavedChanges
