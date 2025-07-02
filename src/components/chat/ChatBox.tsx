@@ -91,6 +91,10 @@ const ChatBox = ({
     (userRole === "client" && contract?.clientConfirmed) ||
     (userRole === "worker" && contract?.workerConfirmed);
 
+  console.log("Contrato:", contract);
+  console.log("userRole:", userRole);
+  console.log("alreadyConfirmed:", alreadyConfirmed);
+
   return (
     <div className="flex flex-col h-full w-full bg-white">
       {/* Info de usuario */}
