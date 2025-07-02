@@ -44,7 +44,7 @@ const ContractForm = ({ onSubmit, onCancel }: ContractFormProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md">
+    <form onSubmit={handleSubmit} className="text-black bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-xl font-bold mb-4">Crear Contrato</h2>
 
       <div className="mb-4">
