@@ -1,7 +1,7 @@
+import ImageCarousel from "@/components/worker-profile/ImageCarousel";
 import { Ticket } from "@/types";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Image from "next/image";
 
 export default function ServiceRequestDetailModal({
     ticket,
@@ -16,6 +16,7 @@ export default function ServiceRequestDetailModal({
     onReject: (ticket: Ticket) => void;
     loadingId?: string;
 }) {
+
     const service = ticket.service as typeof ticket.service & {
         work_photos?: { photo_url: string; id: string }[];
     };
@@ -23,6 +24,10 @@ export default function ServiceRequestDetailModal({
     const defaultImage = "/img/default-service.jpg";
     const hasPhotos =
         Array.isArray(service?.work_photos) && service.work_photos.length > 0;
+
+    const imagesToShow = hasPhotos
+        ? service.work_photos!
+        : [{ photo_url: defaultImage }];
 
     return (
         <div className="fixed inset-0 bg-black/50 z-50 flex justify-center items-center p-6">
@@ -37,14 +42,8 @@ export default function ServiceRequestDetailModal({
                 </button>
 
                 {/* Imagen */}
-                <div className="w-full h-48 rounded-lg overflow-hidden border border-gray-200 mb-4">
-                    <Image
-                        src={defaultImage}
-                        alt={service?.title || "Imagen servicio"}
-                        width={640}
-                        height={192}
-                        className="object-cover w-full h-full"
-                    />
+                <div className="w-full rounded-lg overflow-hidden border border-gray-200 mb-4">
+                    <ImageCarousel images={imagesToShow} heightClass="h-48" objectPosition="top" />
                 </div>
 
                 {/* Contenido */}
@@ -68,14 +67,21 @@ export default function ServiceRequestDetailModal({
                     {/* Botones */}
                     <div className="flex justify-center gap-4">
                         <button
-                            onClick={() => onReject(ticket)}
+                            onClick={() => {
+                                onReject(ticket);
+                                onClose();
+                            }}
                             disabled={loadingId === ticket.id}
                             className="px-5 py-2 rounded bg-red-600 text-white hover:bg-red-700 shadow-md transition disabled:opacity-50"
                         >
                             Rechazar
                         </button>
+
                         <button
-                            onClick={() => onAccept(ticket)}
+                            onClick={() => {
+                                onAccept(ticket);
+                                onClose();
+                            }}
                             disabled={loadingId === ticket.id || !hasPhotos}
                             className="px-5 py-2 rounded bg-green-600 text-white hover:bg-green-700 shadow-md transition disabled:opacity-30"
                         >
