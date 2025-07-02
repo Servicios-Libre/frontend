@@ -24,6 +24,7 @@ interface JwtPayload {
     status: string;
   }>;
   image?: string;
+  premium?: boolean;
 }
 
 interface AuthContextType {
@@ -33,6 +34,8 @@ interface AuthContextType {
   setToken: (token: string | null) => void;
   logout: () => void;
   unreadCount: number;
+  userName: string;
+  setUserName: (name: string) => void;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -49,12 +52,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const [token, setTokenState] = useState<string | null>(null);
   const [user, setUser] = useState<JwtPayload | null>(null);
+  const [userName, setUserName] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
 
   const logout = useCallback(() => {
     setTokenState(null);
     setUser(null);
+    setUserName("");
     signOut({ callbackUrl: "/landing" });
   }, []);
 
@@ -64,9 +69,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (session?.user && session.backendJwt) {
       setUser(session.user as JwtPayload);
       setTokenState(session.backendJwt);
+      setUserName(session.user.name ?? ""); // 👈 Asignar nombre del token
     } else {
       setUser(null);
       setTokenState(null);
+      setUserName(""); // 👈 Reiniciar si no hay sesión
 
       if (status === "authenticated") {
         logout();
@@ -83,7 +90,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const chats = await fetchUserChats();
 
-        // ⚠️ Validar que chats sea un array
         if (!Array.isArray(chats)) {
           setUnreadCount(0);
           return;
@@ -116,7 +122,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ token, user, loading, setToken, logout, unreadCount }}
+      value={{
+        token,
+        user,
+        loading,
+        setToken,
+        logout,
+        unreadCount,
+        userName,
+        setUserName,
+      }}
     >
       {children}
     </AuthContext.Provider>
