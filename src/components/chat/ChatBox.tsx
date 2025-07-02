@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import ContractForm from "./ContractForm";
 import ContractView from "./ContractView";
 import { FaPaperPlane } from "react-icons/fa";
+import ReviewForm from "../reviews/ReviewForm";
 
 interface ChatBoxProps {
   chatId: string;
@@ -39,6 +40,30 @@ const ChatBox = ({
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>(messages);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const [showContractForm, setShowContractForm] = useState(false);
+  const [alreadyReviewed, setAlreadyReviewed] = useState(false);
+
+  useEffect(() => {
+    const checkReview = async () => {
+      if (contract?.completed && userRole === "client") {
+        try {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/check?contractId=${contract.id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );
+          const data = await response.json();
+          setAlreadyReviewed(data.reviewExists);
+        } catch (error) {
+          console.error("Error al verificar reseña:", error);
+        }
+      }
+    };
+
+    checkReview();
+  }, [contract, userRole]);
 
   useEffect(() => {
     setLocalMessages(messages);
@@ -179,6 +204,16 @@ const ChatBox = ({
           <p className="text-green-600 text-center font-semibold mt-2">
             ✅ Servicio completado
           </p>
+        )}
+        {contract?.completed && userRole === "client" && !alreadyReviewed && (
+          <ReviewForm
+            workerId={trabajadorId}
+            contractId={contract.id}
+            token={localStorage.getItem("token") || ""}
+            onReviewSubmitted={() => {
+              setAlreadyReviewed(true);
+            }}
+          />
         )}
 
         <form onSubmit={handleSubmit} className="flex gap-2 mt-2 items-center">
