@@ -9,9 +9,10 @@ type Props = {
   fileInputRef: RefObject<HTMLInputElement | null>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setUserImageFile: any;
+  premium: boolean;
 };
 
-const ProfilePhoto = ({ userPic, setUserPic, editable, fileInputRef, setUserImageFile }: Props) => {
+const ProfilePhoto = ({ userPic, setUserPic, editable, fileInputRef, setUserImageFile, premium }: Props) => {
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -35,7 +36,7 @@ const ProfilePhoto = ({ userPic, setUserPic, editable, fileInputRef, setUserImag
         src={userPic || "/img/avatar.jpg"}
         alt="Avatar"
         priority
-        className="w-32 h-32 sm:w-24 sm:h-24 rounded-full object-cover border-2 border-white shadow"
+        className={`w-32 h-32 sm:w-24 sm:h-24 rounded-full object-cover border-3 ${premium ? "border-amber-300" : "border-white"} shadow`}
       />
       {editable && (
         <div
