@@ -23,6 +23,8 @@ export default function ChatDemo() {
 
   const [clienteName, setClienteName] = useState("Cliente");
   const [trabajadorName, setTrabajadorName] = useState("Trabajador");
+  const [trabajadorId, setTrabajadorId] = useState("");
+  const [clienteId, setClienteId] = useState("");
 
   useEffect(() => {
     document.title = "Servicio Libre - Chat";
@@ -103,12 +105,13 @@ export default function ChatDemo() {
         if (user1.role === "worker" && user2.role === "user") {
           setTrabajadorName(user1.name);
           setClienteName(user2.name);
+          setTrabajadorId(user1.id);
+          setClienteId(user2.id);
         } else if (user2.role === "worker" && user1.role === "user") {
           setTrabajadorName(user2.name);
           setClienteName(user1.name);
-        } else {
-          setTrabajadorName("Trabajador");
-          setClienteName("Cliente");
+          setTrabajadorId(user2.id);
+          setClienteId(user1.id);
         }
       })
       .finally(() => setLoading(false));
@@ -285,6 +288,8 @@ export default function ChatDemo() {
             clienteName={clienteName}
             trabajadorName={trabajadorName}
             userRole={user.role === "user" ? "client" : "worker"}
+            trabajadorId={trabajadorId}
+            clienteId={clienteId}
           />
         )}
       </section>
