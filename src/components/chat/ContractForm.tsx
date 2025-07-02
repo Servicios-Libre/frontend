@@ -18,6 +18,13 @@ const ContractForm = ({ onSubmit, onCancel }: ContractFormProps) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const parsedPayment = Number(formValues.payment);
+    if (isNaN(parsedPayment) || parsedPayment < 0) {
+      alert("El monto debe ser un número válido mayor o igual a cero.");
+      return;
+    }
+
     onSubmit({
       id: "",
       workerId: "",
@@ -25,7 +32,7 @@ const ContractForm = ({ onSubmit, onCancel }: ContractFormProps) => {
       description: formValues.description,
       startDate: formValues.startDate,
       endDate: formValues.endDate,
-      payment: Number(formValues.payment),
+      payment: parsedPayment,
       accepted: false,
       clientConfirmed: false,
       workerConfirmed: false,
@@ -44,7 +51,10 @@ const ContractForm = ({ onSubmit, onCancel }: ContractFormProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md">
+    <form
+      onSubmit={handleSubmit}
+      className="text-black bg-white p-6 rounded-lg shadow-md"
+    >
       <h2 className="text-xl font-bold mb-4">Crear Contrato</h2>
 
       <div className="mb-4">

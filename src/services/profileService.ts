@@ -32,7 +32,15 @@ export const updateSocialLinks = async (socialData: {
   instagram?: string;
 }) => {
   try {
-    const res = await api.put("/users/social-links", socialData);
+    const cleanedData: Record<string, string> = {};
+
+    if (socialData.facebook?.trim()) cleanedData.facebook = socialData.facebook.trim();
+    if (socialData.linkedin?.trim()) cleanedData.linkedin = socialData.linkedin.trim();
+    if (socialData.instagram?.trim()) cleanedData.instagram = socialData.instagram.trim();
+    if (socialData.twitter?.trim()) cleanedData.x = socialData.twitter.trim();
+
+    const res = await api.put("/users/social", cleanedData);
+    
     return res.data;
   } catch (error) {
     console.error("Error al actualizar redes sociales:", error);
@@ -52,7 +60,14 @@ export const createSocialLinks = async (socialData: {
   instagram?: string;
 }) => {
   try {
-    const res = await api.post("/users/social", socialData);
+    const cleanedData: Record<string, string> = {};
+
+    if (socialData.facebook) cleanedData.facebook = socialData.facebook;
+    if (socialData.linkedin) cleanedData.linkedin = socialData.linkedin;
+    if (socialData.instagram) cleanedData.instagram = socialData.instagram;
+    if (socialData.twitter) cleanedData.x = socialData.twitter;
+
+    const res = await api.post("/users/social", cleanedData);
     return res.data;
   } catch (error) {
     console.error("Error al crear redes sociales:", error);
