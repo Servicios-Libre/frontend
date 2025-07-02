@@ -66,7 +66,7 @@ export default function WorkerManagementPage() {
 
   useEffect(() => {
     document.title = "Servicio Libre - Dashboard de trabajadores"
-   }, [])
+  }, [])
 
   useEffect(() => {
     setCurrentWorkerPage(1);
@@ -204,6 +204,7 @@ export default function WorkerManagementPage() {
             loading={usersLoading}
             loadingId={loadingId}
             onDowngrade={handleDowngrade}
+            isFiltered={!!searchTerm}
           />
 
           <Pagination

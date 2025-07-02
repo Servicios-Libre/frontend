@@ -11,6 +11,7 @@ import { FaClipboardList } from "react-icons/fa";
 import { useToast } from "@/context/ToastContext";
 import { SearchInput } from "@/components/dashboard/SearchInput";
 import AdminsList from "@/components/dashboard/admin-management/AdminsList";
+import { LoadingScreen } from "@/components/dashboard/LoadingScreen";
 
 const GOD_EMAIL = "nachomartinezdap@gmail.com";
 
@@ -94,6 +95,10 @@ export default function AdminUsersPage() {
         } catch {
             showToast("Error al revocar admin", "error");
         }
+    }
+
+    if (loadingAdmins) {
+        return <LoadingScreen />;
     }
 
     if (!isGod) {
