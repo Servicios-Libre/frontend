@@ -37,6 +37,7 @@ const ContractForm = ({ onSubmit, onCancel }: ContractFormProps) => {
       clientConfirmed: false,
       workerConfirmed: false,
       completed: false,
+      status: "pending",
     });
   };
 

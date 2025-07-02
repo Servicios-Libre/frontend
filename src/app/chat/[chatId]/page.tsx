@@ -71,9 +71,19 @@ export default function ChatDemo() {
     };
 
     socket.on("newMessage", handleNewMessage);
+    socket.on("newContract", (contractData) => {
+      console.log("📦 Contrato recibido por socket:", contractData);
+      setContract(contractData);
+    });
+    socket.on("contractUpdated", (updatedContract) => {
+      console.log("📡 Contrato actualizado vía socket:", updatedContract);
+      setContract(updatedContract);
+    });
 
     return () => {
       socket.off("newMessage", handleNewMessage);
+      socket.off("newContract");
+      socket.off("contractUpdated");
       socket.emit("leaveChat", { chatRoom: `chat_${chatId}` });
     };
   }, [chatId, token]);
@@ -153,12 +163,10 @@ export default function ChatDemo() {
 
     const newMsg: ChatMessage = {
       id: response.data.id,
-      message: response.data.message ?? text, // fallback con el texto enviado
+      message: response.data.message ?? text,
       senderId: response.data.senderId ?? user.id,
       timestamp: response.data.timestamp ?? new Date().toISOString(),
     };
-
-    setMessages((prev) => [...prev, newMsg]);
 
     const socket = getSocket();
     socket.emit("sendMessage", {
@@ -208,28 +216,41 @@ export default function ChatDemo() {
     }
   };
 
-  const handleContractAccept = () => {
-    if (contract) {
-      setContract((prev) => ({
-        ...prev!,
-        accepted: true,
-      }));
-    }
-  };
-
-  const handleConfirmService = async () => {
+  const handleContractAccept = async () => {
     if (!contract || !token) return;
 
     try {
       const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/chat/contract/${contract.id}/accept`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setContract(response.data);
+    } catch (error) {
+      console.error("❌ Error al aceptar el contrato:", error);
+    }
+  };
+
+  const handleConfirmService = async () => {
+    if (!contract || !token || !user) return;
+
+    try {
+      const role = user.id === clienteId ? "user" : "worker";
+
+      const response = await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/api/chat/contract/${contract.id}/confirm`,
-        { role: user!.role }, // "user" o "worker"
+        { role },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      setContract(response.data); // actualiza el estado local
+      setContract(response.data);
     } catch (error) {
       console.error("Error al confirmar servicio:", error);
     }
@@ -241,6 +262,21 @@ export default function ChatDemo() {
         Debes iniciar sesión para ver tus chats.
       </div>
     );
+
+  const userRole =
+    user.id === clienteId
+      ? "client"
+      : user.id === trabajadorId
+      ? "worker"
+      : null;
+
+  if (!userRole) {
+    return (
+      <p className="text-center text-red-500">
+        Error: No se pudo determinar el rol del usuario.
+      </p>
+    );
+  }
 
   return (
     <div className="min-h-screen flex bg-[#ece5dd] overflow-x-auto overflow-y-hidden">
@@ -329,7 +365,7 @@ export default function ChatDemo() {
             onConfirmService={handleConfirmService}
             clienteName={clienteName}
             trabajadorName={trabajadorName}
-            userRole={user.role === "user" ? "client" : "worker"}
+            userRole={userRole}
             trabajadorId={trabajadorId}
             clienteId={clienteId}
           />
