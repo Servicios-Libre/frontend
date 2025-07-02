@@ -179,6 +179,17 @@ export interface ServiceContractFormValues {
   termsAccepted: boolean;
 }
 
+export type Job = {
+  id: string;
+  title: string;
+  description: string;
+  work_photos?: {
+    id: string;
+    photo_url: string;
+  }[];
+};
+
+
 // Chats Worker y User
 export interface ChatMessage {
   id: string;
