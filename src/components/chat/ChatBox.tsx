@@ -21,6 +21,8 @@ interface ChatBoxProps {
   trabajadorId: string;
   clienteId: string;
   userRole: "client" | "worker";
+  showContractForm: boolean;
+  setShowContractForm: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ChatBox = ({
