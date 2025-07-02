@@ -12,7 +12,6 @@ import { jwtDecode } from "jwt-decode";
 import {  useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import WorkerReviews from "./WorkerReviews";
-import axios from "axios";
 
 type WorkerProfileClientProps = {
   id: string;
@@ -140,7 +139,6 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
           <div className="bg-gradient-to-b from-blue-800 via-blue-700 to-blue-600 shadow-md rounded-b-lg p-6 sticky top-20">
             <WorkerHeader
               user={user}
-              onPremiumSubscription={handlePremiumSubscription}
             />
           </div>
         </aside>
