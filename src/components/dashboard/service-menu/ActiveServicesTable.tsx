@@ -1,25 +1,49 @@
-// src/components/dashboard/service-menu/ActiveServicesTable.tsx
 import React from "react";
 import { Servicio } from "@/types";
 import { Trash2 } from "lucide-react";
+import ActiveServicesSkeleton from "@/components/ui/serviciosSkeleton/ActiveServicesSkeleton";
+import EmptyState from "@/components/ui/empty-state/EmptyState";
 
 type Props = {
   services: Servicio[];
   onDeactivate: (service: Servicio) => void;
   loadingId?: string;
+  isLoading?: boolean;
+  isFiltered?: boolean;
 };
 
 export default function ActiveServicesTable({
   services = [],
   onDeactivate,
   loadingId,
+  isLoading = false,
+  isFiltered = false,
 }: Props) {
-  if (!services.length)
+  if (isLoading) return <ActiveServicesSkeleton />;
+
+  if (!services.length && isFiltered) {
     return (
-      <div className="text-green-400 text-center py-6">
-        No hay servicios activos.
-      </div>
+      <EmptyState
+        message="No se encontraron servicios que coincidan con tu búsqueda."
+        bgColor="bg-purple-50/10"
+        textColor="text-purple-600"
+        borderColor="border-purple-200"
+        icon="folder"
+      />
     );
+  }
+
+  if (!services.length && !isFiltered) {
+    return (
+      <EmptyState
+        message="No hay servicios activos."
+        bgColor="bg-purple-50/10"
+        textColor="text-purple-600"
+        borderColor="border-purple-200"
+        icon="tools"
+      />
+    );
+  }
 
   return (
     <div className="grid gap-4">

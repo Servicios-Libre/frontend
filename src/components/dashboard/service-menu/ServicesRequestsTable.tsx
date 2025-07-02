@@ -1,3 +1,4 @@
+import EmptyState from "@/components/ui/empty-state/EmptyState";
 import { Ticket } from "@/types";
 import { Eye } from "lucide-react";
 
@@ -8,7 +9,15 @@ interface Props {
 
 export default function ServiceRequestsTable({ requests, onView }: Props) {
   if (!requests || requests.length === 0)
-    return <div className="text-green-400 text-center py-6">No hay solicitudes pendientes.</div>;
+  return (
+    <EmptyState
+      message="No hay solicitudes pendientes."
+      bgColor="bg-purple-50/10"
+      textColor="text-purple-600"
+      borderColor="border-purple-200"
+      icon="tools"
+    />
+  );
 
   return (
     <div className="grid gap-4">

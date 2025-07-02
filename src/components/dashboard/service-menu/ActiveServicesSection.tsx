@@ -26,6 +26,8 @@ export default function ActiveServicesSection({
   const itemsPerPage = 5;
   const totalPages = Math.ceil(activeServicesCount / itemsPerPage);
 
+  const isFiltered = activeServicesSearch.trim().length > 0;
+
   return (
     <div className="mt-4">
 
@@ -42,6 +44,7 @@ export default function ActiveServicesSection({
         services={activeServices}
         onDeactivate={onDeactivate}
         loadingId={loadingServiceId}
+        isFiltered={isFiltered}
       />
 
       <Pagination
