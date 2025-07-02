@@ -213,28 +213,54 @@ export default function ChatDemo() {
     }
   };
 
-  const handleContractAccept = () => {
-    if (contract) {
-      setContract((prev) => ({
-        ...prev!,
-        accepted: true,
-      }));
-    }
-  };
-
-  const handleConfirmService = async () => {
+  const handleContractAccept = async () => {
     if (!contract || !token) return;
 
     try {
       const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/chat/contract/${contract.id}/confirm`,
-        { role: user!.role }, // "user" o "worker"
+        `${process.env.NEXT_PUBLIC_API_URL}/api/chat/contract/${contract.id}/accept`,
+        {},
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      setContract(response.data); // actualiza el estado local
+      const updatedContract = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/chat/contract`,
+        {
+          params: {
+            worker: trabajadorId,
+            client: clienteId,
+          },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return response;
+
+      setContract(updatedContract.data);
+    } catch (error) {
+      console.error("❌ Error al aceptar contrato:", error);
+    }
+  };
+
+  const handleConfirmService = async () => {
+    if (!contract || !token || !user) return;
+
+    try {
+      const role = user.role === "user" ? "user" : "worker";
+
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/chat/contract/${contract.id}/confirm`,
+        { role },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setContract(response.data);
     } catch (error) {
       console.error("Error al confirmar servicio:", error);
     }
