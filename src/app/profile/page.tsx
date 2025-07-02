@@ -155,10 +155,10 @@ export default function ProfilePage() {
             zip_code: data.address_id?.zip_code?.toString() ?? "",
             user_pic: data.user_pic ?? "",
             description: data.description ?? "",
-            facebook: data.facebook ?? "",
-            linkedin: data.linkedin ?? "",
-            twitter: data.twitter ?? "",
-            instagram: data.instagram ?? "",
+            facebook: data.social?.facebook ?? "",
+            linkedin: data.social?.linkedin ?? "",
+            twitter: data.social?.x ?? "", // <- X en el backend, twitter en el front
+            instagram: data.social?.instagram ?? "",
           };
 
           setFormData(baseForm);
@@ -271,7 +271,7 @@ export default function ProfilePage() {
     if (token) {
       const url = await redirectToPayment();
       window.location.href = url
-  }
+    }
   };
 
   const getMissingFields = () => {
