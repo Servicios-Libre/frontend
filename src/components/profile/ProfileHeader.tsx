@@ -22,6 +22,7 @@ interface Props {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setUserImageFile: any;
   ticket: Ticket | null;
+  handlePremiumSubscription: () => void;
 }
 
 export default function ProfileHeader({
@@ -38,7 +39,8 @@ export default function ProfileHeader({
   setShowMissing,
   userId,
   setUserImageFile,
-  ticket
+  ticket,
+  handlePremiumSubscription,
 }: Props) {
   const { showToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -80,7 +82,9 @@ export default function ProfileHeader({
 
 
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   if (!mounted) {
     return (
       <div className="flex flex-col sm:flex-row items-center sm:items-start sm:justify-between gap-6 sm:gap-8 p-6 rounded-lg bg-blue-500 shadow-md mb-6 text-center sm:text-left">
@@ -97,7 +101,10 @@ export default function ProfileHeader({
 
   const handleRequestWorker = async () => {
     if (!isComplete) {
-      showToast("Completa tu perfil antes de solicitar ser trabajador.", "error");
+      showToast(
+        "Completa tu perfil antes de solicitar ser trabajador.",
+        "error"
+      );
       setShowMissing(true);
       return;
     }
@@ -156,12 +163,18 @@ export default function ProfileHeader({
 
       {/* Info y progreso */}
       <div className="flex-1 w-full flex flex-col items-center sm:items-start">
-        <p className="text-xl font-bold text-white mb-1 break-words">{userName}</p>
-        <p className="text-blue-100 text-sm mb-2">Puedes editar tu información personal</p>
+        <p className="text-xl font-bold text-white mb-1 break-words">
+          {userName}
+        </p>
+        <p className="text-blue-100 text-sm mb-2">
+          Puedes editar tu información personal
+        </p>
 
         <div className="flex flex-col items-center sm:items-start gap-3 w-full">
           <div className="flex items-center gap-2">
-            <span className="text-white text-sm font-medium">Perfil completo:</span>
+            <span className="text-white text-sm font-medium">
+              Perfil completo:
+            </span>
             <span className="text-white font-bold">{completion}%</span>
             <div className="w-24 h-2 bg-blue-200 rounded overflow-hidden">
               <div
@@ -184,29 +197,34 @@ export default function ProfileHeader({
           {userRole !== "worker" && !hasAcceptedTicket && (
             <button
               className={`px-4 py-2 rounded-md font-semibold transition-colors mt-2 sm:mt-0 cursor-pointer
-                ${!editMode && !hasUnsavedChanges
-                  ? isComplete
-                    ? hasPendingRequest
-                      ? "bg-yellow-300 text-yellow-900 cursor-not-allowed"
-                      : "bg-green-500 hover:bg-green-600 text-white cursor-pointer"
-                    : "bg-gray-300 hover:bg-gray-400 text-gray-700 cursor-not-allowed"
-                  : "bg-gray-300 text-gray-400 cursor-not-allowed"
+                ${
+                  !editMode && !hasUnsavedChanges
+                    ? isComplete
+                      ? hasPendingRequest
+                        ? "bg-yellow-300 text-yellow-900 cursor-not-allowed"
+                        : "bg-green-500 hover:bg-green-600 text-white cursor-pointer"
+                      : "bg-gray-300 hover:bg-gray-400 text-gray-700 cursor-not-allowed"
+                    : "bg-gray-300 text-gray-400 cursor-not-allowed"
                 }`}
-              disabled={!isComplete || editMode || hasUnsavedChanges || loadingTicket || hasPendingRequest}
+              disabled={
+                !isComplete ||
+                editMode ||
+                hasUnsavedChanges ||
+                loadingTicket ||
+                hasPendingRequest
+              }
               onClick={handleRequestWorker}
             >
               {loadingTicket
                 ? "Enviando..."
                 : ticketSuccess
-                  ? "Solicitud enviada"
-                  : hasPendingRequest
-                    ? "Solicitud pendiente"
-                    : "Solicitar ser trabajador"}
+                ? "Solicitud enviada"
+                : hasPendingRequest
+                ? "Solicitud pendiente"
+                : "Solicitar ser trabajador"}
             </button>
           )}
-          {ticketError && (
-            <p className="text-red-200 mt-2">{ticketError}</p>
-          )}
+          {ticketError && <p className="text-red-200 mt-2">{ticketError}</p>}
         </div>
       </div>
 
@@ -235,7 +253,13 @@ export default function ProfileHeader({
             Editar perfil
           </button>
         )}
+        <button
+          className="px-4 py-2 rounded-md bg-blue-700 hover:bg-blue-600 text-white font-semibold transition w-full sm:w-auto cursor-pointer"
+          onClick={handlePremiumSubscription}
+        >
+          Subscribirse a premium
+        </button>
       </div>
-    </div >
+    </div>
   );
 }

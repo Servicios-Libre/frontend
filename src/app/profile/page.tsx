@@ -3,7 +3,7 @@
 
 import LoadingScreen from "@/components/loading-screen/LoadingScreen";
 import { useEffect, useState } from "react";
-import { createSocialLinks, getProfile, updateProfile, updateProfileImage } from "@/services/profileService";
+import { createSocialLinks, getProfile, redirectToPayment, updateProfile, updateProfileImage } from "@/services/profileService";
 import { updateSocialLinks } from "@/services/profileService"
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileForm from "@/components/profile/ProfileForm";
@@ -77,9 +77,10 @@ export default function ProfilePage() {
     userId: ""
   });
   const [statesData, setStatesData] = useState<
-    { id: number; state: string; cities: { id: number; name: string; state: string }[] }[]
+  { id: number; state: string; cities: { id: number; name: string; state: string }[] }[]
   >([]);
-
+  
+  
   const auth = useAuth();
   const user = auth?.user;
   const loading = auth?.loading ?? false;
@@ -283,6 +284,13 @@ export default function ProfilePage() {
     setEditMode(false);
   };
 
+  const handlePremiumSubscription = async () => {
+  if (token) {
+    console.log("redireccionando para mp......")
+    await redirectToPayment()
+  }
+};
+
   const getMissingFields = () => {
     return requiredFields.filter((field) => {
       return !formData[field.key as keyof ProfileFormType] || formData[field.key as keyof ProfileFormType] === "";
@@ -320,6 +328,7 @@ export default function ProfilePage() {
           userId={user.id ?? ""}
           setUserImageFile={setUserImageFile}
           ticket={ticket}
+          handlePremiumSubscription={handlePremiumSubscription}
         />
         <ProfileForm
           formData={formData}
