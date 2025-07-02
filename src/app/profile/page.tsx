@@ -269,8 +269,9 @@ export default function ProfilePage() {
 
   const handlePremiumSubscription = async () => {
     if (token) {
-      await redirectToPayment();
-    }
+      const url = await redirectToPayment();
+      window.location.href = url
+  }
   };
 
   const getMissingFields = () => {
