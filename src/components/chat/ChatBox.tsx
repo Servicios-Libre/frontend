@@ -183,7 +183,7 @@ const ChatBox = ({
         )}
 
         {/* Confirmar servicio */}
-        {contract?.accepted && !contract.completed && (
+        {contract?.status === "accepted" && !contract.completed && (
           <button
             onClick={onConfirmService}
             disabled={alreadyConfirmed}
