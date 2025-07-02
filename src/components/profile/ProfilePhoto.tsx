@@ -12,8 +12,10 @@ type Props = {
 };
 
 const ProfilePhoto = ({ userPic, setUserPic, editable, fileInputRef, setUserImageFile }: Props) => {
+
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+
     if (file) {
       setUserImageFile(file);
       const reader = new FileReader();
@@ -22,6 +24,7 @@ const ProfilePhoto = ({ userPic, setUserPic, editable, fileInputRef, setUserImag
       };
       reader.readAsDataURL(file);
     }
+    e.target.value = "";
   };
 
   return (
