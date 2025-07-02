@@ -397,7 +397,7 @@ export default function ProfilePage() {
         ) : (
           <div className="flex justify-center my-6">
             <button
-              className="relative px-8 py-4 rounded-2xl bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 hover:from-yellow-500 hover:via-yellow-600 hover:to-yellow-700 text-white font-bold text-lg transition-all duration-300 w-full sm:w-auto cursor-pointer flex items-center justify-center gap-3 shadow-2xl transform 
+              className="relative px-8 py-4 rounded-2xl bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 hover:from-yellow-500 hover:via-yellow-600 hover:to-yellow-700 text-white font-bold text-lg transition-all duration-300 w-full sm:w-auto cursor-pointer flex items-center justify-center gap-3 shadow-md transform 
               border-2 border-yellow-300"
               onClick={handlePremiumSubscription}
             >

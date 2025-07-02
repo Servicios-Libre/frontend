@@ -117,7 +117,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           <p className="text-xs text-gray-300 font-semibold uppercase tracking-wider mt-8 mb-3">Administración</p>
 
           <NavLink
-            href="/dashboard/admins"
+            href="/dashboard/admins-management"
             icon={<FaUserShield />}
             text="Admins"
             pathname={pathname}
