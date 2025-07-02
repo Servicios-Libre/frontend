@@ -8,7 +8,6 @@ import {
   FaTools,
   FaUserCog,
   FaTicketAlt,
-  FaCogs,
   FaChartBar,
   FaUserShield,
   FaSignOutAlt,
@@ -128,14 +127,6 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             href="/dashboard/stats"
             icon={<FaChartBar />}
             text="Estadísticas"
-            pathname={pathname}
-            onClick={onClose}
-          />
-
-          <NavLink
-            href="/dashboard/config"
-            icon={<FaCogs />}
-            text="Configuración"
             pathname={pathname}
             onClick={onClose}
           />
