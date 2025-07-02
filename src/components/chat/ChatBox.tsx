@@ -34,6 +34,7 @@ const ChatBox = ({
   clienteName,
   trabajadorName,
   trabajadorId,
+  clienteId,
   userRole,
 }: ChatBoxProps) => {
   const [newMessage, setNewMessage] = useState("");
@@ -155,7 +156,7 @@ const ChatBox = ({
 
       {/* Input y contrato */}
       <div className="sticky bottom-0 left-0 right-0 px-6 py-2 bg-[#f0f0f0]">
-        {contract && !contract.accepted && (
+        {contract && !contract.accepted && currentUserId === clienteId && (
           <ContractView
             contract={contract}
             onAccept={onContractAccept}

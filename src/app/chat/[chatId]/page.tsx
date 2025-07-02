@@ -162,8 +162,29 @@ export default function ChatDemo() {
     return newMsg;
   };
 
-  const handleContractCreate = (contractData: ChatContract) => {
-    setContract(contractData);
+  const handleContractCreate = async (contractData: ChatContract) => {
+    if (!token) return;
+
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/chat/${chatId}/contract`,
+        {
+          ...contractData,
+          chatId,
+          workerId: trabajadorId,
+          clientId: clienteId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setContract(response.data);
+    } catch (error) {
+      console.error("Error al crear el contrato:", error);
+    }
   };
 
   const handleContractAccept = () => {
