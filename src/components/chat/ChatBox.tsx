@@ -87,10 +87,9 @@ const ChatBox = ({
     setTimeout(scrollToBottom, 100);
   };
 
-  const alreadyConfirmed = !!(
-    (userRole === "client" && contract?.clientConfirmed) ||
-    (userRole === "worker" && contract?.workerConfirmed)
-  );
+  const alreadyConfirmed =
+    (userRole === "client" && contract?.clientConfirmed === true) ||
+    (userRole === "worker" && contract?.workerConfirmed === true);
 
   console.log("Contrato:", contract);
   console.log("userRole:", userRole);
