@@ -56,13 +56,20 @@ export default function RequestProfileModal({ user, open, onClose, onAccept, onR
 
           <div className="flex justify-center gap-4">
             <button
-              onClick={() => onReject(user.id)}
+              onClick={() => {
+                onReject(user.id);
+                onClose();
+              }}
               className="px-5 py-2 rounded bg-red-600 text-white hover:bg-red-700 shadow-md transition"
             >
               Rechazar
             </button>
+
             <button
-              onClick={() => onAccept(user.id)}
+              onClick={() => {
+                onAccept(user.id);
+                onClose();
+              }}
               className="px-5 py-2 rounded bg-green-600 text-white hover:bg-green-700 shadow-md transition"
             >
               Aceptar

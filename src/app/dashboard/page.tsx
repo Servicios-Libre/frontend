@@ -133,13 +133,6 @@ export default function DashboardPage() {
             </div>
             <div className="hidden lg:block absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-indigo-800 to-transparent pointer-events-none"></div>
           </div>
-
-          <button
-            className="w-full md:w-auto px-8 py-4 text-xl bg-gradient-to-r from-amber-400 via-amber-200 to-amber-400 text-amber-900 font-bold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
-            onClick={() => (window.location.href = '/servicios')}
-          >
-            Salir del Panel
-          </button>
         </main>
       </div>
     </div>

@@ -15,7 +15,6 @@ const PremiumSection = () => {
 //   console.log("acacaac", isPremium)
   const router = useRouter()
   const { user } = useAuth()
-  console.log("asereje", user?.premium)
   return (
     <>
       {user?.premium ?? false ? (

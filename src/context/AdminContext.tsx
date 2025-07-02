@@ -1,7 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { useCallback } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, useCallback } from "react";
 import { User, Servicio, WorkerRequestTicket, Ticket } from "@/types";
 import {
   fetchWorkerRequestsPaginated,
@@ -37,6 +36,7 @@ interface AdminContextProps {
 
   activeServices: Servicio[];
   activeServicesCount: number;
+  totalActiveServices: number;
   activeServicesPage: number;
   setActiveServicesPage: (page: number) => void;
   activeServicesSearch: string;
@@ -49,28 +49,29 @@ interface AdminContextProps {
 const AdminContext = createContext<AdminContextProps>({
   users: [],
   loading: true,
-  refreshUsers: async () => {},
+  refreshUsers: async () => { },
   acceptedServiceCount: 0,
-  refreshAcceptedServices: async () => {},
+  refreshAcceptedServices: async () => { },
   workerRequests: [],
   workerRequestsCount: 0,
   displayedWorkerRequestsCount: 0,
   workerRequestsPage: 1,
-  setWorkerRequestsPage: () => {},
-  refreshWorkerRequests: async () => {},
+  setWorkerRequestsPage: () => { },
+  refreshWorkerRequests: async () => { },
   serviceRequests: [],
   serviceRequestsCount: 0,
   displayedServiceRequestsCount: 0,
   serviceRequestsPage: 1,
-  setServiceRequestsPage: () => {},
-  refreshServiceRequests: async () => {},
+  setServiceRequestsPage: () => { },
+  refreshServiceRequests: async () => { },
   activeServices: [],
   activeServicesCount: 0,
+  totalActiveServices: 0,
   activeServicesPage: 1,
-  setActiveServicesPage: () => {},
+  setActiveServicesPage: () => { },
   activeServicesSearch: "",
-  setActiveServicesSearch: () => {},
-  refreshActiveServices: async () => {},
+  setActiveServicesSearch: () => { },
+  refreshActiveServices: async () => { },
   isReady: false,
 });
 
@@ -92,6 +93,7 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
 
   const [activeServices, setActiveServices] = useState<Servicio[]>([]);
   const [activeServicesCount, setActiveServicesCount] = useState(0);
+  const [totalActiveServices, setTotalActiveServices] = useState(0);
   const [activeServicesPage, setActiveServicesPage] = useState(1);
   const [activeServicesSearch, setActiveServicesSearch] = useState("");
 
@@ -152,19 +154,27 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
   const refreshActiveServices = useCallback(async () => {
     if (!token || !isAdmin) return;
     try {
-      const { services, total } = await fetchActiveServices(
-        activeServicesPage,
-        5,
-        activeServicesSearch
-      );
+      const services = await fetchAllActiveServices();
       setActiveServices(services);
-      setActiveServicesCount(total);
+      setActiveServicesCount(services.length);
+      setTotalActiveServices(services.length);
     } catch (error) {
       console.error("Error al cargar servicios activos", error);
       setActiveServices([]);
       setActiveServicesCount(0);
+      setTotalActiveServices(0);
     }
-  }, [token, isAdmin, activeServicesPage, activeServicesSearch]);
+  }, [token, isAdmin]);
+
+  const fetchTotalActiveServices = useCallback(async () => {
+    if (!token || !isAdmin) return;
+    try {
+      const { total } = await fetchActiveServices(1, 1);
+      setTotalActiveServices(total);
+    } catch (error) {
+      console.error("Error al cargar total de servicios activos", error);
+    }
+  }, [token, isAdmin]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -177,6 +187,7 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
       setServiceRequestsCount(0);
       setActiveServices([]);
       setActiveServicesCount(0);
+      setTotalActiveServices(0);
       setLoading(false);
       return;
     }
@@ -189,10 +200,12 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
         refreshWorkerRequests(),
         refreshServiceRequests(),
         refreshActiveServices(),
+        fetchTotalActiveServices(),
       ]);
       setLoading(false);
     })();
-  }, [token, authLoading, isAdmin, refreshUsers, refreshAcceptedServices, refreshWorkerRequests, refreshServiceRequests, refreshActiveServices]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, authLoading, isAdmin]);
 
   useEffect(() => {
     if (!loading && isAdmin) {
@@ -246,6 +259,7 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
         refreshServiceRequests,
         activeServices,
         activeServicesCount,
+        totalActiveServices,
         activeServicesPage,
         setActiveServicesPage,
         activeServicesSearch,

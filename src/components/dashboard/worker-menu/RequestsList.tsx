@@ -1,3 +1,4 @@
+import EmptyState from "@/components/ui/empty-state/EmptyState";
 import { User, WorkerRequestTicket } from "@/types";
 
 type RequestsListProps = {
@@ -7,7 +8,15 @@ type RequestsListProps = {
 
 export function RequestsList({ requests, onViewProfile }: RequestsListProps) {
   if (!requests || requests.length === 0)
-    return <p className="text-indigo-300 text-center">No hay solicitudes pendientes.</p>;
+    return (
+      <EmptyState
+        message="No hay solicitudes pendientes."
+        bgColor="bg-purple-50/10"
+        textColor="text-purple-600"
+        borderColor="border-purple-200"
+        icon="tools"
+      />
+    );
 
   return (
     <div className="grid gap-4">
