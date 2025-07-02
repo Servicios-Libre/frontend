@@ -224,13 +224,6 @@ export default function ProfilePage() {
   };
 
   const handleSave = async () => {
-    if (!formData.description || formData.description.trim() === "") {
-      showToast(
-        "Agrega una descripción a tu perfil antes de solicitar ser trabajador.",
-        "error"
-      );
-      return;
-    }
 
     const socialData = {
       facebook: formData.facebook?.trim(),
