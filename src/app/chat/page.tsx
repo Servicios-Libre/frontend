@@ -23,7 +23,6 @@ export default function ChatInboxPage() {
       })
       .then((res) => {
         const chatsData = Array.isArray(res.data) ? res.data : [];
-        console.log(res.data);
         setChats(chatsData);
       })
       .catch((error) => {

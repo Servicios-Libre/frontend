@@ -104,8 +104,18 @@ export interface UserBasic {
   user_pic: string;
   availability: boolean;
   address: Address;
-  rate?: number; // <-- Agregado
-  phone?: string; // <-- Agregado
+  rate?: number;
+  phone?: string;
+  description?: string;
+  social?: SocialLinks;
+}
+
+export interface SocialLinks {
+  id: string;
+  facebook?: string | null;
+  linkedin?: string | null;
+  instagram?: string | null;
+  x?: string | null;
 }
 
 // Service con category como objeto y descripción (para perfil de worker)
