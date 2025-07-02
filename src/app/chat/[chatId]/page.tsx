@@ -217,32 +217,26 @@ export default function ChatDemo() {
     if (!contract || !token) return;
 
     try {
-      const response = await axios.put(
+      await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/api/chat/contract/${contract.id}/accept`,
         {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      const updatedContract = await axios.get(
+      const res = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/api/chat/contract`,
         {
           params: {
             worker: trabajadorId,
             client: clienteId,
           },
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      return response;
-
-      setContract(updatedContract.data);
+      setContract(res.data);
     } catch (error) {
-      console.error("❌ Error al aceptar contrato:", error);
+      console.error("❌ Error al aceptar el contrato:", error);
     }
   };
 

@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { ChatContract } from '@/types';
-import { useState } from 'react';
+import { ChatContract } from "@/types";
+import { useState } from "react";
 
 interface ContractViewProps {
   contract: ChatContract;
@@ -23,7 +23,7 @@ const ContractView = ({ contract, onAccept, onCancel }: ContractViewProps) => {
             onClick={() => setShowDetails(!showDetails)}
             className="text-blue-500 hover:text-blue-600"
           >
-            {showDetails ? 'Ocultar detalles' : 'Mostrar detalles'}
+            {showDetails ? "Ocultar detalles" : "Mostrar detalles"}
           </button>
         </div>
 
@@ -56,7 +56,10 @@ const ContractView = ({ contract, onAccept, onCancel }: ContractViewProps) => {
             Cancelar
           </button>
           <button
-            onClick={onAccept}
+            onClick={() => {
+              console.log("👆 Se hizo clic en Aceptar Contrato");
+              onAccept();
+            }}
             className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg"
           >
             Aceptar Contrato
