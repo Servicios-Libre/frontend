@@ -6,9 +6,14 @@ import { useState } from "react";
 interface ContractFormProps {
   onSubmit: (contract: ChatContract) => void;
   onCancel: () => void;
+  setShowContractForm: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const ContractForm = ({ onSubmit, onCancel }: ContractFormProps) => {
+const ContractForm = ({
+  onSubmit,
+  onCancel,
+  setShowContractForm,
+}: ContractFormProps) => {
   const [formValues, setFormValues] = useState({
     description: "",
     startDate: "",
@@ -39,6 +44,8 @@ const ContractForm = ({ onSubmit, onCancel }: ContractFormProps) => {
       completed: false,
       status: "pending",
     });
+
+    setShowContractForm(false); 
   };
 
   const handleChange = (
