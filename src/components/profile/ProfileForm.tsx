@@ -102,7 +102,7 @@ export default function ProfileForm({
                         className="w-full rounded-md border border-gray-300 px-4 py-2 text-base focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:bg-gray-100"
                     >
                         <option value="">Selecciona una provincia</option>
-                        {countries.map((country) => (
+                        {[...new Set(countries)].map((country) => (
                             <option key={country} value={country}>
                                 {country}
                             </option>
@@ -122,7 +122,7 @@ export default function ProfileForm({
                         className="w-full rounded-md border border-gray-300 px-4 py-2 text-base focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:bg-gray-100"
                     >
                         <option value="">Selecciona una ciudad</option>
-                        {countryCities.map((city) => (
+                        {[...new Set(countryCities)].sort().map((city) => (
                             <option key={city} value={city}>
                                 {city}
                             </option>
