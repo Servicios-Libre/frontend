@@ -84,7 +84,6 @@ const ChatBox = ({
 
     await onSend(newMessage.trim());
     setNewMessage("");
-    setTimeout(scrollToBottom, 100);
   };
 
   const alreadyConfirmed =
