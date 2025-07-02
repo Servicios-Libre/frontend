@@ -64,7 +64,7 @@ const ChatBox = ({
     };
 
     checkReview();
-  }, [contract, userRole]);
+  }, [contract?.id, contract?.completed, userRole]);
 
   useEffect(() => {
     setLocalMessages(messages);
