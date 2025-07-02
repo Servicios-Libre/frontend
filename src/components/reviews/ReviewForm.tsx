@@ -30,7 +30,7 @@ const ReviewForm = ({
 
     try {
       await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/new/${workerId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/reviews/new/${workerId}`,
         { description, rate, contractId },
         {
           headers: {
