@@ -21,6 +21,8 @@ interface ChatBoxProps {
   trabajadorId: string;
   clienteId: string;
   userRole: "client" | "worker";
+  showContractForm: boolean;
+  setShowContractForm: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ChatBox = ({
@@ -64,7 +66,7 @@ const ChatBox = ({
     };
 
     checkReview();
-  }, [contract, userRole]);
+  }, [contract?.id, contract?.completed, userRole]);
 
   useEffect(() => {
     setLocalMessages(messages);

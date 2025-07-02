@@ -179,6 +179,36 @@ export interface ServiceContractFormValues {
   termsAccepted: boolean;
 }
 
+export type Job = {
+  id: string;
+  title: string;
+  description: string;
+  work_photos?: {
+    id: string;
+    photo_url: string;
+  }[];
+  worker: {
+    id: string;
+    user_pic?: string;
+    name: string;
+  };
+};
+
+export type Review = {
+  id: string;
+  description: string;
+  rate: number;
+  created_at: string;
+  author: {
+    id: string;
+    name: string;
+    user_pic?: string;
+  };
+};
+
+
+
+
 // Chats Worker y User
 export interface ChatMessage {
   id: string;

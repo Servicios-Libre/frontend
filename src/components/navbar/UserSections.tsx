@@ -93,7 +93,7 @@ export function UserDropdown({
                             </Link>
                         )}
                         <Link
-                            href="/facturas"
+                            href="/invoices"
                             onClick={() => setDropdownOpen(false)}
                             className="block px-4 py-2 hover:bg-blue-100 hover:text-blue-700 transition-colors duration-150 cursor-pointer"
                         >
@@ -180,7 +180,7 @@ export function MobileUserSection({
           </Link>
         )}
         <Link
-          href="/facturas"
+          href="/invoices"
           onClick={() => setIsOpen(false)}
           className="w-full px-4 py-2 hover:bg-blue-100 hover:text-blue-700 text-sm flex items-center gap-2 transition-colors duration-150 cursor-pointer"
         >
