@@ -79,7 +79,7 @@ export default function AdminsList({ admins, onRevokeAdmin, loading }: Props) {
                                 <div className="flex items-center gap-4">
                                     <div className="h-10 w-10 rounded-full overflow-hidden border-2 border-indigo-500 flex-shrink-0">
                                         <Image
-                                            src={admin.user_pic || "/placeholder-user.png"}
+                                            src={admin.user_pic || "/img/avatar.jpg"}
                                             alt={admin.name}
                                             width={40}
                                             height={40}

@@ -26,6 +26,7 @@ interface Props {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setUserImageFile: any;
   ticket: Ticket | null;
+  showToast?: (message: string, type: "success" | "error" | "info") => void;
   setUserName: (name: string) => void;
   premium: boolean;
 }
@@ -164,14 +165,13 @@ export default function ProfileHeader({
         <button
           onClick={() => editMode && setNameModalOpen(true)}
           className={`flex items-center text-xl font-bold mb-1 gap-2
-            ${
-              premium && editMode
-                ? "text-amber-300 hover:text-amber-200 cursor-pointer"
-                : editMode
+            ${premium && editMode
+              ? "text-amber-300 hover:text-amber-200 cursor-pointer"
+              : editMode
                 ? "text-white hover:text-blu-200 cursor-pointer"
                 : premium
-                ? "text-amber-300"
-                : "text-white cursor-default"
+                  ? "text-amber-300"
+                  : "text-white cursor-default"
             }`}
           aria-label="Editar nombre"
           title={editMode ? "Editar nombre" : undefined}
@@ -186,9 +186,8 @@ export default function ProfileHeader({
           {userName}
           <FontAwesomeIcon
             icon={faPen}
-            className={`transition-colors ${
-              editMode ? "text-white hover:text-blue-200" : "text-transparent"
-            }`}
+            className={`transition-colors ${editMode ? "text-white hover:text-blue-200" : "text-transparent"
+              }`}
             style={{ fontSize: "1.25rem" }}
           />
         </button>
@@ -223,14 +222,13 @@ export default function ProfileHeader({
           {userRole !== "worker" && !hasAcceptedTicket && (
             <button
               className={`px-4 py-2 rounded-md font-semibold transition-colors mt-2 sm:mt-0 cursor-pointer
-                ${
-                  !editMode && !hasUnsavedChanges
-                    ? isComplete
-                      ? hasPendingRequest
-                        ? "bg-yellow-300 text-yellow-900 cursor-not-allowed"
-                        : "bg-green-500 hover:bg-green-600 text-white cursor-pointer"
-                      : "bg-gray-300 hover:bg-gray-400 text-gray-700 cursor-not-allowed"
-                    : "bg-gray-300 text-gray-400 cursor-not-allowed"
+                ${!editMode && !hasUnsavedChanges
+                  ? isComplete
+                    ? hasPendingRequest
+                      ? "bg-yellow-300 text-yellow-900 cursor-not-allowed"
+                      : "bg-green-500 hover:bg-green-600 text-white cursor-pointer"
+                    : "bg-gray-300 hover:bg-gray-400 text-gray-700 cursor-not-allowed"
+                  : "bg-gray-300 text-gray-400 cursor-not-allowed"
                 }`}
               disabled={
                 !isComplete ||
@@ -244,10 +242,10 @@ export default function ProfileHeader({
               {loadingTicket
                 ? "Enviando..."
                 : ticketSuccess
-                ? "Solicitud enviada"
-                : hasPendingRequest
-                ? "Solicitud pendiente"
-                : "Solicitar ser trabajador"}
+                  ? "Solicitud enviada"
+                  : hasPendingRequest
+                    ? "Solicitud pendiente"
+                    : "Solicitar ser trabajador"}
             </button>
           )}
           {ticketError && <p className="text-red-200 mt-2">{ticketError}</p>}

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { searchUserByEmail, fetchAdmins } from "@/services/dashboard/adminService";
+import { searchUserByEmail, fetchAdmins, promoteToAdmin, downgradeAdmin } from "@/services/dashboard/adminService";
 import { User } from "@/types";
 
 import Sidebar from "@/components/dashboard/Sidebar";
@@ -11,6 +11,7 @@ import { FaClipboardList } from "react-icons/fa";
 import { useToast } from "@/context/ToastContext";
 import { SearchInput } from "@/components/dashboard/SearchInput";
 import AdminsList from "@/components/dashboard/admin-management/AdminsList";
+import { LoadingScreen } from "@/components/dashboard/LoadingScreen";
 
 const GOD_EMAIL = "nachomartinezdap@gmail.com";
 
@@ -70,8 +71,7 @@ export default function AdminUsersPage() {
 
         setLoadingAction(true);
         try {
-            // await updateUserRole(user.id, "admin");
-            console.log("Se debería hacer admin: ", user);
+            await promoteToAdmin(user.id);
             setFoundUser(null);
             setSearchEmail("");
             await loadAdmins();
@@ -87,13 +87,16 @@ export default function AdminUsersPage() {
         if (!isGod) return;
 
         try {
-            // await updateUserRole(user.id, "user");
-            console.log("Se debería quitar el admin: ", user);
+            await downgradeAdmin(user.id);
             showToast("Administrador revocado con éxito", "success");
             await loadAdmins();
         } catch {
             showToast("Error al revocar admin", "error");
         }
+    }
+
+    if (loadingAdmins) {
+        return <LoadingScreen />;
     }
 
     if (!isGod) {
