@@ -22,6 +22,7 @@ export const InvoiceList = () => {
         setLoading(true);
         const response = await getInvoices({
           provider,
+          page
         });
         setInvoices(response.invoices);
         setTotalPaid(
