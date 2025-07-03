@@ -11,6 +11,8 @@ import { Servicio, ServicioGrid } from "@/types";
 import { obtenerServicios } from "@/services/serviciosService";
 import ServiciosSkeleton from "@/components/ui/serviciosSkeleton/ServiciosSkeleton";
 import PremiumSection from "@/components/servicios/premium-section/PremiumSection";
+import { useAuth } from "@/context/AuthContext";
+import BeWorker from "@/components/servicios/be-worker/BeWorker";
 
 export default function ServiciosPage() {
 
@@ -26,6 +28,7 @@ export default function ServiciosPage() {
     const [servicios, setServicios] = useState<ServicioGrid[]>([]);
     const [totalServicios, setTotalServicios] = useState(0);
     const [loading, setLoading] = useState(false);
+    const { user } = useAuth()
 
 
     // Efecto para actualizar la cantidad al redimensionar la ventana
@@ -94,51 +97,52 @@ export default function ServiciosPage() {
     }, [busqueda, categoriasSeleccionadas]);
 
     return (
-        <div className="bg-white">
-            <BannerServicios />
+      <div className="bg-white">
+        <BannerServicios />
 
-            <div className="p-8 max-w-7xl mx-auto">
-                <h1 className="text-2xl text-gray-800 font-bold mb-4">Explorá los rubros disponibles</h1>
+        <div className="p-8 max-w-7xl mx-auto">
+          <h1 className="text-2xl text-gray-800 font-bold mb-4">
+            Explorá los rubros disponibles
+          </h1>
 
-                <SearchAndFilter
-                    mostrarFiltro={mostrarFiltro}
-                    setMostrarFiltro={setMostrarFiltro}
-                    enfocado={enfocado}
-                    setEnfocado={setEnfocado}
-                    categoriasSeleccionadas={categoriasSeleccionadas}
-                    setCategoriasSeleccionadas={setCategoriasSeleccionadas}
-                    busqueda={busqueda}
-                    setBusqueda={setBusqueda}
+          <SearchAndFilter
+            mostrarFiltro={mostrarFiltro}
+            setMostrarFiltro={setMostrarFiltro}
+            enfocado={enfocado}
+            setEnfocado={setEnfocado}
+            categoriasSeleccionadas={categoriasSeleccionadas}
+            setCategoriasSeleccionadas={setCategoriasSeleccionadas}
+            busqueda={busqueda}
+            setBusqueda={setBusqueda}
+          />
+
+          {loading && <ServiciosSkeleton cantidad={serviciosPorPagina} />}
+
+          {!loading && serviciosVisibles.length > 0 && (
+            <>
+              <ServicesGrid servicios={serviciosVisibles} />
+              {totalPaginas > 1 && (
+                <Pagination
+                  totalPages={totalPaginas}
+                  currentPage={paginaActual}
+                  setPage={setPaginaActual}
                 />
+              )}
+            </>
+          )}
 
-                {loading && (
-                    <ServiciosSkeleton cantidad={serviciosPorPagina} />
-                )}
-
-                {!loading && serviciosVisibles.length > 0 && (
-                    <>
-                        <ServicesGrid servicios={serviciosVisibles} />
-                        {totalPaginas > 1 && (
-                            <Pagination
-                                totalPages={totalPaginas}
-                                currentPage={paginaActual}
-                                setPage={setPaginaActual}
-                            />
-                        )}
-                    </>
-                )}
-
-                {!loading && servicios.length === 0 && serviciosVisibles.length === 0 && (
-                    <NoResults mensaje="No hay servicios que coincidan con los filtros seleccionados." />
-                )}
-
-            </div>
-
-            <PerfilesDestacados />
-
-            <PremiumSection />
-
-            <InformacionServicios />
+          {!loading &&
+            servicios.length === 0 &&
+            serviciosVisibles.length === 0 && (
+              <NoResults mensaje="No hay servicios que coincidan con los filtros seleccionados." />
+            )}
         </div>
+
+        <PerfilesDestacados />
+
+        {user?.role !== "worker" ? <BeWorker /> : <PremiumSection />}
+
+        <InformacionServicios />
+      </div>
     );
 }

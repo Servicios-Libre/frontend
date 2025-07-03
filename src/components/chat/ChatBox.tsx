@@ -6,6 +6,8 @@ import ContractForm from "./ContractForm";
 import ContractView from "./ContractView";
 import { FaPaperPlane } from "react-icons/fa";
 import ReviewForm from "../reviews/ReviewForm";
+import Image from "next/image";
+import { Crown } from "lucide-react";
 
 interface ChatBoxProps {
   chatId: string;
@@ -20,6 +22,9 @@ interface ChatBoxProps {
   trabajadorName: string;
   trabajadorId: string;
   clienteId: string;
+  clientePic: string;
+  trabajadorPic: string;
+  trabajadorPremium: boolean;
   userRole: "client" | "worker";
   showContractForm: boolean;
   setShowContractForm: React.Dispatch<React.SetStateAction<boolean>>;
@@ -38,6 +43,9 @@ const ChatBox = ({
   trabajadorId,
   clienteId,
   userRole,
+  clientePic,
+  trabajadorPic,
+  trabajadorPremium
 }: ChatBoxProps) => {
   const [newMessage, setNewMessage] = useState("");
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>(messages);
@@ -99,7 +107,11 @@ const ChatBox = ({
         {/* Cliente */}
         <div className="flex-1 flex items-center gap-4 bg-white rounded-xl shadow border border-blue-100 p-4">
           <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xl border-2 border-white shadow">
-            {clienteName.charAt(0).toUpperCase()}
+            {clientePic ? (
+              <Image src={clientePic} className="rounded-full" width={40} height={40} alt="Cliente" />
+            ) : (
+              clienteName.charAt(0).toUpperCase()
+            )}
           </div>
           <div>
             <div className="font-semibold text-gray-800">{clienteName}</div>
@@ -110,11 +122,28 @@ const ChatBox = ({
         {/* Trabajador */}
         <div className="flex-1 flex items-center gap-4 bg-white rounded-xl shadow border border-green-100 p-4">
           <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-xl border-2 border-white shadow">
-            {trabajadorName.charAt(0).toUpperCase()}
+            {trabajadorPic ? (
+              <Image
+              className="rounded-full"
+                src={trabajadorPic}
+                width={40}
+                height={40}
+                alt="Trabajador"
+              />
+            ) : (
+              trabajadorName.charAt(0).toUpperCase()
+            )}
           </div>
           <div>
-            <div className="font-semibold text-gray-800">{trabajadorName}</div>
-            <div className="text-xs text-green-600 font-bold">Trabajador</div>
+            <div
+              className={`font-semibold flex items-center gap-1 ${
+              trabajadorPremium ? "bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-500 bg-clip-text text-transparent" : "text-gray-800"
+              }`}
+            >
+              {trabajadorPremium && <Crown className="w-4 h-4 text-amber-600" />}
+              {trabajadorName}
+            </div>
+            <div className={`text-xs ${trabajadorPremium ? "text-yellow-400" : "text-green-600"} font-bold`}>Trabajador {trabajadorPremium && "Premium"}</div>
           </div>
         </div>
       </div>

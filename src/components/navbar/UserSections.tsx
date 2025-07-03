@@ -52,7 +52,7 @@ export function UserDropdown({
         return (
             <div className="relative ml-6" ref={dropdownRef}>
                 <button
-                    className={`${user.premium ? "bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-300" : "bg-blue-300 text-white  hover:bg-blue-400 " } font-normal px-4 py-2 rounded transition flex items-center gap-2 cursor-pointerhover:shadow-sm`}
+                    className={`cursor-pointer ${user.premium ? "bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-300" : "bg-blue-300 text-white  hover:bg-blue-400 " } font-normal px-4 py-2 rounded transition flex items-center gap-2 cursor-pointerhover:shadow-sm`}
                     onClick={(e) => {
                         e.stopPropagation();
                         setDropdownOpen((open) => !open);
