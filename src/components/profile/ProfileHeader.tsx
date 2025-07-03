@@ -58,7 +58,6 @@ export default function ProfileHeader({
   };
 
   const [loadingTicket, setLoadingTicket] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [ticketSuccess, setTicketSuccess] = useState(false);
   const [ticketError, setTicketError] = useState<string | null>(null);
   const [hasPendingRequest, setHasPendingRequest] = useState(false);
@@ -244,7 +243,7 @@ export default function ProfileHeader({
           )}
 
           {/* Botón de solicitar ser trabajador */}
-          {userRole !== "worker" && !hasAcceptedTicket && (
+          {user?.role !== "worker" && !hasAcceptedTicket && (
             <div className="relative group w-full">
               <button
                 className={`px-4 py-2 rounded-md font-semibold transition-colors mt-2 sm:mt-0 cursor-pointer
