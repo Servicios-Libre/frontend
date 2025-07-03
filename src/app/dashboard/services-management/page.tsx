@@ -11,7 +11,7 @@ import {
   acceptServiceRequest,
   rejectServiceRequest,
 } from "@/services/dashboard/tickets";
-import { deactivateService } from "@/services/dashboard/services";
+import { dropService } from "@/services/dashboard/services";
 import { useToast } from "@/context/ToastContext";
 import { FaTools, FaClipboardList } from "react-icons/fa"; // Íconos para títulos
 import { useAuth } from "@/context/AuthContext";
@@ -58,10 +58,10 @@ export default function ServicesMenuPage() {
     setLoadingId(undefined);
   };
 
-  const handleDeactivate = async (service: Servicio) => {
+  const handleDesactivate = async (service: Servicio) => {
     setLoadingServiceId(service.id);
     try {
-      await deactivateService(service.id);
+      await dropService(service.id);
       showToast("Servicio dado de baja", "success");
       await refreshActiveServices();
     } catch {
@@ -137,7 +137,7 @@ export default function ServicesMenuPage() {
           </h2>
 
           <ActiveServicesSection
-            onDeactivate={handleDeactivate}
+            onDesactivate={handleDesactivate}
             loadingServiceId={loadingServiceId}
           />
         </section>
