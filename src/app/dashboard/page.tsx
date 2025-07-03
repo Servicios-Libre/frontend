@@ -13,6 +13,7 @@ import {
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useAdminContext } from "@/context/AdminContext";
+import { useAuth } from "@/context/AuthContext";
 import { LoadingScreen } from "@/components/dashboard/LoadingScreen";
 import MobileHeader from "@/components/dashboard/MobileHeader";
 import RoleDistributionChart from "@/components/dashboard/charts/RoleDistributionChart";
@@ -22,6 +23,7 @@ import StatsBarChart from "@/components/dashboard/charts/ServicesCategoryChart";
 export default function DashboardPage() {
   const { users, loading, acceptedServiceCount } = useAdminContext();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     document.title = "Servicio Libre - Dashboard";
@@ -99,13 +101,15 @@ export default function DashboardPage() {
               description="Aprobar o rechazar servicios publicados"
               hoverColor="hover:bg-indigo-700"
             />
-            <QuickAccessCard
-              href="#"
-              icon={<FaUserPlus />}
-              title="Crear nuevo usuario"
-              description="Agregar usuarios al sistema"
-              hoverColor="hover:bg-fuchsia-700"
-            />
+            {user?.email === "nachomartinezdap@gmail.com" &&
+              <QuickAccessCard
+                href="#"
+                icon={<FaUserPlus />}
+                title="Gestión de administradores"
+                description="Dar de alta/baja para administradores"
+                hoverColor="hover:bg-fuchsia-700"
+              />
+            }
           </div>
 
           {/* Nueva sección de gráficas */}
