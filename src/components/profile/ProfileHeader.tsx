@@ -4,7 +4,6 @@ import ProfilePhoto from "./ProfilePhoto";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
 import Link from "next/link";
-import { Ticket } from "@/app/profile/page";
 import EditNameModal from "@/components/profile/EditNameModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen } from "@fortawesome/free-solid-svg-icons";
@@ -26,7 +25,6 @@ interface Props {
   userId: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setUserImageFile: any;
-  ticket: Ticket | null;
   showToast?: (message: string, type: "success" | "error" | "info") => void;
   setUserName: (name: string) => void;
   premium: boolean;
@@ -47,7 +45,6 @@ export default function ProfileHeader({
   setShowMissing,
   userId,
   setUserImageFile,
-  ticket,
   premium,
 }: Props) {
   const { showToast } = useToast();
@@ -61,7 +58,6 @@ export default function ProfileHeader({
   const [ticketSuccess, setTicketSuccess] = useState(false);
   const [ticketError, setTicketError] = useState<string | null>(null);
   const [hasPendingRequest, setHasPendingRequest] = useState(false);
-  const [hasAcceptedTicket, setHasAcceptedTicket] = useState(false);
   const [nameModalOpen, setNameModalOpen] = useState(false);
   const [isWorker, setIsWorker] = useState<boolean | null>(null);
 
@@ -86,23 +82,23 @@ export default function ProfileHeader({
     }
   }, [userId, isWorker]);
 
-  useEffect(() => {
-    if (ticket?.type === "to-worker") {
-      if (ticket.status === "pending") {
-        setHasPendingRequest(true);
-        setHasAcceptedTicket(false);
-      } else if (ticket.status === "accepted") {
-        setHasPendingRequest(false);
-        setHasAcceptedTicket(true);
-      } else {
-        setHasPendingRequest(false);
-        setHasAcceptedTicket(false);
-      }
-    } else {
-      setHasPendingRequest(false);
-      setHasAcceptedTicket(false);
-    }
-  }, [ticket]);
+  // useEffect(() => {
+  //   if (ticket?.type === "to-worker") {
+  //     if (ticket.status === "pending") {
+  //       setHasPendingRequest(true);
+  //       setHasAcceptedTicket(false);
+  //     } else if (ticket.status === "accepted") {
+  //       setHasPendingRequest(false);
+  //       setHasAcceptedTicket(true);
+  //     } else {
+  //       setHasPendingRequest(false);
+  //       setHasAcceptedTicket(false);
+  //     }
+  //   } else {
+  //     setHasPendingRequest(false);
+  //     setHasAcceptedTicket(false);
+  //   }
+  // }, [ticket]);
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -243,7 +239,7 @@ export default function ProfileHeader({
           )}
 
           {/* Botón de solicitar ser trabajador */}
-          {user?.role !== "worker" && !hasAcceptedTicket && (
+          {!isWorker  && (
             <div className="relative group w-full">
               <button
                 className={`px-4 py-2 rounded-md font-semibold transition-colors mt-2 sm:mt-0 cursor-pointer

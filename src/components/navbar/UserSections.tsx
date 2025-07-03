@@ -6,6 +6,7 @@ import { useState, useRef, useEffect } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faUser, faFileInvoice, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import { Crown } from "lucide-react";
+import { getProfile } from "@/services/profileService";
 
 interface User {
     id?: string;
@@ -26,11 +27,23 @@ export function UserDropdown({
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const [ profilePremium, setProfilePremium] = useState<boolean>(false)
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    const fetchProfile = async () => {
+      try {
+        const { premium } = await getProfile()
+        setProfilePremium(premium);
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      }
+    }
+    if(user) {
+      fetchProfile()
+    }
+  }, [user]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -52,13 +65,13 @@ export function UserDropdown({
         return (
             <div className="relative ml-6" ref={dropdownRef}>
                 <button
-                    className={`cursor-pointer ${user.premium ? "bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-300" : "bg-blue-300 text-white  hover:bg-blue-400 " } font-normal px-4 py-2 rounded transition flex items-center gap-2 cursor-pointerhover:shadow-sm`}
+                    className={`cursor-pointer ${profilePremium ? "bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-300" : "bg-blue-300 text-white  hover:bg-blue-400 " } font-normal px-4 py-2 rounded transition flex items-center gap-2 cursor-pointerhover:shadow-sm`}
                     onClick={(e) => {
                         e.stopPropagation();
                         setDropdownOpen((open) => !open);
                     }}
                 > 
-                {user.premium && <Crown className="w-6 h-6 text-orange-400" />}
+                {profilePremium && <Crown className="w-6 h-6 text-orange-400" />}
                     {userName}
                     <FontAwesomeIcon
                         icon={faChevronDown}
