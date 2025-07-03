@@ -74,6 +74,9 @@ export default function ProfileHeader({
       try {
         const result = await checkIfUserIsWorker(userId);
         setIsWorker(result);
+        if (result) return console.log("debería mostrar el boton de worker")
+        if (!result) return console.log("No debería mostrar el boton de worker")
+
       } catch (e) {
         console.warn("No se pudo verificar si es worker (posiblemente por red):", e);
       }
@@ -237,31 +240,45 @@ export default function ProfileHeader({
           )}
 
           {/* Botón de solicitar ser trabajador */}
-          {isWorker === false && !hasAcceptedTicket && !hasPendingRequest && (
-            <button
-              className={`px-4 py-2 rounded-md font-semibold transition-colors mt-2 sm:mt-0
-    ${!editMode && !hasUnsavedChanges
-                  ? isComplete
-                    ? "bg-green-500 hover:bg-green-600 text-white"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-gray-300 text-gray-400 cursor-not-allowed"
-                }`}
-              disabled={
-                !isComplete || editMode || hasUnsavedChanges || loadingTicket
-              }
-              onClick={handleRequestWorker}
-            >
-              {loadingTicket ? "Enviando..." : "Solicitar ser trabajador"}
-            </button>
-          )}
-
-          {isWorker === false && (hasPendingRequest || hasAcceptedTicket) && (
-            <p className="text-blue-100 text-sm font-medium mt-2">
-              {hasPendingRequest
-                ? "Tu solicitud para ser trabajador está pendiente."
-                : "Tu solicitud fue aceptada. Ya puedes operar como trabajador."}
+          {/* Si el usuario es admin, mostrar mensaje de restricción */}
+          {user?.role === "admin" && (
+            <p className="text-yellow-100 text-sm font-medium mt-2 bg-yellow-500/10 px-3 py-2 rounded">
+              Los administradores no pueden solicitar ser trabajadores.
             </p>
           )}
+
+          {/* Si no es admin y no es worker y no tiene solicitud aceptada o pendiente */}
+          {user?.role !== "admin" &&
+            isWorker === false &&
+            !hasAcceptedTicket &&
+            !hasPendingRequest && (
+              <button
+                className={`px-4 py-2 rounded-md font-semibold transition-colors mt-2 sm:mt-0
+        ${!editMode && !hasUnsavedChanges
+                    ? isComplete
+                      ? "bg-green-500 hover:bg-green-600 text-white"
+                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-gray-300 text-gray-400 cursor-not-allowed"
+                  }`}
+                disabled={
+                  !isComplete || editMode || hasUnsavedChanges || loadingTicket
+                }
+                onClick={handleRequestWorker}
+              >
+                {loadingTicket ? "Enviando..." : "Solicitar ser trabajador"}
+              </button>
+            )}
+
+          {/* Si tiene solicitud pendiente o aceptada */}
+          {user?.role !== "admin" &&
+            isWorker === false &&
+            (hasPendingRequest || hasAcceptedTicket) && (
+              <p className="text-blue-100 text-sm font-medium mt-2 bg-blue-500/10 px-3 py-2 rounded">
+                {hasPendingRequest
+                  ? "Tu solicitud para ser trabajador está pendiente de aprobación."
+                  : "Tu solicitud fue aceptada. Ya puedes operar como trabajador."}
+              </p>
+            )}
 
           {ticketError && <p className="text-red-200 mt-2">{ticketError}</p>}
         </div>

@@ -98,11 +98,6 @@ export const redirectToStripe = async () => {
 };
 
 export async function checkIfUserIsWorker(id: string): Promise<boolean> {
-  try {
-    await api.get(`/users/worker/${id}`);
-    return true;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (err: any) {
-    return err.response?.status === 404 ? false : false;
-  }
+  const response = await api.get(`/users/is-worker/${id}`);
+  return response.data;
 }
