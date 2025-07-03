@@ -66,6 +66,16 @@ export default function ChatDemo() {
         const exists = prev.some((m) => m.id === formatted.id);
         return exists ? prev : [...prev, formatted];
       });
+      axios
+        .get(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/contract`, {
+          params: {
+            worker: trabajadorId,
+            client: clienteId,
+          },
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((res) => setContract(res.data))
+        .catch(() => setContract(null));
 
       // Refrescar lista de chats lateral
       axios
@@ -93,6 +103,7 @@ export default function ChatDemo() {
       socket.off("contractUpdated");
       socket.emit("leaveChat", { chatRoom: `chat_${chatId}` });
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatId, token]);
 
   useEffect(() => {
