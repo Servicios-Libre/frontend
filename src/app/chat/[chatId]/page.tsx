@@ -8,6 +8,7 @@ import axios from "axios";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { getSocket } from "@/services/chat/socket";
 import Image from "next/image";
+import LoadingScreen from "@/components/loading-screen/LoadingScreen"; // Asegúrate de importar el componente
 
 export default function ChatDemo() {
   const params = useParams();
@@ -269,12 +270,10 @@ export default function ChatDemo() {
     }
   };
 
-  if (!user)
-    return (
-      <div className="pt-24 text-center">
-        Debes iniciar sesión para ver tus chats.
-      </div>
-    );
+  // Mostrar LoadingScreen mientras carga el usuario o los chats
+  if (!user || loadingChats) {
+    return <LoadingScreen />;
+  }
 
   const userRole =
     user.id === clienteId
