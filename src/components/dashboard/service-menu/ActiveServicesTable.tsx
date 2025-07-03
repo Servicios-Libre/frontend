@@ -1,7 +1,7 @@
 import React from "react";
 import { Servicio } from "@/types";
 import { Trash2 } from "lucide-react";
-import ActiveServicesSkeleton from "@/components/ui/serviciosSkeleton/ActiveServicesSkeleton";
+import ServiciosSkeleton from "@/components/ui/serviciosSkeleton/ServiciosSkeleton";
 import EmptyState from "@/components/ui/empty-state/EmptyState";
 
 type Props = {
@@ -19,19 +19,7 @@ export default function ActiveServicesTable({
   isLoading = false,
   isFiltered = false,
 }: Props) {
-  if (isLoading) return <ActiveServicesSkeleton />;
-
-  if (!services.length && isFiltered) {
-    return (
-      <EmptyState
-        message="No se encontraron servicios que coincidan con tu búsqueda."
-        bgColor="bg-purple-50/10"
-        textColor="text-purple-600"
-        borderColor="border-purple-200"
-        icon="folder"
-      />
-    );
-  }
+  if (isLoading) return <ServiciosSkeleton />;
 
   if (!services.length && !isFiltered) {
     return (
