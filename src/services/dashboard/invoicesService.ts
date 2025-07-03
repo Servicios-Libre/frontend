@@ -2,7 +2,7 @@
 import axiosConfig from "@/services/axiosConfig";
 
 export const fetchInvoices = async (params: {
-  provider: string;
+  provider: string | undefined;
   year: string;
   page: number;
   limit: number;
