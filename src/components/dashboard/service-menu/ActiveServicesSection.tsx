@@ -6,12 +6,12 @@ import { useAdminContext } from "@/context/AdminContext";
 import { Servicio } from "@/types";
 
 type Props = {
-  onDeactivate: (service: Servicio) => void;
+  onDesactivate: (service: Servicio) => void;
   loadingServiceId?: string;
 };
 
 export default function ActiveServicesSection({
-  onDeactivate,
+  onDesactivate,
   loadingServiceId,
 }: Props) {
   const {
@@ -57,7 +57,7 @@ export default function ActiveServicesSection({
       {/* 🧾 Tabla de servicios paginada */}
       <ActiveServicesTable
         services={paginatedServices}
-        onDeactivate={onDeactivate}
+        onDesactivate={onDesactivate}
         loadingId={loadingServiceId}
         isFiltered={isFiltered}
       />

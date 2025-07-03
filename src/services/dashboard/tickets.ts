@@ -80,8 +80,3 @@ export async function fetchActiveServices(
   const res = await api.get("/services", { params });
   return res.data;
 }
-
-export async function deactivateService(serviceId: string) {
-  const res = await api.put(`/services/deactivate/${serviceId}`);
-  return res.data;
-}

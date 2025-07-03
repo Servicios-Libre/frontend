@@ -11,17 +11,17 @@ import {
   acceptServiceRequest,
   rejectServiceRequest,
 } from "@/services/dashboard/tickets";
-import { deactivateService } from "@/services/dashboard/services";
+import { dropService } from "@/services/dashboard/services";
 import { useToast } from "@/context/ToastContext";
 import { FaTools, FaClipboardList } from "react-icons/fa"; // Íconos para títulos
 import { useAuth } from "@/context/AuthContext";
+import { LoadingScreen } from "@/components/dashboard/LoadingScreen";
 
 export default function ServicesMenuPage() {
   const { user: authUser } = useAuth();
   const [loadingId, setLoadingId] = useState<string | undefined>(undefined);
   const [loadingServiceId, setLoadingServiceId] = useState<string | undefined>(undefined);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { activeServicesCount } = useAdminContext();
   const isAdmin = authUser?.role === "admin";
 
   const {
@@ -29,7 +29,6 @@ export default function ServicesMenuPage() {
     refreshServiceRequests,
     refreshActiveServices,
     isReady,
-    totalActiveServices,
   } = useAdminContext();
 
   const { showToast } = useToast();
@@ -59,10 +58,10 @@ export default function ServicesMenuPage() {
     setLoadingId(undefined);
   };
 
-  const handleDeactivate = async (service: Servicio) => {
+  const handleDesactivate = async (service: Servicio) => {
     setLoadingServiceId(service.id);
     try {
-      await deactivateService(service.id);
+      await dropService(service.id);
       showToast("Servicio dado de baja", "success");
       await refreshActiveServices();
     } catch {
@@ -82,6 +81,8 @@ export default function ServicesMenuPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isReady]);
+
+  if (!isReady) return <LoadingScreen />;
 
   if (!isAdmin) {
     return (
@@ -133,15 +134,10 @@ export default function ServicesMenuPage() {
         <section>
           <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
             <FaClipboardList className="text-emerald-400" /> Servicios activos
-            {activeServicesCount > 0 && (
-              <span className="ml-2 bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full text-sm font-medium">
-                {activeServicesCount} coincidencias de {totalActiveServices}
-              </span>
-            )}
           </h2>
 
           <ActiveServicesSection
-            onDeactivate={handleDeactivate}
+            onDesactivate={handleDesactivate}
             loadingServiceId={loadingServiceId}
           />
         </section>

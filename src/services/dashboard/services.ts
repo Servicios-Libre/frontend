@@ -57,11 +57,7 @@ export async function fetchAllActiveServices(search = ""): Promise<Servicio[]> {
   return allServices;
 }
 
-export async function deactivateService(serviceId: string) {
-  try {
-    const res = await axiosInstance.put(`/services/deactivate/${serviceId}`);
-    return res.data;
-  } catch (error) {
-    throw new Error("Error al dar de baja el servicio");
-  }
+export async function dropService(serviceId: string) {
+  const res = await api.delete(`/services/delete/${serviceId}`);
+  return res.data;
 }

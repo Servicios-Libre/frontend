@@ -13,7 +13,8 @@ import {
   FaSignOutAlt,
   FaTimes,
 } from "react-icons/fa";
-import { useAdminContext } from "@/context/AdminContext";
+import { useAdminContext} from "@/context/AdminContext";
+import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 
 interface SidebarProps {
@@ -32,6 +33,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   // Estado local para mantener el último valor visible y evitar parpadeo
   const [stableServiceCount, setStableServiceCount] = useState<number>(displayedServiceRequestsCount);
   const [stableWorkerCount, setStableWorkerCount] = useState<number>(displayedWorkerRequestsCount);
+  const { user } = useAuth();
 
   useEffect(() => {
     if (isReady && displayedServiceRequestsCount !== undefined) {
@@ -106,7 +108,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           />
 
           <NavLink
-            href="/dashboard/tickets"
+            href="/dashboard/invoices-management"
             icon={<FaTicketAlt />}
             text="Tickets"
             pathname={pathname}
@@ -115,13 +117,15 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
           <p className="text-xs text-gray-300 font-semibold uppercase tracking-wider mt-8 mb-3">Administración</p>
 
-          <NavLink
-            href="/dashboard/admins-management"
-            icon={<FaUserShield />}
-            text="Admins"
-            pathname={pathname}
-            onClick={onClose}
-          />
+          {user?.email === "nachomartinezdap@gmail.com" && (
+            <NavLink
+              href="/dashboard/admins-management"
+              icon={<FaUserShield />}
+              text="Admins"
+              pathname={pathname}
+              onClick={onClose}
+            />
+          )}
 
           <NavLink
             href="/dashboard/stats"

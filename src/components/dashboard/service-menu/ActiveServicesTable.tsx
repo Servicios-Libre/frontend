@@ -1,12 +1,12 @@
 import React from "react";
 import { Servicio } from "@/types";
 import { Trash2 } from "lucide-react";
-import ActiveServicesSkeleton from "@/components/ui/serviciosSkeleton/ActiveServicesSkeleton";
+import ServiciosSkeleton from "@/components/ui/serviciosSkeleton/ServiciosSkeleton";
 import EmptyState from "@/components/ui/empty-state/EmptyState";
 
 type Props = {
   services: Servicio[];
-  onDeactivate: (service: Servicio) => void;
+  onDesactivate: (service: Servicio) => void;
   loadingId?: string;
   isLoading?: boolean;
   isFiltered?: boolean;
@@ -14,24 +14,12 @@ type Props = {
 
 export default function ActiveServicesTable({
   services = [],
-  onDeactivate,
+  onDesactivate,
   loadingId,
   isLoading = false,
   isFiltered = false,
 }: Props) {
-  if (isLoading) return <ActiveServicesSkeleton />;
-
-  if (!services.length && isFiltered) {
-    return (
-      <EmptyState
-        message="No se encontraron servicios que coincidan con tu búsqueda."
-        bgColor="bg-purple-50/10"
-        textColor="text-purple-600"
-        borderColor="border-purple-200"
-        icon="folder"
-      />
-    );
-  }
+  if (isLoading) return <ServiciosSkeleton />;
 
   if (!services.length && !isFiltered) {
     return (
@@ -62,7 +50,7 @@ export default function ActiveServicesTable({
           </div>
 
           <button
-            onClick={() => onDeactivate(service)}
+            onClick={() => onDesactivate(service)}
             disabled={loadingId === service.id}
             className="cursor-pointer flex items-center justify-center gap-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-semibold disabled:opacity-50 w-10 h-10 md:w-auto md:h-auto md:px-6"
             title="Dar de baja"
