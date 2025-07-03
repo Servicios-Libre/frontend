@@ -9,6 +9,7 @@ import EditNameModal from "@/components/profile/EditNameModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen } from "@fortawesome/free-solid-svg-icons";
 import { Crown } from "lucide-react";
+import { checkIfUserIsWorker } from "@/services/profileService";
 
 interface Props {
   userName: string;
@@ -62,10 +63,28 @@ export default function ProfileHeader({
   const [hasPendingRequest, setHasPendingRequest] = useState(false);
   const [hasAcceptedTicket, setHasAcceptedTicket] = useState(false);
   const [nameModalOpen, setNameModalOpen] = useState(false);
+  const [isWorker, setIsWorker] = useState<boolean | null>(null);
 
   const auth = useAuth();
   const user = auth?.user;
-  const userRole = user?.role;
+
+  useEffect(() => {
+    const verifyWorkerStatus = async () => {
+      try {
+        const result = await checkIfUserIsWorker(userId);
+        setIsWorker(result);
+        if (result) return console.log("debería mostrar el boton de worker")
+        if (!result) return console.log("No debería mostrar el boton de worker")
+
+      } catch (e) {
+        console.warn("No se pudo verificar si es worker (posiblemente por red):", e);
+      }
+    };
+
+    if (userId && isWorker === null) {
+      verifyWorkerStatus();
+    }
+  }, [userId, isWorker]);
 
   useEffect(() => {
     if (ticket?.type === "to-worker") {
@@ -213,17 +232,18 @@ export default function ProfileHeader({
             </div>
           </div>
 
-          {/* Tarjeta dorada si es worker */}
-          {userRole === "worker" && (
-            <Link href={`/worker-profile/${userId}`}>
-              <button className="bg-yellow-400 text-yellow-900 font-bold px-4 py-2 cursor-pointer rounded-lg shadow flex items-center gap-2 hover:bg-yellow-500 transition-colors">
-                <span>💼</span> Ver mi perfil de trabajador
-              </button>
-            </Link>
+          {isWorker === true && (
+            <div className="flex flex-col gap-2 items-center sm:items-start mt-2">
+              <Link href={`/worker-profile/${userId}`}>
+                <button className="bg-yellow-400 text-yellow-900 font-bold px-4 py-2 rounded-lg shadow flex items-center gap-2 hover:bg-yellow-500 transition-colors">
+                  <span>💼</span> Ver perfil de trabajador
+                </button>
+              </Link>
+            </div>
           )}
 
           {/* Botón de solicitar ser trabajador */}
-          {userRole !== "worker" && !hasAcceptedTicket && (
+          {user?.role !== "worker" && !hasAcceptedTicket && (
             <div className="relative group w-full">
               <button
                 className={`px-4 py-2 rounded-md font-semibold transition-colors mt-2 sm:mt-0 cursor-pointer

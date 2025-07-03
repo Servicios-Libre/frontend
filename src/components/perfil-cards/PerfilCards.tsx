@@ -1,34 +1,59 @@
 import Image from "next/image";
-import { Perfil } from '../../types/index'
+import {
+  faUserTie,
+  faLocationDot,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+interface Perfil {
+  imagen: string;
+  nombre: string;
+  profesion: string;
+  descripcion: string;
+  ubicacion: string;
+  email?: string;
+}
 
 interface PerfilCardProps {
-    perfil: Perfil;
+  perfil: Perfil;
 }
 
 export default function PerfilCard({ perfil }: PerfilCardProps) {
-    return (
-     <div className="bg-white rounded-2xl p-6 shadow-lg w-80 h-96 text-center flex flex-col transition-all duration-300 hover:shadow-xl hover:scale-105">
-      {/* Imagen con tamaño fijo */}
-      <div className="w-24 h-24 bg-gray-300 mx-auto mb-4 flex-shrink-0">
+  return (
+    <div className="w-64 h-80 bg-white shadow-lg rounded-lg overflow-hidden flex flex-col text-center">
+      {/* Imagen: más alta */}
+      <div className="relative w-full h-40">
         <Image
           src={perfil.imagen || "/placeholder.svg"}
           alt={perfil.nombre}
-          width={200}
-          height={200}
-          className="object-cover w-full h-full rounded-xl"
+          fill
+          priority
+          className="object-cover object-center"
         />
       </div>
 
-      {/* Contenido con flexbox para distribución uniforme */}
-      <div className="flex flex-col flex-grow">
-        <h3 className="font-bold text-lg text-gray-800 mb-1">{perfil.nombre}</h3>
-        <p className="text-blue-600 text-sm mb-3">{perfil.profesion}</p>
+      {/* Profesión dorada */}
+      <div className="flex items-center justify-center w-full px-4 py-2 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-yellow-900 text-sm font-semibold">
+        <FontAwesomeIcon icon={faUserTie} className="mr-2 text-yellow-900" />
+        {perfil.profesion}
+      </div>
 
-        {/* Descripción con altura controlada */}
-        <div className="flex-grow flex items-start">
-          <p className="text-gray-600 text-sm leading-relaxed line-clamp-4 overflow-hidden">{perfil.descripcion}</p>
+      {/* Contenido principal con ubicación fija abajo */}
+      <div className="flex flex-col justify-between flex-1 py-3 px-4">
+        <div>
+          <h1 className="text-base font-semibold text-gray-800">{perfil.nombre}</h1>
+          <p className="text-sm text-gray-600 mt-1">
+            {perfil.descripcion.length > 90
+              ? perfil.descripcion.slice(0, 90) + "..."
+              : perfil.descripcion}
+          </p>
+        </div>
+
+        <div className="flex justify-center items-center mt-auto text-gray-700 text-sm gap-2 pt-3">
+          <FontAwesomeIcon icon={faLocationDot} className="text-blue-700 text-lg" />
+          <span className="text-gray-400">{perfil.ubicacion}</span>
         </div>
       </div>
     </div>
-    );
+  );
 }
