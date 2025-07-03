@@ -45,7 +45,7 @@ const ChatBox = ({
   userRole,
   clientePic,
   trabajadorPic,
-  trabajadorPremium
+  trabajadorPremium,
 }: ChatBoxProps) => {
   const [newMessage, setNewMessage] = useState("");
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>(messages);
@@ -77,7 +77,10 @@ const ChatBox = ({
   }, [contract?.id, contract?.completed, userRole]);
 
   useEffect(() => {
-    setLocalMessages(messages);
+    const sortedMessages = messages.sort((a, b) => {
+      return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+    });
+    setLocalMessages(sortedMessages);
     scrollToBottom();
   }, [messages]);
 
@@ -108,7 +111,13 @@ const ChatBox = ({
         <div className="flex-1 flex items-center gap-4 bg-white rounded-xl shadow border border-blue-100 p-4">
           <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xl border-2 border-white shadow">
             {clientePic ? (
-              <Image src={clientePic} className="w-10 h-10 rounded-full object-cover" width={40} height={40} alt="Cliente" />
+              <Image
+                src={clientePic}
+                className="w-10 h-10 rounded-full object-cover"
+                width={40}
+                height={40}
+                alt="Cliente"
+              />
             ) : (
               clienteName.charAt(0).toUpperCase()
             )}
@@ -124,7 +133,7 @@ const ChatBox = ({
           <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-xl border-2 border-white shadow">
             {trabajadorPic ? (
               <Image
-              className="w-10 h-10 rounded-full object-cover"
+                className="w-10 h-10 rounded-full object-cover"
                 src={trabajadorPic}
                 width={40}
                 height={40}
@@ -137,13 +146,23 @@ const ChatBox = ({
           <div>
             <div
               className={`font-semibold flex items-center gap-1 ${
-              trabajadorPremium ? "bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-500 bg-clip-text text-transparent" : "text-gray-800"
+                trabajadorPremium
+                  ? "bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-500 bg-clip-text text-transparent"
+                  : "text-gray-800"
               }`}
             >
-              {trabajadorPremium && <Crown className="w-4 h-4 text-amber-600" />}
+              {trabajadorPremium && (
+                <Crown className="w-4 h-4 text-amber-600" />
+              )}
               {trabajadorName}
             </div>
-            <div className={`text-xs ${trabajadorPremium ? "text-yellow-400" : "text-green-600"} font-bold`}>Trabajador {trabajadorPremium && "Premium"}</div>
+            <div
+              className={`text-xs ${
+                trabajadorPremium ? "text-yellow-400" : "text-green-600"
+              } font-bold`}
+            >
+              Trabajador {trabajadorPremium && "Premium"}
+            </div>
           </div>
         </div>
       </div>
