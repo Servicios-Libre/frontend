@@ -1,79 +1,93 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FaFilePdf, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
-import { PiStripeLogoBold, PiCoinsBold } from "react-icons/pi";
-import { downloadInvoicePdf } from "@/services/invoiceService";
+import { PiStripeLogoBold } from "react-icons/pi";
+import * as mpSvg from "../../../public/svg/mp.svg"
+import Image from "next/image";
 
 export type Invoice = {
   id: string;
-  date: string;
+  createdAt: string;
   amount: number;
-  method: "Stripe" | "MercadoPago";
+  provider: "stripe" | "mercado_pago";
   service: string;
-  status: "Pagado" | "Fallido";
+  expiredAt: string
 };
 
 export const InvoiceCard = ({ invoice }: { invoice: Invoice }) => {
-  const isStripe = invoice.method === "Stripe";
-  const MethodIcon = isStripe ? PiStripeLogoBold : PiCoinsBold;
+  const isStripe = invoice.provider === "stripe";
+  const providerText = isStripe ? "Stripe" : "Mercado Pago";
+  // const MethodIcon = isStripe ? PiStripeLogoBold : PiCoinsBold;
 
   const methodColor = isStripe
     ? "bg-purple-100 text-purple-700"
-    : "bg-yellow-100 text-yellow-800";
-
-  const statusColor =
-    invoice.status === "Pagado"
-      ? "bg-green-100 text-green-700"
-      : "bg-red-100 text-red-700";
-
-  const StatusIcon = invoice.status === "Pagado" ? FaCheckCircle : FaTimesCircle;
+    : "bg-blue-300 text-white";
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="bg-white border border-gray-100 ring-1 ring-blue-50 rounded-2xl shadow-sm hover:shadow-md transition-all p-5 flex flex-col justify-between h-full"
+   <motion.div
+  initial={{ opacity: 0, y: 10 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.3 }}
+  className="bg-white border border-gray-200 ring-1 ring-blue-50 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 flex flex-col justify-between h-full group hover:scale-[1.02] relative overflow-hidden"
+>
+  {/* Efecto de brillo sutil en el fondo */}
+  <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+  
+  <div className="flex justify-between items-start mb-6 relative z-10">
+    <div>
+      <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-900 transition-colors duration-300">
+        {invoice.service}
+      </h3>
+      <div className="flex items-center gap-2">
+        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+        <p className="text-sm text-gray-500 font-medium">Factura #{invoice.id}</p>
+      </div>
+    </div>
+    
+    <span
+      className={`text-sm font-bold py-2 rounded-xl flex items-center shadow-md hover:shadow-lg transition-all duration-300 ${
+        isStripe ? "gap-2 px-4" : "gap-2 px-4 pl-9"
+      } ${methodColor} relative overflow-hidden group/badge`}
     >
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <h3 className="text-lg font-bold text-gray-900">{invoice.service}</h3>
-          <p className="text-xs text-gray-500 italic mt-1">Factura #{invoice.id}</p>
-        </div>
-        <span
-          className={`text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1 ${methodColor}`}
-        >
-          <MethodIcon className="text-base" />
-          {invoice.method}
-        </span>
-      </div>
+      {/* Efecto de brillo en el badge */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover/badge:translate-x-full transition-transform duration-700"></div>
+      
+      {isStripe ? (
+        <PiStripeLogoBold className="text-lg relative z-10" />
+      ) : (
+        <Image 
+          src={mpSvg} 
+          width={12} 
+          height={12} 
+          alt="mp" 
+          className="scale-[4] absolute top-4.5 left-3.5 z-10" 
+        />
+      )}
+      <span className="relative z-10">{providerText}</span>
+    </span>
+  </div>
 
-      <div className="mt-2 space-y-1 text-sm text-gray-800">
-        <p>
-          <strong className="text-blue-900">Fecha:</strong> {invoice.date}
-        </p>
-        <p>
-          <strong className="text-blue-900">Monto:</strong>{" "}
-          <span className="text-emerald-700 font-semibold">
-            ${invoice.amount.toFixed(2)}
-          </span>
-        </p>
-        <span
-          className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full ${statusColor}`}
-        >
-          <StatusIcon className="text-sm" />
-          {invoice.status}
-        </span>
-      </div>
+  <div className="space-y-4 text-base text-gray-800 relative z-10">
+    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+      <span className="text-gray-600 font-medium">Fecha de inicio:</span>
+      <span className="font-semibold text-blue-900">{invoice.createdAt}</span>
+    </div>
+    
+    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+      <span className="text-gray-600 font-medium">Fecha de vencimiento:</span>
+      <span className="font-semibold text-blue-900">{invoice.expiredAt}</span>
+    </div>
+    
+    <div className="flex justify-between items-center py-3 bg-gradient-to-r from-emerald-50 to-green-50 rounded-xl px-4 mt-4">
+      <span className="text-gray-700 font-bold text-lg">Monto:</span>
+      <span className="text-emerald-700 font-bold text-xl">
+        ${Number(invoice.amount).toFixed(2)}
+      </span>
+    </div>
+  </div>
 
-      <button
-        className="mt-5 inline-flex items-center justify-center gap-2 bg-white border border-blue-600 text-blue-700 hover:bg-blue-50 transition px-4 py-2 rounded-full shadow-sm text-sm font-semibold"
-        onClick={() => downloadInvoicePdf(invoice.id)}
-      >
-        <FaFilePdf className="text-sm" />
-        Descargar PDF
-      </button>
-    </motion.div>
+  {/* Línea decorativa en la parte inferior */}
+  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+</motion.div>
   );
 };

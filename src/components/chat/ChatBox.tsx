@@ -53,6 +53,7 @@ const ChatBox = ({
   const [showContractForm, setShowContractForm] = useState(false);
   const [alreadyReviewed, setAlreadyReviewed] = useState(false);
 
+
   useEffect(() => {
     const checkReview = async () => {
       if (contract?.completed && userRole === "client") {
@@ -77,7 +78,7 @@ const ChatBox = ({
   }, [contract?.id, contract?.completed, userRole]);
 
   useEffect(() => {
-    setLocalMessages(messages);
+    setLocalMessages(messages)
     scrollToBottom();
   }, [messages]);
 
