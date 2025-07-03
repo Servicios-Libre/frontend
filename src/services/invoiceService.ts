@@ -1,27 +1,23 @@
 import axios from "axios";
 
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/api/invoices`;
+const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/stripe/invoices/user`;
 
 export const getInvoices = async ({
-  search,
-  method,
-  year,
+  provider,
   page,
   limit = 6,
 }: {
   search?: string;
-  method?: string;
-  year?: string;
+  provider?: string;
   page?: number;
   limit?: number;
-}): Promise<{ data: Invoice[]; total: number }> => {
+}) => {
   const token = localStorage.getItem("token");
+  console.log(token)
 
   const response = await axios.get(API_URL, {
     params: {
-      search,
-      method,
-      year,
+      provider,
       page,
       limit,
     },
