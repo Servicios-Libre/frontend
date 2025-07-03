@@ -40,7 +40,7 @@ export const updateSocialLinks = async (socialData: {
     if (socialData.twitter?.trim()) cleanedData.x = socialData.twitter.trim();
 
     const res = await api.put("/users/social", cleanedData);
-    
+
     return res.data;
   } catch (error) {
     console.error("Error al actualizar redes sociales:", error);
@@ -96,3 +96,13 @@ export const redirectToStripe = async () => {
     throw error;
   }
 };
+
+export async function checkIfUserIsWorker(id: string): Promise<boolean> {
+  try {
+    await api.get(`/users/worker/${id}`);
+    return true;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
+    return err.response?.status === 404 ? false : false;
+  }
+}

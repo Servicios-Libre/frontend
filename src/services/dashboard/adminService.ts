@@ -35,3 +35,7 @@ export const promoteToAdmin = async (userId: string): Promise<void> => {
 export const downgradeAdmin = async (userId: string): Promise<void> => {
     await api.put(`/users/downgrade-admin/${userId}`);
 };
+
+export const downgradeToUser = async (userId: string): Promise<void> => {
+  await api.put(`/users/to-user/${userId}`);
+};

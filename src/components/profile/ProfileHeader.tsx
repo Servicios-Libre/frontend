@@ -9,6 +9,7 @@ import EditNameModal from "@/components/profile/EditNameModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen } from "@fortawesome/free-solid-svg-icons";
 import { Crown } from "lucide-react";
+import { checkIfUserIsWorker } from "@/services/profileService";
 
 interface Props {
   userName: string;
@@ -57,15 +58,31 @@ export default function ProfileHeader({
   };
 
   const [loadingTicket, setLoadingTicket] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [ticketSuccess, setTicketSuccess] = useState(false);
   const [ticketError, setTicketError] = useState<string | null>(null);
   const [hasPendingRequest, setHasPendingRequest] = useState(false);
   const [hasAcceptedTicket, setHasAcceptedTicket] = useState(false);
   const [nameModalOpen, setNameModalOpen] = useState(false);
+  const [isWorker, setIsWorker] = useState<boolean | null>(null);
 
   const auth = useAuth();
   const user = auth?.user;
-  const userRole = user?.role;
+
+  useEffect(() => {
+    const verifyWorkerStatus = async () => {
+      try {
+        const result = await checkIfUserIsWorker(userId);
+        setIsWorker(result);
+      } catch (e) {
+        console.warn("No se pudo verificar si es worker (posiblemente por red):", e);
+      }
+    };
+
+    if (userId && isWorker === null) {
+      verifyWorkerStatus();
+    }
+  }, [userId, isWorker]);
 
   useEffect(() => {
     if (ticket?.type === "to-worker") {
@@ -209,45 +226,43 @@ export default function ProfileHeader({
             </div>
           </div>
 
-          {/* Tarjeta dorada si es worker */}
-          {userRole === "worker" && (
-            <Link href={`/worker-profile/${userId}`}>
-              <button className="bg-yellow-400 text-yellow-900 font-bold px-4 py-2 cursor-pointer rounded-lg shadow flex items-center gap-2 hover:bg-yellow-500 transition-colors">
-                <span>💼</span> Ver mi perfil de trabajador
-              </button>
-            </Link>
+          {isWorker === true && (
+            <div className="flex flex-col gap-2 items-center sm:items-start mt-2">
+              <Link href={`/worker-profile/${userId}`}>
+                <button className="bg-yellow-400 text-yellow-900 font-bold px-4 py-2 rounded-lg shadow flex items-center gap-2 hover:bg-yellow-500 transition-colors">
+                  <span>💼</span> Ver perfil de trabajador
+                </button>
+              </Link>
+            </div>
           )}
 
           {/* Botón de solicitar ser trabajador */}
-          {userRole !== "worker" && !hasAcceptedTicket && (
+          {isWorker === false && !hasAcceptedTicket && !hasPendingRequest && (
             <button
-              className={`px-4 py-2 rounded-md font-semibold transition-colors mt-2 sm:mt-0 cursor-pointer
-                ${!editMode && !hasUnsavedChanges
+              className={`px-4 py-2 rounded-md font-semibold transition-colors mt-2 sm:mt-0
+    ${!editMode && !hasUnsavedChanges
                   ? isComplete
-                    ? hasPendingRequest
-                      ? "bg-yellow-300 text-yellow-900 cursor-not-allowed"
-                      : "bg-green-500 hover:bg-green-600 text-white cursor-pointer"
-                    : "bg-gray-300 hover:bg-gray-400 text-gray-700 cursor-not-allowed"
+                    ? "bg-green-500 hover:bg-green-600 text-white"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
                   : "bg-gray-300 text-gray-400 cursor-not-allowed"
                 }`}
               disabled={
-                !isComplete ||
-                editMode ||
-                hasUnsavedChanges ||
-                loadingTicket ||
-                hasPendingRequest
+                !isComplete || editMode || hasUnsavedChanges || loadingTicket
               }
               onClick={handleRequestWorker}
             >
-              {loadingTicket
-                ? "Enviando..."
-                : ticketSuccess
-                  ? "Solicitud enviada"
-                  : hasPendingRequest
-                    ? "Solicitud pendiente"
-                    : "Solicitar ser trabajador"}
+              {loadingTicket ? "Enviando..." : "Solicitar ser trabajador"}
             </button>
           )}
+
+          {isWorker === false && (hasPendingRequest || hasAcceptedTicket) && (
+            <p className="text-blue-100 text-sm font-medium mt-2">
+              {hasPendingRequest
+                ? "Tu solicitud para ser trabajador está pendiente."
+                : "Tu solicitud fue aceptada. Ya puedes operar como trabajador."}
+            </p>
+          )}
+
           {ticketError && <p className="text-red-200 mt-2">{ticketError}</p>}
         </div>
       </div>

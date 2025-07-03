@@ -6,7 +6,6 @@ import {
   acceptWorkerRequest,
   rejectWorkerRequest,
 } from "@/services/dashboard/tickets";
-import { downgradeWorker } from "@/services/dashboard/worker";
 import { User, WorkerRequestTicket } from "@/types";
 import { useToast } from "@/context/ToastContext";
 import { FaUserCheck, FaUserCog } from "react-icons/fa";
@@ -19,6 +18,7 @@ import { RequestsList } from "@/components/dashboard/worker-menu/RequestsList";
 import { SearchInput } from "@/components/dashboard/SearchInput";
 import Pagination from "@/components/dashboard/Pagination";
 import MobileHeader from "@/components/dashboard/MobileHeader";
+import { downgradeToUser } from "@/services/dashboard/adminService";
 
 export default function WorkerManagementPage() {
   const {
@@ -76,7 +76,6 @@ export default function WorkerManagementPage() {
     if (!token || !isAdmin) {
       return;
     }
-    // El contexto ya carga las solicitudes, pero acá refrescamos para asegurarnos
     refreshWorkerRequests().catch(() => showToast("Error al cargar solicitudes", "error"));
   }, [token, isAdmin, refreshWorkerRequests, showToast, workerRequestsPage]);
 
@@ -121,7 +120,7 @@ export default function WorkerManagementPage() {
     if (!token || !isAdmin) return;
     setLoadingId(worker.id);
     try {
-      await downgradeWorker(worker.id);
+      await downgradeToUser(worker.id);
       showToast("Trabajador dado de baja", "success");
       await refreshUsers();
     } catch {
