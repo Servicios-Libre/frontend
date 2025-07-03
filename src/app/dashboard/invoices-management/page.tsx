@@ -37,7 +37,7 @@ export default function AdminInvoicesPage() {
       setLoading(true);
       try {
         const data = await fetchInvoices({
-          provider: "mercado_pago",
+          provider: undefined,
           year: year || "",
           page,
           limit,
