@@ -1,41 +1,3 @@
-import axios from "axios";
-
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/stripe/invoices/user`;
-
-export const getInvoices = async ({
-  provider,
-  page,
-  limit = 6,
-}: {
-  search?: string;
-  provider?: string;
-  page?: number;
-  limit?: number;
-}) => {
-  const token = localStorage.getItem("token");
-  console.log(token)
-
-  const response = await axios.get(API_URL, {
-    params: {
-      provider,
-      page,
-      limit,
-    },
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  return response.data;
-};
-
-export const downloadInvoicePdf = async (invoiceId: string) => {
-  const token = localStorage.getItem("token");
-  const pdfUrl = `${API_URL}/${invoiceId}/pdf`;
-
-  window.open(`${pdfUrl}?token=${token}`, "_blank");
-};
-
 import { useState, useEffect } from 'react';  
 import api from '@/services/axiosConfig';  
   
@@ -79,8 +41,43 @@ export const useInvoiceData = () => {
       } catch (err) {  
         setError('Error al cargar facturas');  
         console.error('Error loading invoices:', err);  
-        // Datos de ejemplo para desarrollo  
-        setInvoices([]);  
+        // Datos de ejemplo para desarrollo si falla la API  
+        setInvoices([  
+          {  
+            id: 1,  
+            externalReference: 'INV-001',  
+            amount: 2500,  
+            paymentMethod: 'tarjeta',  
+            paymentType: 'credit',  
+            createdAt: '2024-01-15T10:30:00Z',  
+            expiredAt: '2024-02-15T10:30:00Z',  
+            provider: 'stripe',  
+            user: {  
+              id: 'user1',  
+              email: 'user@example.com',  
+              name: 'Usuario Ejemplo',  
+              premium: true,  
+              created_at: '2024-01-01T00:00:00Z'  
+            }  
+          },  
+          {  
+            id: 2,  
+            externalReference: 'INV-002',  
+            amount: 1800,  
+            paymentMethod: 'efectivo',  
+            paymentType: 'cash',  
+            createdAt: '2024-02-10T14:20:00Z',  
+            expiredAt: '2024-03-10T14:20:00Z',  
+            provider: 'mercado_pago',  
+            user: {  
+              id: 'user2',  
+              email: 'user2@example.com',  
+              name: 'Usuario Regular',  
+              premium: false,  
+              created_at: '2024-01-15T00:00:00Z'  
+            }  
+          }  
+        ]);  
       } finally {  
         setLoading(false);  
       }  
