@@ -4,15 +4,20 @@ import Link from "next/link";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import axios from "axios";
 import { FaRegComments } from "react-icons/fa";
+import Image from "next/image";
+import { Crown } from "lucide-react";
+import LoadingScreen from "@/components/loading-screen/LoadingScreen"; // Asegúrate de tener este componente
 
 export default function ChatInboxPage() {
   const { user, token } = useAuthUser();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [chats, setChats] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     document.title = "Servicio Libre - Tus chats";
+    setMounted(true);
   }, []);
 
   useEffect(() => {
@@ -35,14 +40,9 @@ export default function ChatInboxPage() {
       .finally(() => setLoading(false));
   }, [user, token]);
 
-  if (!user)
-    return (
-      <div className="pt-24 text-center">
-        Debes iniciar sesión para ver tus chats.
-      </div>
-    );
-  if (loading)
-    return <div className="pt-24 text-center">Cargando chats...</div>;
+  if (!mounted || loading || !user) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-start pt-32 pb-16">
@@ -76,20 +76,35 @@ export default function ChatInboxPage() {
                   <div className="flex items-center gap-4">
                     {/* Avatar con inicial */}
                     <div className="relative w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg border border-blue-200">
-                      {chat.otherUsername?.[0]?.toUpperCase() || "?"}
+                      {chat.otherUserPic ? (
+                        <Image
+                          src={chat.otherUserPic}
+                          alt="avatar"
+                          width={40}
+                          height={40}
+                          className="object-cover w-10 h-10 rounded-full"
+                        />
+                      ) : (
+                        chat.otherUsername?.[0]?.toUpperCase() || "?"
+                      )}
                       {isUnread && (
                         <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-amber-500 rounded-full border border-white shadow-sm animate-pulse"></span>
                       )}
                     </div>
                     <div>
                       <div
-                        className={`font-semibold text-lg transition ${
-                          isUnread ? "text-blue-600" : "text-black"
+                        className={`font-semibold text-lg transition flex items-center gap-1 ${
+                          isUnread && "text-blue-600"
+                        } ${
+                          chat.otherUserPremium
+                            ? "bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-500 bg-clip-text text-transparent"
+                            : "text-black"
                         }`}
                       >
+                        {chat.otherUserPremium && <Crown className="w-4 h-4  text-amber-500"/>}
                         {chat.otherUsername}
                       </div>
-                      <div className="text-sm text-gray-500 truncate max-w-xs">
+                      <div className="text-sm text-gray-500 truncate max-w-xs ">
                         {chat.lastMessage?.message || (
                           <span className="italic text-gray-400">
                             Sin mensajes aún

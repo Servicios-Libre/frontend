@@ -185,13 +185,14 @@ export default function ProfileHeader({
         <button
           onClick={() => editMode && setNameModalOpen(true)}
           className={`flex items-center text-xl font-bold mb-1 gap-2
-            ${premium && editMode
-              ? "text-amber-300 hover:text-amber-200 cursor-pointer"
-              : editMode
+            ${
+              premium && editMode
+                ? "text-amber-300 hover:text-amber-200 cursor-pointer"
+                : editMode
                 ? "text-white hover:text-blu-200 cursor-pointer"
                 : premium
-                  ? "text-amber-300"
-                  : "text-white cursor-default"
+                ? "text-amber-300"
+                : "text-white cursor-default"
             }`}
           aria-label="Editar nombre"
           title={editMode ? "Editar nombre" : undefined}
@@ -206,13 +207,16 @@ export default function ProfileHeader({
           {userName}
           <FontAwesomeIcon
             icon={faPen}
-            className={`transition-colors ${editMode ? "text-white hover:text-blue-200" : "text-transparent"
-              }`}
+            className={`transition-colors ${
+              editMode ? "text-white hover:text-blue-200" : "text-transparent"
+            }`}
             style={{ fontSize: "1.25rem" }}
           />
         </button>
         <p className="text-blue-100 text-sm mb-2">
-          Puedes editar tu información personal
+          {user?.role === "user"
+            ? "Debes completar tu perfil al 100% si quieres solicitar ser trabajador"
+            : "Puedes editar tu información personal"}
         </p>
 
         <div className="flex flex-col items-center sm:items-start gap-3 w-full">
@@ -240,46 +244,49 @@ export default function ProfileHeader({
           )}
 
           {/* Botón de solicitar ser trabajador */}
-          {/* Si el usuario es admin, mostrar mensaje de restricción */}
-          {user?.role === "admin" && (
-            <p className="text-yellow-100 text-sm font-medium mt-2 bg-yellow-500/10 px-3 py-2 rounded">
-              Los administradores no pueden solicitar ser trabajadores.
-            </p>
-          )}
-
-          {/* Si no es admin y no es worker y no tiene solicitud aceptada o pendiente */}
-          {user?.role !== "admin" &&
-            isWorker === false &&
-            !hasAcceptedTicket &&
-            !hasPendingRequest && (
+          {userRole !== "worker" && !hasAcceptedTicket && (
+            <div className="relative group w-full">
               <button
-                className={`px-4 py-2 rounded-md font-semibold transition-colors mt-2 sm:mt-0
-        ${!editMode && !hasUnsavedChanges
-                    ? isComplete
-                      ? "bg-green-500 hover:bg-green-600 text-white"
-                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-gray-300 text-gray-400 cursor-not-allowed"
-                  }`}
+                className={`px-4 py-2 rounded-md font-semibold transition-colors mt-2 sm:mt-0 cursor-pointer
+      ${
+        !editMode && !hasUnsavedChanges
+          ? isComplete
+            ? hasPendingRequest
+              ? "bg-yellow-300 text-yellow-900 cursor-not-allowed"
+              : "bg-green-500 hover:bg-green-600 text-white cursor-pointer"
+            : "bg-gray-300 hover:bg-gray-400 text-gray-700 cursor-not-allowed"
+          : "bg-gray-300 text-gray-400 cursor-not-allowed"
+      }`}
                 disabled={
-                  !isComplete || editMode || hasUnsavedChanges || loadingTicket
+                  !isComplete ||
+                  editMode ||
+                  hasUnsavedChanges ||
+                  loadingTicket ||
+                  hasPendingRequest
                 }
                 onClick={handleRequestWorker}
               >
-                {loadingTicket ? "Enviando..." : "Solicitar ser trabajador"}
+                {loadingTicket
+                  ? "Enviando..."
+                  : ticketSuccess
+                  ? "Solicitud enviada"
+                  : hasPendingRequest
+                  ? "Solicitud pendiente"
+                  : "Solicitar ser trabajador"}
               </button>
-            )}
-
-          {/* Si tiene solicitud pendiente o aceptada */}
-          {user?.role !== "admin" &&
-            isWorker === false &&
-            (hasPendingRequest || hasAcceptedTicket) && (
-              <p className="text-blue-100 text-sm font-medium mt-2 bg-blue-500/10 px-3 py-2 rounded">
-                {hasPendingRequest
-                  ? "Tu solicitud para ser trabajador está pendiente de aprobación."
-                  : "Tu solicitud fue aceptada. Ya puedes operar como trabajador."}
-              </p>
-            )}
-
+              {/* Tooltip solo si el botón está habilitado */}
+              {isComplete &&
+                !editMode &&
+                !hasUnsavedChanges &&
+                !loadingTicket &&
+                !hasPendingRequest && (
+                  <span className="absolute left-1/2 -translate-x-1/2 -top-10 z-20 w-64 bg-gray-900 text-white text-xs rounded px-3 py-2 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 shadow-lg">
+                    La solicitud pasará por la aprobación de un administrador y
+                    podría tardar unas horas
+                  </span>
+                )}
+            </div>
+          )}
           {ticketError && <p className="text-red-200 mt-2">{ticketError}</p>}
         </div>
       </div>
