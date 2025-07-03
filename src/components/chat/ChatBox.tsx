@@ -108,7 +108,7 @@ const ChatBox = ({
         <div className="flex-1 flex items-center gap-4 bg-white rounded-xl shadow border border-blue-100 p-4">
           <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xl border-2 border-white shadow">
             {clientePic ? (
-              <Image src={clientePic} className="rounded-full" width={40} height={40} alt="Cliente" />
+              <Image src={clientePic} className="w-10 h-10 rounded-full object-cover" width={40} height={40} alt="Cliente" />
             ) : (
               clienteName.charAt(0).toUpperCase()
             )}
@@ -124,7 +124,7 @@ const ChatBox = ({
           <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-xl border-2 border-white shadow">
             {trabajadorPic ? (
               <Image
-              className="rounded-full"
+              className="w-10 h-10 rounded-full object-cover"
                 src={trabajadorPic}
                 width={40}
                 height={40}
