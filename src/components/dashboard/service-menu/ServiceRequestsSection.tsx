@@ -4,7 +4,7 @@ import { Ticket } from "@/types";
 import { useState } from "react";
 import ServiceRequestsTable from "@/components/dashboard/service-menu/ServicesRequestsTable";
 import ServiceRequestDetailModal from "@/components/dashboard/service-menu/ServiceRequestDetailModal";
-import Pagination from "@/components/dashboard/Pagination";
+import Pagination from "@/components/ui/Pagination";
 import { useAdminContext } from "@/context/AdminContext";
 
 interface Props {

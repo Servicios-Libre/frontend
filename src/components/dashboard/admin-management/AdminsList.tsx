@@ -3,7 +3,7 @@ import { useState } from "react";
 import { User } from "@/types";
 import Image from "next/image";
 import { FaUserShield } from "react-icons/fa";
-import Pagination from "@/components/dashboard/Pagination"; // Ajusta path si es necesario
+import Pagination from "@/components/ui/Pagination"; // Ajusta path si es necesario
 import { SkeletonCard } from "@/components/ui/skeleton/SkeletonCard";
 
 type Props = {
@@ -109,7 +109,6 @@ export default function AdminsList({ admins, onRevokeAdmin, loading }: Props) {
                     totalPages={totalPages}
                     currentPage={currentPage}
                     onPageChange={onPageChange}
-                    maxButtons={7}
                 />
             </section>
 

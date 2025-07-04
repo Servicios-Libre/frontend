@@ -3,8 +3,6 @@ import { User } from "@/types";
 
 export async function searchUserByEmail(email: string): Promise<User | null> {
 
-    console.log(email);
-
     const res = await api.get("/users", {
         params: {
             search: email,
@@ -13,8 +11,6 @@ export async function searchUserByEmail(email: string): Promise<User | null> {
             page: 1,
         },
     });
-
-    console.log(res.data.users);
 
     return res.data.users[0] || null;
 }

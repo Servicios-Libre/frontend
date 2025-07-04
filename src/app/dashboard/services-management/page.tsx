@@ -13,7 +13,7 @@ import {
 } from "@/services/dashboard/tickets";
 import { dropService } from "@/services/dashboard/services";
 import { useToast } from "@/context/ToastContext";
-import { FaTools, FaClipboardList } from "react-icons/fa"; // Íconos para títulos
+import { FaTools, FaClipboardList } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
 import { LoadingScreen } from "@/components/dashboard/LoadingScreen";
 

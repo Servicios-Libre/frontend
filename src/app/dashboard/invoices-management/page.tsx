@@ -8,7 +8,7 @@ import MobileHeader from "@/components/dashboard/MobileHeader";
 import { useAuth } from "@/context/AuthContext";
 import { LoadingScreen } from "@/components/dashboard/LoadingScreen";
 import { FaTools } from "react-icons/fa";
-import Pagination from "@/components/dashboard/Pagination";
+import Pagination from "@/components/ui/Pagination";
 
 export default function AdminInvoicesPage() {
   const [invoices, setInvoices] = useState([]);

@@ -14,7 +14,6 @@ interface Props {
 }
 
 export default function WorkerHeader({ user }: Props) {
-  console.log(user.address)
   return (
     <div className="flex flex-col items-center gap-6 text-left text-blue-100 px-4 sm:px-0 max-w-sm mx-auto">
       {/* Foto */}

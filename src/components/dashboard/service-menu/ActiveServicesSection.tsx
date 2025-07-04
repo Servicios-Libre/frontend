@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { SearchInput } from "@/components/dashboard/SearchInput";
-import Pagination from "../Pagination";
+import Pagination from "../../ui/Pagination";
 import ActiveServicesTable from "./ActiveServicesTable";
 import { useAdminContext } from "@/context/AdminContext";
 import { Servicio } from "@/types";
