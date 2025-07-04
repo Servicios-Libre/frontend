@@ -11,8 +11,6 @@ import { useRouter } from "next/navigation";
 
 
 const PremiumSection = () => {
-//   const { isPremium } = useAuth()
-//   console.log("acacaac", isPremium)
   const router = useRouter()
   const { user } = useAuth()
   return (

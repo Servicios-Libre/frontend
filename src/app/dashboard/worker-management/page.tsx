@@ -16,7 +16,7 @@ import { LoadingScreen } from "@/components/dashboard/LoadingScreen";
 import { WorkersList } from "@/components/dashboard/worker-menu/WorkersList";
 import { RequestsList } from "@/components/dashboard/worker-menu/RequestsList";
 import { SearchInput } from "@/components/dashboard/SearchInput";
-import Pagination from "@/components/dashboard/Pagination";
+import Pagination from "@/components/ui/Pagination";
 import MobileHeader from "@/components/dashboard/MobileHeader";
 import { downgradeToUser } from "@/services/dashboard/adminService";
 

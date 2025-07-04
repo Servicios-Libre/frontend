@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import BannerServicios from "@/components/banner-servicios/BannerServicios";
 import SearchAndFilter from "@/components/servicios/search-filter/SearchAndFilter";
 import ServicesGrid from "@/components/servicios/services-grid/ServicesGrid";
-import Pagination from "@/components/ui/pagination-services/PaginationServices";
+import Pagination from "@/components/ui/Pagination";
 import NoResults from "@/components/ui/no-results/NoResults";
 import InformacionServicios from "@/components/ui/sections/informacio-servicios/InformacioServicios";
 import PerfilesDestacados from "@/components/servicios/perfiles-destacados/PerfilesDestacados";
@@ -125,7 +125,9 @@ export default function ServiciosPage() {
                 <Pagination
                   totalPages={totalPaginas}
                   currentPage={paginaActual}
-                  setPage={setPaginaActual}
+                  onPageChange={setPaginaActual}
+                  variant="default"
+                  size="default"
                 />
               )}
             </>

@@ -13,7 +13,6 @@ export const getInvoices = async ({
   limit?: number;
 }) => {
   const token = localStorage.getItem("token");
-  console.log(token)
 
   const response = await axios.get(API_URL, {
     params: {

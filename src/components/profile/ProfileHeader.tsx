@@ -69,8 +69,6 @@ export default function ProfileHeader({
       try {
         const result = await checkIfUserIsWorker(userId);
         setIsWorker(result);
-        if (result) return console.log("debería mostrar el boton de worker")
-        if (!result) return console.log("No debería mostrar el boton de worker")
 
       } catch (e) {
         console.warn("No se pudo verificar si es worker (posiblemente por red):", e);

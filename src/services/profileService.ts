@@ -7,7 +7,6 @@ export const getProfile = async () => {
 };
 
 export const updateProfile = async (data: object): Promise<void> => {
-  console.log("[datos para actualizar el usuario]:", data);
 
   await api.put(`/users/update/`, data);
 };

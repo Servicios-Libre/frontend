@@ -57,7 +57,6 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
     getWorkerById(id)
       .then((data) => {
         setUser(data);
-        console.log(data);
         
         setLoading(false);
 

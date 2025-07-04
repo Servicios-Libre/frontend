@@ -57,7 +57,6 @@ const ContractView = ({ contract, onAccept, onCancel }: ContractViewProps) => {
           </button>
           <button
             onClick={() => {
-              console.log("👆 Se hizo clic en Aceptar Contrato");
               onAccept();
             }}
             className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg"
