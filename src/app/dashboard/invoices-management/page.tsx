@@ -67,12 +67,6 @@ export default function AdminInvoicesPage() {
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-[#1A1443] text-white">
-      {isSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-30 z-40 lg:hidden"
-          onClick={() => setIsSidebarOpen(false)}
-        />
-      )}
 
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       <MobileHeader onOpenSidebar={() => setIsSidebarOpen(true)} />

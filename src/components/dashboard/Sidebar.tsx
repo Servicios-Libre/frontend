@@ -13,7 +13,7 @@ import {
   FaSignOutAlt,
   FaTimes,
 } from "react-icons/fa";
-import { useAdminContext} from "@/context/AdminContext";
+import { useAdminContext } from "@/context/AdminContext";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 
@@ -57,9 +57,14 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 w-64 bg-gradient-to-t from-purple-700 to-indigo-800 min-h-screen
-                   transform transition-transform duration-300 ease-in-out z-50
-                   ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 lg:static lg:shadow-xl`}
+        className={`
+    bg-gradient-to-t from-purple-700 to-indigo-800 w-64 min-h-screen
+    transform transition-transform duration-300 ease-in-out z-50
+
+    fixed inset-y-0 left-0 lg:sticky lg:top-0 lg:h-[calc(100vh)] lg:shadow-xl
+
+    ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 lg:static
+  `}
       >
         <div className="p-6 flex justify-between items-start">
           <Image
