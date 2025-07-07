@@ -94,13 +94,6 @@ export default function ServicesMenuPage() {
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-indigo-950 text-white">
-      {/* Overlay móvil */}
-      {isSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-30 z-40 lg:hidden"
-          onClick={() => setIsSidebarOpen(false)}
-        />
-      )}
 
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       <MobileHeader onOpenSidebar={() => setIsSidebarOpen(true)} />

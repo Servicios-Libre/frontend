@@ -8,9 +8,7 @@ import {
   FaUsers,
   FaUserShield,
   FaUserTie,
-  FaArrowRight,
 } from "react-icons/fa";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useAdminContext } from "@/context/AdminContext";
 import { useAuth } from "@/context/AuthContext";
@@ -19,6 +17,9 @@ import MobileHeader from "@/components/dashboard/MobileHeader";
 import RoleDistributionChart from "@/components/dashboard/charts/RoleDistributionChart";
 import SystemActivityChart from "@/components/dashboard/charts/SystemActivityChart";
 import StatsBarChart from "@/components/dashboard/charts/ServicesCategoryChart";
+import StatCard from "@/components/dashboard/cards/StatCard";
+import QuickAccessCard from "@/components/dashboard/cards/QuickAccessCard";
+
 
 export default function DashboardPage() {
   const { users, loading, acceptedServiceCount } = useAdminContext();
@@ -51,7 +52,7 @@ export default function DashboardPage() {
             Panel de Administración
           </h1>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12">
             <StatCard
               icon={<FaUsers />}
               value={totalRegularUsers}
@@ -126,65 +127,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-interface StatCardProps {
-  icon: React.ReactNode;
-  value: number;
-  label: string;
-  bgColor: string;
-  iconColor: string;
-  valueColor: string;
-}
-
-const StatCard: React.FC<StatCardProps> = ({
-  icon,
-  value,
-  label,
-  bgColor,
-  iconColor,
-  valueColor,
-}) => (
-  <div
-    className={`${bgColor} rounded-xl shadow-xl p-6 flex flex-col items-center justify-center transform transition-all duration-300 hover:scale-[1.02] cursor-pointer`}
-  >
-    <div className={`${iconColor} text-5xl mb-3`}>{icon}</div>
-    <span className={`${valueColor} text-5xl font-extrabold mb-2`}>
-      {value}
-    </span>
-    <span className="text-gray-200 text-lg font-medium text-center">
-      {label}
-    </span>
-  </div>
-);
-
-interface QuickAccessCardProps {
-  href: string;
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  hoverColor: string;
-}
-
-const QuickAccessCard: React.FC<QuickAccessCardProps> = ({
-  href,
-  icon,
-  title,
-  description,
-  hoverColor,
-}) => (
-  <Link
-    href={href}
-    className={`bg-indigo-800 rounded-xl shadow-xl p-6 flex items-center justify-between transition-all duration-300 transform hover:scale-[1.02] ${hoverColor} group`}
-  >
-    <div>
-      <div className="flex items-center gap-3 mb-2">
-        <div className="text-white text-3xl group-hover:scale-110 transition-transform duration-200">
-          {icon}
-        </div>
-        <span className="font-bold text-xl text-white">{title}</span>
-      </div>
-      <span className="text-gray-300 text-base">{description}</span>
-    </div>
-    <FaArrowRight className="text-gray-400 text-3xl group-hover:text-white transition-all duration-200" />
-  </Link>
-);

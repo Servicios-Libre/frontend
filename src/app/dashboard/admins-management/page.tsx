@@ -109,14 +109,6 @@ export default function AdminUsersPage() {
 
     return (
         <div className="min-h-screen flex flex-col lg:flex-row bg-indigo-950 text-white">
-            {/* Overlay móvil */}
-            {isSidebarOpen && (
-                <div
-                    className="fixed inset-0 bg-black bg-opacity-40 z-40 lg:hidden"
-                    onClick={() => setIsSidebarOpen(false)}
-                    aria-hidden="true"
-                />
-            )}
 
             <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
             <MobileHeader onOpenSidebar={() => setIsSidebarOpen(true)} />
