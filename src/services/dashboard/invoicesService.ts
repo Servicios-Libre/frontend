@@ -9,7 +9,7 @@ export const fetchInvoices = async (params: {
 }) => {
   const { provider, year, page, limit } = params;
 
-  const response = await axiosConfig.get("/stripe/invoices", {
+  const response = await axiosConfig.get("/invoices", {
     params: {
       provider,
       year,

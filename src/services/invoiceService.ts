@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/stripe/invoices/user`;
+const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/invoices/worker`;
 
 export const getInvoices = async ({
   provider,

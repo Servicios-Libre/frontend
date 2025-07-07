@@ -36,7 +36,7 @@ export const useInvoiceData = () => {
     const loadInvoices = async () => {  
       try {  
         setLoading(true);  
-        const response = await api.get('/stripe/invoices?page=1&limit=100');  
+        const response = await api.get('/invoices?page=1&limit=100');  
         setInvoices(response.data.invoices || []);  
       } catch (err) {  
         setError('Error al cargar facturas');  
