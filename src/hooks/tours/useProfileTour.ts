@@ -1,6 +1,7 @@
 import { driver, DriveStep } from "driver.js";
 import "driver.js/dist/driver.css";
 import { useEffect } from "react";
+import "@/styles/driver-custom-styles.css";
 
 export const useProfileTour = (isWorker: boolean | null) => {
   const steps: DriveStep[] = [
@@ -71,8 +72,21 @@ export const useProfileTour = (isWorker: boolean | null) => {
 
   const startProfileTour = () => {
     const driverInstance = driver({
+      doneBtnText: "Finalizar",
+      nextBtnText: "Siguiente",
+      prevBtnText: "Anterior",
+      progressText: "{{current}} de {{total}}",
+      popoverClass: "driver-popover-custom",
       showProgress: true,
+      smoothScroll: true,
+      allowClose: true,
       animate: true,
+      onPopoverRender: (popover) => {
+        const title = popover.title;
+        if (title) {
+          title.style.background = "linear-gradient(135deg, #4285f4 0%, #3367d6 100%)";
+        }
+      },
       onDestroyed: () => {
         localStorage.setItem("profileTourCompleted", "true");
       },
@@ -89,6 +103,7 @@ export const useProfileTour = (isWorker: boolean | null) => {
       }, 1000);
       return () => clearTimeout(timer);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return { startProfileTour }
