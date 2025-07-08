@@ -38,6 +38,7 @@ export default function WorkerManagementPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [requestProfile, setRequestProfile] = useState<User | null>(null);
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+  const [disabledUserIds, setDisabledUserIds] = useState<string[]>([]);
   const { showToast } = useToast();
 
   const [currentWorkerPage, setCurrentWorkerPage] = useState(1);
@@ -52,6 +53,10 @@ export default function WorkerManagementPage() {
     worker.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     worker.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const disableUserButton = (userId: string) => {
+    setDisabledUserIds((prev) => [...prev, userId]);
+  };
 
   // Paginación local para workers activos
   const totalWorkerPages = Math.ceil(filteredWorkers.length / workersPerPage);
@@ -147,7 +152,7 @@ export default function WorkerManagementPage() {
       {/* Header mobile */}
       <MobileHeader onOpenSidebar={() => setIsSidebarOpen(true)} />
 
-      <main className="flex-1 p-6 md:p-10 text-white">
+      <main className="flex-1 p-6 text-white">
 
         {/* Título principal */}
         <h1 className="text-3xl font-bold mb-10 flex items-center gap-3">
@@ -172,6 +177,7 @@ export default function WorkerManagementPage() {
           <RequestsList
             requests={paginatedRequests}
             onViewProfile={handleViewRequestProfile}
+            disabledUserIds={disabledUserIds}
           />
 
           <Pagination
@@ -215,6 +221,7 @@ export default function WorkerManagementPage() {
           user={requestProfile}
           open={isRequestModalOpen}
           onClose={() => setIsRequestModalOpen(false)}
+          onStartProcessing={disableUserButton}
           onAccept={(userId) => {
             const ticket = workerRequests.find((t) => t.user.id === userId);
             if (ticket) handleAccept(ticket);

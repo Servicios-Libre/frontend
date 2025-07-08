@@ -71,7 +71,7 @@ export default function AdminInvoicesPage() {
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       <MobileHeader onOpenSidebar={() => setIsSidebarOpen(true)} />
 
-      <main className="flex-1 p-6 sm:p-6">
+      <main className="flex-1 p-6 sm:p-6 ">
         <div className="mb-6">
           <h1 className="text-3xl font-bold flex items-center gap-3">
             <FaTools className="text-indigo-400" />

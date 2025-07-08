@@ -118,14 +118,21 @@ export default function AdminUsersPage() {
             <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
             <MobileHeader onOpenSidebar={() => setIsSidebarOpen(true)} />
 
-            <main className="flex-1 p-6 md:p-10 flex justify-center">
-                <div className="w-full max-w-screen-xl">
-                    <h2 className="text-2xl font-semibold flex items-center gap-2 mb-4">
-                        <FaClipboardList className="text-emerald-400" /> Dar de alta administradores.
-                    </h2>
+            <main className="flex-1 p-6 flex justify-center">
+
+                <div className="w-full max-w-screen-7xl">
+
+                    <h2 className="text-2xl font-semibold flex items-center gap-2 mb-6">
+                <FaClipboardList className="text-emerald-400" /> Gestión de administradores.
+            </h2>
 
                     <section className="mb-12 rounded-lg bg-indigo-800 p-6 shadow-lg border border-indigo-700">
+                        <h2 className="text-2xl font-semibold flex items-center gap-2 mb-6">
+                            <FaClipboardList className="text-emerald-400" /> Dar de alta administradores.
+                        </h2>
                         <div className="flex flex-col sm:flex-row gap-3 items-stretch">
+
+
                             <div className="flex-1">
                                 <SearchInput
                                     searchTerm={searchEmail}

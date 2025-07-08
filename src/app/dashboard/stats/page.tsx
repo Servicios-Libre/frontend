@@ -43,7 +43,7 @@ export default function StatsPage() {
       <div className="flex-1 flex flex-col">  
         <MobileHeader onOpenSidebar={() => setIsSidebarOpen(true)} />  
   
-        <main className="flex-1 p-8 text-white">  
+        <main className="flex-1 p-6 text-white">  
           <div className="mb-8">  
             <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">  
               <FaCrown className="text-amber-400" />  
