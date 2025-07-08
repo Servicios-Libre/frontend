@@ -47,7 +47,7 @@ export default function DashboardPage() {
       <div className="flex-1 flex flex-col">
         <MobileHeader onOpenSidebar={() => setIsSidebarOpen(true)} />
 
-        <main className="flex-1 p-8 text-white">
+        <main className="flex-1 p-6 text-white">
           <h1 className="hidden lg:block text-3xl font-bold mb-8 tracking-wide">
             Panel de Administración
           </h1>
