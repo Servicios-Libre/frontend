@@ -25,17 +25,25 @@ export default function ChatDemo() {
   const [loading, setLoading] = useState(true);
   const [showContractForm, setShowContractForm] = useState(false);
 
-  const { chats, loadingChats, fetchChats } = useChatSidebar(token || "", user?.id || "");
-  const { sendMessageToBackend, createContract, acceptContract, confirmService } = useChatBackend(
-    chatId,
+  const { chats, loadingChats, fetchChats } = useChatSidebar(
     token || "",
     user?.id || ""
   );
+  const {
+    sendMessageToBackend,
+    createContract,
+    acceptContract,
+    confirmService,
+  } = useChatBackend(chatId, token || "", user?.id || "");
 
   const [user1, setUser1] = useState<any>(null);
   const [user2, setUser2] = useState<any>(null);
 
-  const { trabajador, cliente, userRole } = useChatData(user1, user2, user?.id || "");
+  const { trabajador, cliente, userRole } = useChatData(
+    user1,
+    user2,
+    user?.id || ""
+  );
 
   useChatSocket({
     chatId,
@@ -84,8 +92,14 @@ export default function ChatDemo() {
         axios
           .get(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/contract`, {
             params: {
-              worker: res.data.user1.role === "worker" ? res.data.user1.id : res.data.user2.id,
-              client: res.data.user1.role === "user" ? res.data.user1.id : res.data.user2.id,
+              worker:
+                res.data.user1.role === "worker"
+                  ? res.data.user1.id
+                  : res.data.user2.id,
+              client:
+                res.data.user1.role === "user"
+                  ? res.data.user1.id
+                  : res.data.user2.id,
             },
             headers: {
               Authorization: `Bearer ${token}`,
@@ -116,12 +130,21 @@ export default function ChatDemo() {
 
   const handleConfirmService = async () => {
     if (!contract) return;
-    const confirmed = await confirmService(contract.id, cliente.id, trabajador.id);
+    const confirmed = await confirmService(
+      contract.id,
+      cliente.id,
+      trabajador.id
+    );
     if (confirmed) setContract(confirmed);
   };
 
   if (!user || loadingChats) return <LoadingScreen />;
-  if (!userRole) return <p className="text-center text-red-500">Error: No se pudo determinar el rol del usuario.</p>;
+  if (!userRole)
+    return (
+      <p className="text-center text-red-500">
+        Error: No se pudo determinar el rol del usuario.
+      </p>
+    );
 
   return (
     <div className="min-h-screen flex bg-[#ece5dd] overflow-x-auto overflow-y-hidden">
@@ -132,9 +155,13 @@ export default function ChatDemo() {
         </div>
         <div className="flex-1 overflow-y-auto">
           {loadingChats ? (
-            <div className="text-center py-8 text-gray-500">Cargando chats...</div>
+            <div className="text-center py-8 text-gray-500">
+              Cargando chats...
+            </div>
           ) : chats.length === 0 ? (
-            <div className="text-center py-8 text-gray-400">No tienes chats activos.</div>
+            <div className="text-center py-8 text-gray-400">
+              No tienes chats activos.
+            </div>
           ) : (
             <ul className="divide-y divide-gray-100">
               {chats.map((chat) => {
@@ -147,7 +174,13 @@ export default function ChatDemo() {
                   <li
                     key={chat.id}
                     className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition 
-                      ${chat.id === chatId ? "bg-blue-100/60" : isUnread ? "bg-amber-50" : ""}
+                      ${
+                        chat.id === chatId
+                          ? "bg-blue-100/60"
+                          : isUnread
+                          ? "bg-amber-50"
+                          : ""
+                      }
                       hover:bg-blue-50`}
                     onClick={() => router.push(`/chat/${chat.id}`)}
                   >
@@ -170,17 +203,24 @@ export default function ChatDemo() {
 
                     <div
                       className={`${
-                        chat.otherUserId === trabajador.id && chat.otherUserPremium
+                        chat.otherUserId === trabajador.id &&
+                        chat.otherUserPremium
                           ? "bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-500 bg-clip-text text-transparent"
                           : "text-black"
                       } flex-1 min-w-0`}
                     >
-                      <div className={`font-semibold truncate ${isUnread ? "text-blue-600" : ""}`}>
+                      <div
+                        className={`font-semibold truncate ${
+                          isUnread ? "text-blue-600" : ""
+                        }`}
+                      >
                         {chat.otherUsername}
                       </div>
                       <div className="text-xs text-gray-500 truncate">
                         {chat.lastMessage?.message || (
-                          <span className="italic text-gray-400">Sin mensajes aún</span>
+                          <span className="italic text-gray-400">
+                            Sin mensajes aún
+                          </span>
                         )}
                       </div>
                     </div>
@@ -194,7 +234,7 @@ export default function ChatDemo() {
 
       {/* Panel derecho */}
       <section className="flex-1 flex flex-col h-screen pt-20 overflow-hidden">
-        {!loading && (
+        {!loading && user1 && user2 && userRole ? (
           <ChatBox
             chatId={chatId}
             messages={messages}
@@ -215,6 +255,8 @@ export default function ChatDemo() {
             trabajadorPic={trabajador.pic}
             trabajadorPremium={!!trabajador.premium}
           />
+        ) : (
+          <LoadingScreen />
         )}
       </section>
     </div>
