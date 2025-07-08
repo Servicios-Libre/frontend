@@ -44,12 +44,12 @@ export default function AdminsList({ admins, onRevokeAdmin, loading }: Props) {
 
     return (
         <>
-            <section className="rounded-lg bg-indigo-800 p-6 shadow-lg border border-indigo-700">
-                <h2 className="text-2xl font-semibold mb-6 flex items-center gap-2">
-                    <FaUserShield className="text-emerald-400" /> Usuarios Admin actuales
+            <section className="mb-8 rounded-xl bg-indigo-800 p-5 shadow-xl border border-indigo-700 md:p-6 lg:p-8">
+                <h2 className="text-xl font-bold mb-5 flex items-center gap-2 text-white md:text-2xl">
+                    <FaUserShield className="text-emerald-400 text-2xl md:text-3xl" /> Usuarios Admin actuales
                 </h2>
 
-                <div className="mb-4">
+                <div className="mb-6">
                     <input
                         value={searchTerm}
                         onChange={(e) => {
@@ -57,45 +57,45 @@ export default function AdminsList({ admins, onRevokeAdmin, loading }: Props) {
                             setCurrentPage(1); // Resetear a página 1 al buscar
                         }}
                         placeholder="Buscar por nombre o email..."
-                        className="w-full p-2 rounded bg-white text-gray-800"
+                        className="w-full p-2.5 rounded-lg bg-white text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all duration-200"
                     />
                 </div>
 
                 {loading ? (
-                    <ul className="space-y-3">
+                    <ul className="grid grid-cols-1 gap-3">
                         {Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => (
                             <SkeletonCard key={i} />
                         ))}
                     </ul>
                 ) : visibleAdmins.length === 0 ? (
-                    <p>No se encontraron administradores.</p>
+                    <p className="text-center text-white/80 py-4">No se encontraron administradores.</p>
                 ) : (
-                    <ul className="space-y-3 max-h-80 overflow-auto">
+                    <ul className="grid grid-cols-1 gap-3">
                         {visibleAdmins.map((admin) => (
                             <li
                                 key={admin.id}
-                                className="p-3 bg-indigo-700 rounded flex justify-between items-center shadow-sm gap-4"
+                                className="p-3 bg-indigo-700 rounded-lg flex flex-col sm:flex-row justify-between items-center shadow-md gap-3 sm:gap-4 text-white"
                             >
-                                <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-3 w-full sm:w-auto">
                                     <div className="h-10 w-10 rounded-full overflow-hidden border-2 border-indigo-500 flex-shrink-0">
                                         <Image
                                             src={admin.user_pic || "/img/avatar.jpg"}
-                                            alt={admin.name}
+                                            alt={admin.name || "Usuario"}
                                             width={40}
                                             height={40}
                                             className="object-cover"
                                         />
                                     </div>
 
-                                    <div>
-                                        <p className="font-semibold">{admin.name}</p>
-                                        <p className="text-sm text-indigo-200">{admin.email}</p>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="font-semibold truncate">{admin.name}</p>
+                                        <p className="text-sm text-indigo-200 truncate">{admin.email}</p>
                                     </div>
                                 </div>
 
                                 <button
                                     onClick={() => openModal(admin)}
-                                    className="text-sm px-3 py-1 bg-red-600 hover:bg-red-500 text-white rounded font-semibold"
+                                    className="w-full sm:w-auto text-sm px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-semibold transition-all duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-indigo-700"
                                 >
                                     Dar de baja
                                 </button>
@@ -105,11 +105,15 @@ export default function AdminsList({ admins, onRevokeAdmin, loading }: Props) {
                 )}
 
                 {/* Paginación */}
-                <Pagination
-                    totalPages={totalPages}
-                    currentPage={currentPage}
-                    onPageChange={onPageChange}
-                />
+                {totalPages > 1 && ( // Mostrar paginación solo si hay más de una página
+                    <div className="mt-6">
+                        <Pagination
+                            totalPages={totalPages}
+                            currentPage={currentPage}
+                            onPageChange={onPageChange}
+                        />
+                    </div>
+                )}
             </section>
 
             {/* Modal de confirmación */}

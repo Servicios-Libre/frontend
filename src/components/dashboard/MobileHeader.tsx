@@ -15,7 +15,7 @@ export default function MobileHeader({ onOpenSidebar }: MobileHeaderProps) {
         alt="logo"
         width={120}
         height={120}
-        className="object-contain filter brightness-125"
+        className="object-contain filter brightness-125 ml-1"
       />
       <button
         onClick={onOpenSidebar}

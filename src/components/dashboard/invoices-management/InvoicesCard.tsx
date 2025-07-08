@@ -1,6 +1,5 @@
 // components/dashboard/invoices-management/InvoiceCard.tsx
 import Image from "next/image";
-import Link from "next/link";
 
 interface InvoiceCardProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -8,7 +7,7 @@ interface InvoiceCardProps {
 }
 
 export default function InvoiceCard({ invoice }: InvoiceCardProps) {
-    const { externalReference, amount, createdAt, expiredAt, user, id } = invoice;
+    const { externalReference, amount, createdAt, expiredAt, user } = invoice;
     const { name, email, user_pic, address_id } = user;
 
     return (
@@ -64,11 +63,9 @@ export default function InvoiceCard({ invoice }: InvoiceCardProps) {
                     <p className="text-xl font-extrabold text-green-300">${amount} <span className="text-sm">ARS</span></p>
                 </div>
 
-                <Link href={`/admin/invoices/${id}`}>
-                    <span className="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 text-yellow-900 font-bold text-sm px-4 py-1.5 rounded-md shadow-md hover:brightness-110 transition cursor-pointer inline-block">
-                        Membresía premium
-                    </span>
-                </Link>
+                <span className="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 text-yellow-900 font-bold text-sm px-4 py-1.5 rounded-md shadow-md hover:brightness-110 transition cursor-pointer inline-block">
+                    Membresía premium
+                </span>
             </div>
         </div>
     );
