@@ -312,7 +312,10 @@ export default function ProfileHeader({
           onClose={() => setNameModalOpen(false)}
         />
       )}
-      {!editMode &&<HelpTourButton startTour={startProfileTour} />}
+      {!editMode && (
+        <div className="absolute bottom-7 right-14 z-10">
+        <HelpTourButton startTour={startProfileTour} />
+        </div>)}
     </div>
   );
 }

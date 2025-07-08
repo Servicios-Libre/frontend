@@ -66,6 +66,7 @@ export default function WorkerServiceCard({
         {isOwner && (
           <>
             <button
+              id="edit-service-button"
               onClick={(e) => {
                 e.stopPropagation();
                 onEdit(service);
@@ -78,6 +79,7 @@ export default function WorkerServiceCard({
             </button>
 
             <button
+            id="delete-service-button"
               onClick={(e) => {
                 e.stopPropagation();
                 onDelete(service); // <-- Aquí
@@ -98,7 +100,9 @@ export default function WorkerServiceCard({
         <span className="text-xs text-blue-600 font-medium mt-auto mb-4">{service.category.name}</span>
 
         {isOwner && (
-          <div className="absolute bottom-2 right-2 z-20 group">
+          <div 
+          id="service-status"
+          className="absolute bottom-2 right-2 z-20 group">
             <span
               className={`px-3 py-1 rounded-full text-xs font-semibold select-none ${currentStatus.bg} ${currentStatus.textColor}`}
             >
