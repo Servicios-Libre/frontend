@@ -11,10 +11,30 @@ type Props = {
   onClose: () => void;
   onAccept: (userId: string) => void;
   onReject: (userId: string) => void;
+  onStartProcessing: (userId: string) => void;
 };
 
-export default function RequestProfileModal({ user, open, onClose, onAccept, onReject }: Props) {
+export default function RequestProfileModal({
+  user,
+  open,
+  onClose,
+  onAccept,
+  onReject,
+  onStartProcessing,
+}: Props) {
   if (!open || !user) return null;
+
+  const handleAccept = () => {
+    onStartProcessing(user.id); // 🔒 Desactiva botón "Ver perfil"
+    onClose();                  // ❌ Cierra modal
+    onAccept(user.id);          // ✅ Procesa en segundo plano
+  };
+
+  const handleReject = () => {
+    onStartProcessing(user.id); // 🔒 Desactiva botón "Ver perfil"
+    onClose();                  // ❌ Cierra modal
+    onReject(user.id);          // ❌ Procesa en segundo plano
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex justify-center items-center p-4">
@@ -56,20 +76,14 @@ export default function RequestProfileModal({ user, open, onClose, onAccept, onR
 
           <div className="flex justify-center gap-4">
             <button
-              onClick={() => {
-                onReject(user.id);
-                onClose();
-              }}
+              onClick={handleReject}
               className="px-5 py-2 rounded bg-red-600 text-white hover:bg-red-700 shadow-md transition"
             >
               Rechazar
             </button>
 
             <button
-              onClick={() => {
-                onAccept(user.id);
-                onClose();
-              }}
+              onClick={handleAccept}
               className="px-5 py-2 rounded bg-green-600 text-white hover:bg-green-700 shadow-md transition"
             >
               Aceptar

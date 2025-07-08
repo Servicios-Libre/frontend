@@ -29,7 +29,6 @@ export default function ConfirmModal({
                     className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
                     aria-label="Cerrar modal"
                 >
-                    {/* Puedes usar un icono X aquí si tienes FontAwesome o react-icons */}
                     ✕
                 </button>
 

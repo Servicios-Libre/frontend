@@ -98,7 +98,7 @@ export default function ServicesMenuPage() {
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       <MobileHeader onOpenSidebar={() => setIsSidebarOpen(true)} />
 
-      <main className="flex-1 p-6 md:p-10">
+      <main className="flex-1 p-6">
         {/* Título principal */}
         <h1 className="text-3xl font-bold mb-10 flex items-center gap-3">
           <FaTools className="text-indigo-400" /> Gestión de Servicios
