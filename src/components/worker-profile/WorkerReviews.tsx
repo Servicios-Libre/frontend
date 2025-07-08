@@ -70,7 +70,9 @@ export default function WorkerReviews({ workerId }: WorkerReviewsProps) {
   };
 
   return (
-    <div className="mt-10 bg-white rounded-2xl border border-gray-200 shadow-lg p-8 space-y-6">
+    <div 
+    id="worker-reviews"
+    className="mt-10 bg-white rounded-2xl border border-gray-200 shadow-lg p-8 space-y-6">
       <h2 className="text-2xl font-bold text-gray-800">Reseñas de clientes</h2>
 
       {/* Filtro */}
