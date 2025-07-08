@@ -30,8 +30,11 @@ export default function ProfileActions() {
         aria-disabled={!isWorker}
       >
         <button
+          id="profile-post-service"
           className={`bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold text-lg shadow transition cursor-pointer w-full max-w-xs
-            ${!isWorker ? "opacity-50 cursor-not-allowed hover:bg-blue-500" : ""}
+            ${
+              !isWorker ? "opacity-50 cursor-not-allowed hover:bg-blue-500" : ""
+            }
           `}
           disabled={!isWorker}
         >

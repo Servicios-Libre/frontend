@@ -9,6 +9,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen } from "@fortawesome/free-solid-svg-icons";
 import { Crown } from "lucide-react";
 import { checkIfUserIsWorker } from "@/services/profileService";
+import HelpTourButton from "./HelpTourButton";
+import { useProfileTour } from "@/hooks/tours/useProfileTour";
 
 interface Props {
   userName: string;
@@ -60,48 +62,35 @@ export default function ProfileHeader({
   const [hasPendingRequest, setHasPendingRequest] = useState(false);
   const [nameModalOpen, setNameModalOpen] = useState(false);
   const [isWorker, setIsWorker] = useState<boolean | null>(null);
-
+  
   const auth = useAuth();
   const user = auth?.user;
-
+  
   useEffect(() => {
     const verifyWorkerStatus = async () => {
       try {
         const result = await checkIfUserIsWorker(userId);
         setIsWorker(result);
-
       } catch (e) {
-        console.warn("No se pudo verificar si es worker (posiblemente por red):", e);
+        console.warn(
+          "No se pudo verificar si es worker (posiblemente por red):",
+          e
+        );
       }
     };
-
+    
     if (userId && isWorker === null) {
       verifyWorkerStatus();
     }
   }, [userId, isWorker]);
-
-  // useEffect(() => {
-  //   if (ticket?.type === "to-worker") {
-  //     if (ticket.status === "pending") {
-  //       setHasPendingRequest(true);
-  //       setHasAcceptedTicket(false);
-  //     } else if (ticket.status === "accepted") {
-  //       setHasPendingRequest(false);
-  //       setHasAcceptedTicket(true);
-  //     } else {
-  //       setHasPendingRequest(false);
-  //       setHasAcceptedTicket(false);
-  //     }
-  //   } else {
-  //     setHasPendingRequest(false);
-  //     setHasAcceptedTicket(false);
-  //   }
-  // }, [ticket]);
+  
+  const { startProfileTour } = useProfileTour(isWorker);
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
   }, []);
+
   if (!mounted) {
     return (
       <div className="flex flex-col sm:flex-row items-center sm:items-start sm:justify-between gap-6 sm:gap-8 p-6 rounded-lg bg-blue-500 shadow-md mb-6 text-center sm:text-left">
@@ -149,10 +138,10 @@ export default function ProfileHeader({
   };
 
   return (
-    <div className="flex flex-col sm:flex-row items-center sm:items-start sm:justify-between gap-6 sm:gap-8 p-6 rounded-lg bg-blue-500 shadow-md mb-6 text-center sm:text-left">
+    <div className="flex flex-col sm:flex-row items-center sm:items-start sm:justify-between gap-6 sm:gap-8 p-6 rounded-lg bg-blue-500 shadow-md mb-6 text-center sm:text-left relative">
       {/* Foto y botón */}
       <div className="flex flex-col items-center sm:items-center w-full sm:w-auto">
-        <div className="w-32 h-32 sm:w-24 sm:h-24 flex justify-center">
+        <div id="profile-photo-container" className="w-32 h-32 sm:w-24 sm:h-24 flex justify-center">
           <ProfilePhoto
             userPic={userPic}
             setUserPic={setUserPic}
@@ -176,6 +165,7 @@ export default function ProfileHeader({
       {/* Info y progreso */}
       <div className="flex-1 w-full flex flex-col items-center sm:items-start">
         <button
+        id="profile-name-section"
           onClick={() => editMode && setNameModalOpen(true)}
           className={`flex items-center text-xl font-bold mb-1 gap-2
             ${
@@ -213,7 +203,9 @@ export default function ProfileHeader({
         </p>
 
         <div className="flex flex-col items-center sm:items-start gap-3 w-full">
-          <div className="flex items-center gap-2">
+          <div 
+          id="profile-completion-bar"
+          className="flex items-center gap-2">
             <span className="text-white text-sm font-medium">
               Perfil completo:
             </span>
@@ -227,9 +219,12 @@ export default function ProfileHeader({
           </div>
 
           {isWorker === true && (
-            <div className="flex flex-col gap-2 items-center sm:items-start mt-2">
+            <div 
+            id="profile-worker-button"
+            className="flex flex-col gap-2 items-center sm:items-start mt-2">
               <Link href={`/worker-profile/${userId}`}>
-                <button className="bg-yellow-400 text-yellow-900 font-bold px-4 py-2 rounded-lg shadow flex items-center gap-2 hover:bg-yellow-500 transition-colors">
+                <button 
+                className="bg-yellow-400 text-yellow-900 font-bold px-4 py-2 rounded-lg shadow flex items-center gap-2 hover:bg-yellow-500 transition-colors">
                   <span>💼</span> Ver perfil de trabajador
                 </button>
               </Link>
@@ -237,9 +232,10 @@ export default function ProfileHeader({
           )}
 
           {/* Botón de solicitar ser trabajador */}
-          {!isWorker  && (
+          {!isWorker && (
             <div className="relative group w-full">
               <button
+                id="profile-worker-request"
                 className={`px-4 py-2 rounded-md font-semibold transition-colors mt-2 sm:mt-0 cursor-pointer
       ${
         !editMode && !hasUnsavedChanges
@@ -283,7 +279,6 @@ export default function ProfileHeader({
           {ticketError && <p className="text-red-200 mt-2">{ticketError}</p>}
         </div>
       </div>
-
       {/* Botones de acción */}
       <div className="flex flex-row sm:flex-col justify-center items-center gap-2 mt-4 sm:mt-0 w-full sm:w-auto">
         {editMode ? (
@@ -317,6 +312,7 @@ export default function ProfileHeader({
           onClose={() => setNameModalOpen(false)}
         />
       )}
+      {!editMode &&<HelpTourButton startTour={startProfileTour} />}
     </div>
   );
 }
