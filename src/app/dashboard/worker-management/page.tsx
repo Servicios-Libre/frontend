@@ -156,10 +156,14 @@ export default function WorkerManagementPage() {
 
         {/* Solicitudes pendientes */}
         <section className="mb-12">
-          <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-            <FaUserCheck className="text-emerald-400" /> Solicitudes pendientes
+          <h2 className="text-2xl font-semibold mb-4 flex flex-col sm:flex-row sm:items-center gap-2">
+            <span className="flex items-center gap-2">
+              <FaUserCheck className="text-emerald-400" />
+              Solicitudes pendientes
+            </span>
+
             {workerRequestsCount > 0 && (
-              <span className="ml-2 bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full text-sm font-medium">
+              <span className="bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap">
                 {workerRequestsCount} nuevas
               </span>
             )}

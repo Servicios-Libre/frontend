@@ -27,7 +27,7 @@ export default function JobCard({
 
   return (
     <Link href={`/worker-profile/${workerId}?serviceId=${serviceId}`}>
-      <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer">
+      <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer h-[340px] flex flex-col justify-between">
         <div className="relative w-full h-44">
           <Image
             src={image}
@@ -38,13 +38,15 @@ export default function JobCard({
             className="rounded-t-xl"
           />
         </div>
-        <div className="p-5 relative">
-          <h3 className="text-lg font-bold text-gray-900 mb-1">{title}</h3>
-          <p className="text-sm text-gray-700 leading-normal">
+        <div className="p-5 flex flex-col justify-between flex-1 relative">
+          <h3 className="text-lg font-bold text-gray-900 mb-1">
+            {title}
+          </h3>
+          <p className="md:text-sm lg:text-base text-gray-700 leading-normal line-clamp-3">
             {truncatedDescription}
           </p>
           {needsFade && (
-            <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent"></div>
+            <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent" />
           )}
         </div>
       </div>

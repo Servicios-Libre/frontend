@@ -55,8 +55,8 @@ export default function PromoteToAdminCard({ onPromoted }: Props) {
     };
 
     return (
-        <section className="mb-12 rounded-lg bg-indigo-800 p-6 shadow-lg border border-indigo-700">
-            <div className="flex flex-col sm:flex-row gap-3 items-stretch">
+        <section className="mb-8 rounded-xl bg-indigo-800 p-5 shadow-xl border border-indigo-700 md:p-6 lg:p-8">
+            <div className="flex flex-col gap-4 sm:flex-row sm:gap-3 items-stretch">
                 <div className="flex-1">
                     <SearchInput
                         searchTerm={searchEmail}
@@ -67,7 +67,7 @@ export default function PromoteToAdminCard({ onPromoted }: Props) {
                 <button
                     onClick={handleSearch}
                     disabled={loading}
-                    className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-60 text-white px-6 py-2 rounded-lg font-semibold shadow-sm transition"
+                    className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-lg font-semibold shadow-md transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-indigo-800"
                 >
                     {loading ? "Buscando..." : "Buscar"}
                 </button>
@@ -93,17 +93,17 @@ export default function PromoteToAdminCard({ onPromoted }: Props) {
             )}
 
             {foundUser && (
-                <div className="mt-6 p-5 bg-indigo-700 rounded flex flex-col sm:flex-row justify-between items-center gap-6 shadow-inner">
-                    <div>
-                        <p><strong>Nombre:</strong> {foundUser.name}</p>
-                        <p><strong>Email:</strong> {foundUser.email}</p>
+                <div className="mt-6 p-4 bg-indigo-700 rounded-lg flex flex-col items-start gap-4 shadow-inner sm:flex-row sm:justify-between sm:items-center sm:p-5 sm:gap-6">
+                    <div className="text-white text-sm sm:text-base">
+                        <p className="mb-1 sm:mb-0"><strong>Nombre:</strong> {foundUser.name}</p>
+                        <p className="mb-1 sm:mb-0"><strong>Email:</strong> {foundUser.email}</p>
                         <p><strong>Rol:</strong> {foundUser.role}</p>
                     </div>
                     {foundUser.role !== "admin" && (
                         <button
                             onClick={handlePromote}
                             disabled={actionLoading}
-                            className="bg-green-600 hover:bg-green-500 px-5 py-2 rounded text-white font-semibold transition"
+                            className="w-full bg-green-600 hover:bg-green-500 px-5 py-2.5 rounded-lg text-white font-semibold transition-all duration-200 ease-in-out shadow-md disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-indigo-700 sm:w-auto"
                         >
                             {actionLoading ? "Procesando..." : "Dar de alta como admin"}
                         </button>

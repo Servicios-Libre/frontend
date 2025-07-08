@@ -34,7 +34,12 @@ export default function AdminUsersPage() {
         setLoadingAdmins(true); // activar loading antes de empezar
         try {
             const adminsList = await fetchAdmins();
-            setAdmins(adminsList); // actualizar el estado con los admins
+
+            const filteredAdmins = adminsList.filter(
+                (admin: { email: string; }) => admin.email !== GOD_EMAIL
+            );
+
+            setAdmins(filteredAdmins);
         } catch {
             showToast("Error al cargar usuarios admin", "error");
         } finally {

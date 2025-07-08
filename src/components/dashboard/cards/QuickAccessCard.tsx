@@ -22,7 +22,7 @@ export default function QuickAccessCard({
     return (
         <Link
             href={href}
-            className={`bg-indigo-800 rounded-xl shadow-xl p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 transition-all duration-300 transform hover:scale-[1.02] ${hoverColor} group`}
+            className={`bg-indigo-800 rounded-xl shadow-xl px-4 py-6 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 transition-all duration-300 transform hover:scale-[1.02] ${hoverColor} group`}
         >
             {/* Mobile layout */}
             <div className="flex items-center gap-3 sm:gap-4">
