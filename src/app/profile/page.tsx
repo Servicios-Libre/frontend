@@ -10,12 +10,12 @@ import {
   redirectToStripe,
   updateProfile,
   updateProfileImage,
+  updateSocialLinks,
+  fetchStatesWithCities,
 } from "@/services/profileService";
-import { updateSocialLinks } from "@/services/profileService";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileForm from "@/components/profile/ProfileForm";
 import ProfileActions from "@/components/profile/ProfileActions";
-import { fetchStatesWithCities } from "@/services/profileService";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/context/ToastContext";
@@ -34,6 +34,7 @@ const requiredFields = [
 ];
 
 type ProfileFormType = {
+  name: string; // <--- AGREGAR
   phone: string;
   street: string;
   house_number: string;
@@ -60,6 +61,7 @@ export default function ProfilePage() {
   const [mounted, setMounted] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState<ProfileFormType>({
+    name: "",
     phone: "",
     street: "",
     house_number: "",
@@ -73,13 +75,10 @@ export default function ProfilePage() {
     twitter: "",
     instagram: "",
   });
-  const [originalData, setOriginalData] = useState<ProfileFormType | null>(
-    null
-  );
+  const [originalData, setOriginalData] = useState<ProfileFormType | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [showMissing, setShowMissing] = useState(false);
   const [userImageFile, setUserImageFile] = useState<File | null>(null);
-  // const [ticket, setTicket] = useState<Ticket | null>(null);
   const [statesData, setStatesData] = useState<
     {
       id: number;
@@ -95,9 +94,9 @@ export default function ProfilePage() {
   const token = auth?.token;
   const router = useRouter();
   const { showToast } = useToast();
-  const [userName, setUserName] = useState<string>("");
   const [premium, setPremium] = useState<boolean>(false);
   const [profileRole, setProfileRole] = useState<string>("");
+  const { refreshUser } = useAuth();
 
   useEffect(() => {
     document.title = "Servicio Libre - Mi Perfil";
@@ -117,23 +116,22 @@ export default function ProfilePage() {
     const loadProfile = async () => {
       try {
         const { role } = await getProfile();
-
         setProfileRole(role);
       } catch (err) {
         console.error(err);
       }
     };
+
     loadStates();
     loadProfile();
   }, []);
 
-  
   const provincias = statesData.map((item) => item.state);
 
   const ciudades = formData.state
     ? statesData
-        .find((prov) => prov.state === formData.state)
-        ?.cities.map((city) => city.name) || []
+      .find((prov) => prov.state === formData.state)
+      ?.cities.map((city) => city.name) || []
     : [];
 
   useEffect(() => {
@@ -149,11 +147,6 @@ export default function ProfilePage() {
           const data = await getProfile();
 
           setPremium(data.premium);
-          // const ticketData = data.tickets.find(
-          //   (ticket: Ticket) => ticket.type === "to-worker"
-          // );
-
-          // setTicket(ticketData || null);
 
           const normalize = (input: string) => input.trim().toLowerCase();
 
@@ -177,6 +170,7 @@ export default function ProfilePage() {
               )?.name ?? "";
 
           const baseForm = {
+            name: data.name ?? "",
             phone: data.phone?.toString() ?? "",
             street: data.address_id?.street ?? "",
             house_number: data.address_id?.house_number?.toString() ?? "",
@@ -187,13 +181,12 @@ export default function ProfilePage() {
             description: data.description ?? "",
             facebook: data.social?.facebook ?? "",
             linkedin: data.social?.linkedin ?? "",
-            twitter: data.social?.x ?? "", // <- X en el backend, twitter en el front
+            twitter: data.social?.x ?? "", // X en backend, twitter en front
             instagram: data.social?.instagram ?? "",
           };
 
           setFormData(baseForm);
           setOriginalData(baseForm);
-          setUserName(data.name || data.username || "Usuario");
         } catch (error) {
           console.error("Error al obtener perfil:", error);
         }
@@ -201,6 +194,7 @@ export default function ProfilePage() {
       fetchProfile();
     }
   }, [user, token, statesData]);
+
   if (!mounted) {
     return <LoadingScreen />;
   }
@@ -232,6 +226,10 @@ export default function ProfilePage() {
     setFormData((prev) => ({ ...prev, user_pic: url }));
   };
 
+  const setUserName = (name: string) => {
+    setFormData((prev) => ({ ...prev, name }));
+  };
+
   const handleSave = async () => {
     const socialData = {
       facebook: formData.facebook?.trim(),
@@ -246,7 +244,7 @@ export default function ProfilePage() {
 
     try {
       const dataToSend: any = {
-        name: userName, // <- acá usás el userName actualizado del estado
+        name: formData.name, // <--- CAMBIA ESTO
         phone: formData.phone ? Number(formData.phone) : undefined,
         street: formData.street,
         house_number: formData.house_number
@@ -279,6 +277,7 @@ export default function ProfilePage() {
         await updateProfileImage(userImageFile);
       }
 
+      await refreshUser();
       setOriginalData(formData);
       setEditMode(false);
       showToast("Perfil actualizado correctamente", "success");
@@ -339,7 +338,6 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-gray-100 py-10">
       <div className="text-black max-w-4xl mx-auto bg-white rounded-lg shadow-md mt-20 p-8">
         <ProfileHeader
-          userName={userName}
           userPic={formData.user_pic ?? ""}
           setUserPic={setUserPic}
           editMode={editMode}
@@ -350,11 +348,11 @@ export default function ProfilePage() {
           handleSave={handleSave}
           handleCancel={handleCancel}
           setShowMissing={setShowMissing}
-          userId={user.id ?? ""}
           setUserImageFile={setUserImageFile}
+          name={formData.name}
           setUserName={setUserName}
-          premium={premium}
         />
+
         {/* Boton para redireccionar si no es premium */}
         {profileRole === "worker" &&
           (premium ? (
@@ -398,8 +396,7 @@ export default function ProfilePage() {
           ) : (
             <div className="flex justify-center my-6">
               <button
-                className="relative px-8 py-4 rounded-2xl bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 hover:from-yellow-500 hover:via-yellow-600 hover:to-yellow-700 text-white font-bold text-lg transition-all duration-300 w-full sm:w-auto cursor-pointer flex items-center justify-center gap-3 shadow-md transform 
-              border-2 border-yellow-300"
+                className="relative px-8 py-4 rounded-2xl bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 hover:from-yellow-500 hover:via-yellow-600 hover:to-yellow-700 text-white font-bold text-lg transition-all duration-300 w-full sm:w-auto cursor-pointer flex items-center justify-center gap-3 shadow-md transform border-2 border-yellow-300"
                 onClick={handlePremiumSubscription}
               >
                 <Crown className="w-6 h-6" />

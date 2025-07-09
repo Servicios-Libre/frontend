@@ -1,3 +1,5 @@
+"use client";
+
 import { createTicket } from "@/services/ticketService";
 import { useEffect, useRef, useState } from "react";
 import ProfilePhoto from "./ProfilePhoto";
@@ -13,7 +15,6 @@ import HelpTourButton from "./HelpTourButton";
 import { useProfileTour } from "@/hooks/tours/useProfileTour";
 
 interface Props {
-  userName: string;
   userPic: string;
   setUserPic: (url: string) => void;
   editMode: boolean;
@@ -24,17 +25,14 @@ interface Props {
   handleSave: () => void;
   handleCancel: () => void;
   setShowMissing: (show: boolean) => void;
-  userId: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setUserImageFile: any;
+  name: string;
+  setUserName: (name: string) => void; // <--- AGREGAR
   showToast?: (message: string, type: "success" | "error" | "info") => void;
-  setUserName: (name: string) => void;
-  premium: boolean;
 }
 
 export default function ProfileHeader({
-  userName,
-  setUserName,
   userPic,
   setUserPic,
   editMode,
@@ -45,16 +43,16 @@ export default function ProfileHeader({
   handleSave,
   handleCancel,
   setShowMissing,
-  userId,
   setUserImageFile,
-  premium,
+  name,
+  setUserName,
 }: Props) {
+  const { user } = useAuth();
+  const userId = user?.id;
+  const premium = user?.premium;
+
   const { showToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleChangePhotoClick = () => {
-    setEditMode(true);
-  };
 
   const [loadingTicket, setLoadingTicket] = useState(false);
   const [ticketSuccess, setTicketSuccess] = useState(false);
@@ -62,29 +60,23 @@ export default function ProfileHeader({
   const [hasPendingRequest, setHasPendingRequest] = useState(false);
   const [nameModalOpen, setNameModalOpen] = useState(false);
   const [isWorker, setIsWorker] = useState<boolean | null>(null);
-  
-  const auth = useAuth();
-  const user = auth?.user;
-  
+
+  const { startProfileTour } = useProfileTour(isWorker);
+
   useEffect(() => {
     const verifyWorkerStatus = async () => {
       try {
         const result = await checkIfUserIsWorker(userId);
         setIsWorker(result);
       } catch (e) {
-        console.warn(
-          "No se pudo verificar si es worker (posiblemente por red):",
-          e
-        );
+        console.warn("No se pudo verificar si es worker:", e);
       }
     };
-    
+
     if (userId && isWorker === null) {
       verifyWorkerStatus();
     }
   }, [userId, isWorker]);
-  
-  const { startProfileTour } = useProfileTour(isWorker);
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -105,33 +97,32 @@ export default function ProfileHeader({
     );
   }
 
+  const handleChangePhotoClick = () => {
+    setEditMode(true);
+  };
+
   const handleRequestWorker = async () => {
     if (!isComplete) {
-      showToast(
-        "Completa tu perfil antes de solicitar ser trabajador.",
-        "error"
-      );
+      showToast?.("Completa tu perfil antes de solicitar ser trabajador.", "error");
       setShowMissing(true);
       return;
     }
-    if (!user?.id) {
+
+    if (!userId) {
       setTicketError("Usuario no autenticado");
       return;
     }
+
     setLoadingTicket(true);
     setTicketError(null);
+
     try {
-      await createTicket(user.id, {
-        type: "to-worker",
-        status: "pending",
-      });
+      await createTicket(userId, { type: "to-worker", status: "pending" });
       setTicketSuccess(true);
       setHasPendingRequest(true);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      setTicketError(
-        error?.response?.data?.message || "No se pudo enviar la solicitud."
-      );
+      setTicketError(error?.response?.data?.message || "No se pudo enviar la solicitud.");
     } finally {
       setLoadingTicket(false);
     }
@@ -154,7 +145,7 @@ export default function ProfileHeader({
         <div className="mt-2 w-full sm:w-auto">
           <button
             className={`text-white bg-blue-700 hover:bg-blue-600 px-3 py-1 rounded transition w-full sm:w-auto cursor-pointer
-      ${editMode ? "invisible" : ""}`}
+              ${editMode ? "invisible" : ""}`}
             onClick={handleChangePhotoClick}
           >
             Cambiar foto
@@ -165,18 +156,17 @@ export default function ProfileHeader({
       {/* Info y progreso */}
       <div className="flex-1 w-full flex flex-col items-center sm:items-start">
         <button
-        id="profile-name-section"
+          id="profile-name-section"
           onClick={() => editMode && setNameModalOpen(true)}
-          className={`flex items-center text-xl font-bold mb-1 gap-2
-            ${
-              premium && editMode
-                ? "text-amber-300 hover:text-amber-200 cursor-pointer"
-                : editMode
-                ? "text-white hover:text-blu-200 cursor-pointer"
-                : premium
-                ? "text-amber-300"
-                : "text-white cursor-default"
-            }`}
+          className={`flex items-center text-xl font-bold mb-1 gap-2 ${
+            premium && editMode
+              ? "text-amber-300 hover:text-amber-200 cursor-pointer"
+              : editMode
+              ? "text-white hover:text-blue-200 cursor-pointer"
+              : premium
+              ? "text-amber-300"
+              : "text-white cursor-default"
+          }`}
           aria-label="Editar nombre"
           title={editMode ? "Editar nombre" : undefined}
           type="button"
@@ -187,7 +177,7 @@ export default function ProfileHeader({
           }}
         >
           {premium && <Crown className="w-6 h-6 text-orange-300" />}
-          {userName}
+          {name}
           <FontAwesomeIcon
             icon={faPen}
             className={`transition-colors ${
@@ -196,6 +186,7 @@ export default function ProfileHeader({
             style={{ fontSize: "1.25rem" }}
           />
         </button>
+
         <p className="text-blue-100 text-sm mb-2">
           {user?.role === "user"
             ? "Debes completar tu perfil al 100% si quieres solicitar ser trabajador"
@@ -203,12 +194,8 @@ export default function ProfileHeader({
         </p>
 
         <div className="flex flex-col items-center sm:items-start gap-3 w-full">
-          <div 
-          id="profile-completion-bar"
-          className="flex items-center gap-2">
-            <span className="text-white text-sm font-medium">
-              Perfil completo:
-            </span>
+          <div id="profile-completion-bar" className="flex items-center gap-2">
+            <span className="text-white text-sm font-medium">Perfil completo:</span>
             <span className="text-white font-bold">{completion}%</span>
             <div className="w-24 h-2 bg-blue-200 rounded overflow-hidden">
               <div
@@ -219,33 +206,28 @@ export default function ProfileHeader({
           </div>
 
           {isWorker === true && (
-            <div 
-            id="profile-worker-button"
-            className="flex flex-col gap-2 items-center sm:items-start mt-2">
+            <div id="profile-worker-button" className="flex flex-col gap-2 items-center sm:items-start mt-2">
               <Link href={`/worker-profile/${userId}`}>
-                <button 
-                className="bg-yellow-400 text-yellow-900 font-bold px-4 py-2 rounded-lg shadow flex items-center gap-2 hover:bg-yellow-500 transition-colors">
+                <button className="bg-yellow-400 text-yellow-900 font-bold px-4 py-2 rounded-lg shadow flex items-center gap-2 hover:bg-yellow-500 transition-colors">
                   <span>💼</span> Ver perfil de trabajador
                 </button>
               </Link>
             </div>
           )}
 
-          {/* Botón de solicitar ser trabajador */}
           {!isWorker && (
             <div className="relative group w-full">
               <button
                 id="profile-worker-request"
-                className={`px-4 py-2 rounded-md font-semibold transition-colors mt-2 sm:mt-0 cursor-pointer
-      ${
-        !editMode && !hasUnsavedChanges
-          ? isComplete
-            ? hasPendingRequest
-              ? "bg-yellow-300 text-yellow-900 cursor-not-allowed"
-              : "bg-green-500 hover:bg-green-600 text-white cursor-pointer"
-            : "bg-gray-300 hover:bg-gray-400 text-gray-700 cursor-not-allowed"
-          : "bg-gray-300 text-gray-400 cursor-not-allowed"
-      }`}
+                className={`px-4 py-2 rounded-md font-semibold transition-colors mt-2 sm:mt-0 cursor-pointer ${
+                  !editMode && !hasUnsavedChanges
+                    ? isComplete
+                      ? hasPendingRequest
+                        ? "bg-yellow-300 text-yellow-900 cursor-not-allowed"
+                        : "bg-green-500 hover:bg-green-600 text-white"
+                      : "bg-gray-300 hover:bg-gray-400 text-gray-700 cursor-not-allowed"
+                    : "bg-gray-300 text-gray-400 cursor-not-allowed"
+                }`}
                 disabled={
                   !isComplete ||
                   editMode ||
@@ -263,7 +245,6 @@ export default function ProfileHeader({
                   ? "Solicitud pendiente"
                   : "Solicitar ser trabajador"}
               </button>
-              {/* Tooltip solo si el botón está habilitado */}
               {isComplete &&
                 !editMode &&
                 !hasUnsavedChanges &&
@@ -276,9 +257,11 @@ export default function ProfileHeader({
                 )}
             </div>
           )}
+
           {ticketError && <p className="text-red-200 mt-2">{ticketError}</p>}
         </div>
       </div>
+
       {/* Botones de acción */}
       <div className="flex flex-row sm:flex-col justify-center items-center gap-2 mt-4 sm:mt-0 w-full sm:w-auto">
         {editMode ? (
@@ -305,14 +288,19 @@ export default function ProfileHeader({
           </button>
         )}
       </div>
+
       {nameModalOpen && (
         <EditNameModal
-          initialName={userName}
-          onSave={(newName) => setUserName(newName)}
+          initialName={name}
+          onSave={(newName) => {
+            setUserName(newName);
+            setNameModalOpen(false);
+          }}
           onClose={() => setNameModalOpen(false)}
         />
       )}
-      {!editMode && (
+
+      {!editMode &&  (
         <div className="absolute bottom-7 right-14 z-10">
         <HelpTourButton startTour={startProfileTour} />
         </div>)}

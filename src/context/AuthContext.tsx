@@ -10,6 +10,7 @@ import {
 } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { fetchUserChats } from "@/services/chat/chatService";
+import { getUserById } from "@/services/profileService";
 
 type UserRole = "user" | "worker" | "admin" | null;
 
@@ -36,6 +37,7 @@ interface AuthContextType {
   unreadCount: number;
   userName: string;
   setUserName: (name: string) => void;
+  refreshUser: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -63,24 +65,48 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signOut({ callbackUrl: "/landing" });
   }, []);
 
+  const refreshUser = useCallback(async () => {
+    if (user?.id) {
+      try {
+        const freshUser = await getUserById(user.id);
+        setUser(freshUser);
+        setUserName(freshUser.name || "");
+      } catch (error) {
+        console.error("Error actualizando datos del usuario:", error);
+      }
+    }
+  }, [user?.id]);
+
   useEffect(() => {
     if (status === "loading") return;
 
-    if (session?.user && session.backendJwt) {
-      setUser(session.user as JwtPayload);
-      setTokenState(session.backendJwt);
-      setUserName(session.user.name ?? ""); // 👈 Asignar nombre del token
-    } else {
-      setUser(null);
-      setTokenState(null);
-      setUserName(""); // 👈 Reiniciar si no hay sesión
+    const fetchFreshUser = async () => {
+      if (session?.user && session.backendJwt) {
+        setTokenState(session.backendJwt);
 
-      if (status === "authenticated") {
-        logout();
+        try {
+          const freshUser = await getUserById(session.user.id!);
+          setUser(freshUser);
+          setUserName(freshUser.name || "");
+        } catch (err) {
+          console.error("Error al obtener usuario actualizado:", err);
+          setUser(session.user as JwtPayload); // fallback
+          setUserName(session.user.name ?? "");
+        }
+      } else {
+        setUser(null);
+        setTokenState(null);
+        setUserName("");
+
+        if (status === "authenticated") {
+          logout();
+        }
       }
-    }
 
-    setLoading(false);
+      setLoading(false); // siempre al final
+    };
+
+    fetchFreshUser();
   }, [session, status, logout]);
 
   useEffect(() => {
@@ -131,6 +157,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         unreadCount,
         userName,
         setUserName,
+        refreshUser,
       }}
     >
       {children}

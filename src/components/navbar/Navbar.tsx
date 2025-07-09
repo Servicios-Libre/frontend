@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FaRegComments } from "react-icons/fa";
@@ -12,28 +12,6 @@ import { UserDropdown, MobileUserSection } from "./UserSections";
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { user, logout, unreadCount, loading } = useAuth();
-
-  const [userName, setUserName] = useState("");
-
-  useEffect(() => {
-    if (user?.name) {
-      setUserName(user.name);
-    } else {
-      setUserName("Usuario");
-    }
-  }, [user]);
-
-  useEffect(() => {
-    const handleUserNameChanged = (e: CustomEvent) => {
-      setUserName(e.detail);
-    };
-
-    window.addEventListener("userNameChanged", handleUserNameChanged as EventListener);
-
-    return () => {
-      window.removeEventListener("userNameChanged", handleUserNameChanged as EventListener);
-    };
-  }, []);
 
   return (
     <>
@@ -76,7 +54,7 @@ export default function Navbar() {
             <div className="ml-6">
               {!loading ? (
                 user ? (
-                  <UserDropdown userName={userName} user={user} logout={logout} />
+                  <UserDropdown user={user} logout={logout} />
                 ) : (
                   <Link
                     href="/auth"
@@ -106,8 +84,7 @@ export default function Navbar() {
 
       {/* Menú Mobile */}
       <div
-        className={`md:hidden overflow-hidden fixed top-20 left-0 w-full z-40 transition-all duration-300 ease-in-out transform origin-top ${isOpen ? "scale-y-100 opacity-100" : "scale-y-0 opacity-0 pointer-events-none"
-          } bg-white text-gray-900 px-8 pb-6 shadow-md`}
+        className={`md:hidden overflow-hidden fixed top-20 left-0 w-full z-40 transition-all duration-300 ease-in-out transform origin-top ${isOpen ? "scale-y-100 opacity-100" : "scale-y-0 opacity-0 pointer-events-none"} bg-white text-gray-900 px-8 pb-6 shadow-md`}
       >
         <div className="mt-4 mb-2">
           <Link href="/landing" className="block py-2 hover:underline" onClick={() => setIsOpen(false)}>Inicio</Link>
@@ -131,7 +108,7 @@ export default function Navbar() {
         <hr className="mb-6 border-gray-200 sm:mx-auto" />
 
         {!loading ? (
-          <MobileUserSection user={user} userName={userName} logout={logout} setIsOpen={setIsOpen} />
+          <MobileUserSection user={user} logout={logout} setIsOpen={setIsOpen} />
         ) : (
           <div className="h-10 w-24 bg-gray-200 rounded animate-pulse" />
         )}

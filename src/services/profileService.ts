@@ -6,8 +6,13 @@ export const getProfile = async () => {
   return response.data;
 };
 
-export const updateProfile = async (data: object): Promise<void> => {
+export const getUserById = async (id: string) => {
+  const response = await api.get(`/users/${id}`);
+  return response.data;
+};
 
+export const updateProfile = async (data: object): Promise<void> => {
+  console.log(data);
   await api.put(`/users/update/`, data);
 };
 
@@ -96,7 +101,7 @@ export const redirectToStripe = async () => {
   }
 };
 
-export async function checkIfUserIsWorker(id: string): Promise<boolean> {
+export async function checkIfUserIsWorker(id: string | undefined): Promise<boolean> {
   const response = await api.get(`/users/is-worker/${id}`);
   return response.data;
 }
