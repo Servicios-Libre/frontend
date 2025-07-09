@@ -13,6 +13,8 @@ import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import WorkerReviews from "./WorkerReviews";
 import LoadingScreen from "../loading-screen/LoadingScreen";
+import HelpTourButton from "../profile/HelpTourButton";
+import { useWorkerTour } from "@/hooks/tours/useWorkerTour";
 
 type WorkerProfileClientProps = {
   id: string;
@@ -89,30 +91,27 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
       let uploadedPhotos: { id: string; photo_url: string }[] = [];
 
       if (newFiles && newFiles.length > 0) {
-        uploadedPhotos = await addPhotosToService(
-          updatedService.id,
-          newFiles,
-        );
+        uploadedPhotos = await addPhotosToService(updatedService.id, newFiles);
       }
 
       setUser((prev) =>
         prev
           ? {
-            ...prev,
-            services: prev.services.map((s) =>
-              s.id === updatedService.id
-                ? {
-                  ...s,
-                  title: updatedService.title,
-                  description: updatedService.description,
-                  work_photos: [
-                    ...updatedService.work_photos,
-                    ...uploadedPhotos,
-                  ],
-                }
-                : s
-            ),
-          }
+              ...prev,
+              services: prev.services.map((s) =>
+                s.id === updatedService.id
+                  ? {
+                      ...s,
+                      title: updatedService.title,
+                      description: updatedService.description,
+                      work_photos: [
+                        ...updatedService.work_photos,
+                        ...uploadedPhotos,
+                      ],
+                    }
+                  : s
+              ),
+            }
           : prev
       );
     } catch (err) {
@@ -122,6 +121,8 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
       setIsSaving(false);
     }
   };
+
+  const { startWorkerTour } = useWorkerTour(!!user?.services?.length, isOwner);
 
   if (!mounted || authLoading || loading) {
     return <LoadingScreen message="Cargando perfil..." />;
@@ -143,10 +144,14 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
     <main className="min-h-screen bg-[#f6f8fa] pt-20">
       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-12 gap-6 px-4 sm:px-8">
         <aside className="sm:col-span-4 lg:col-span-3">
-          <div className={`${user.premium ? "bg-gradient-to-b from-amber-400 to-amber-500" : "bg-gradient-to-b from-blue-800 via-blue-700 to-blue-600"} shadow-md rounded-b-lg p-6 sticky top-20`}>
-            <WorkerHeader
-              user={user}
-            />
+          <div
+            className={`${
+              user.premium
+                ? "bg-gradient-to-b from-amber-400 to-amber-500"
+                : "bg-gradient-to-b from-blue-800 via-blue-700 to-blue-600"
+            } shadow-md rounded-b-lg p-6 sticky top-20`}
+          >
+            <WorkerHeader user={user} isOwner={isOwner} />
           </div>
         </aside>
 
@@ -161,9 +166,9 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
               setUser((prev) =>
                 prev
                   ? {
-                    ...prev,
-                    services: prev.services.filter((s) => s.id !== deletedId),
-                  }
+                      ...prev,
+                      services: prev.services.filter((s) => s.id !== deletedId),
+                    }
                   : prev
               );
             }}
@@ -171,6 +176,11 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
           <WorkerReviews workerId={user.id} />
         </section>
       </div>
+      {isOwner && (
+        <div className="fixed bottom-8 right-8 z-10">
+          <HelpTourButton startTour={startWorkerTour} />
+        </div>
+      )}
     </main>
   );
 }

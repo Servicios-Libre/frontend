@@ -11,11 +11,17 @@ import { Crown, Star } from "lucide-react";
 
 interface Props {
   user: User;
+  isOwner: boolean;
 }
 
 export default function WorkerHeader({ user }: Props) {
+
+ 
+
   return (
-    <div className="flex flex-col items-center gap-6 text-left text-blue-100 px-4 sm:px-0 max-w-sm mx-auto">
+    <div 
+    id="worker-header"
+    className="relative flex flex-col items-center gap-6 text-left text-blue-100 px-4 sm:px-0 max-w-sm mx-auto">
       {/* Foto */}
       <div
         className={`w-28 h-28 relative rounded-full ${
@@ -30,9 +36,10 @@ export default function WorkerHeader({ user }: Props) {
           sizes="112px"
           priority
         />
+        
       </div>
-
       <div
+        id="worker-rate"
         className={`inline-flex items-center gap-2 ${
           user.premium
             ? "bg-white/10 backdrop-blur-sm border-white/20 "
@@ -50,7 +57,7 @@ export default function WorkerHeader({ user }: Props) {
       </div>
 
       {/* Nombre y correo */}
-      <div className="text-center">
+      <div className="text-center flex flex-col justify-center items-center gap-1">
         <h1
           className={`text-3xl sm:text-2xl font-bold ${
             user.premium ? "text-amber-950" : "text-white"
