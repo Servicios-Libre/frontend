@@ -3,15 +3,16 @@
 import { useState } from "react";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
-import AlertMessage from "./AlertMessage";
+// import AlertMessage from "./AlertMessage";
 import Image from "next/image";
 import Link from "next/link"; // Agregado
 import { signIn } from "next-auth/react"; // Agrega este import
+import AlertMessage from "./AlertMessage";
 
 export default function AuthForm() {
   const [isLogin, setIsLogin] = useState(true);
   const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+  // const [error, setError] = useState({});
 
   return (
     <div className="fixed inset-0 bg-gray-50 flex items-center justify-center z-50">
@@ -37,7 +38,7 @@ export default function AuthForm() {
               onClick={() => {
                 setIsLogin(false);
                 setMessage("");
-                setError("");
+                // setError("");
               }}
               className={`w-1/2 py-2 text-sm font-semibold transition-all duration-200 cursor-pointer ${
                 !isLogin
@@ -51,7 +52,7 @@ export default function AuthForm() {
               onClick={() => {
                 setIsLogin(true);
                 setMessage("");
-                setError("");
+                // setError("");
               }}
               className={`w-1/2 py-2 text-sm font-semibold transition-all duration-200 cursor-pointer ${
                 isLogin
@@ -82,13 +83,12 @@ export default function AuthForm() {
           <h2 className="text-blue-500 text-center text-lg font-normal mb-4">
             {isLogin ? "Iniciar Sesión" : "Registrar"}
           </h2>
-          <AlertMessage message={message} error={error} />
+          <AlertMessage message={message} />
           {isLogin ? (
-            <LoginForm setMessage={setMessage} setError={setError} />
+            <LoginForm setMessage={setMessage} />
           ) : (
             <RegisterForm
               setMessage={setMessage}
-              setError={setError}
             />
           )}
         </div>
