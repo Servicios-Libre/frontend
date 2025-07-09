@@ -28,23 +28,25 @@ export const ServiceForm = () => {
   const [success, setSuccess] = useState(false);
   const [categories, setCategories] = useState<Categoria[]>([]);
   const [catLoading, setCatLoading] = useState(true);
-  const auth = useAuth();
+  const { user } = useAuth();
 
   useEffect(() => {
-    document.title = 'Servicio Libre - Crear Servicio'
-    const fetchCategories = async () => {
+    document.title = 'Servicio Libre - Crear Servicio';
+
+    const fetchInitialData = async () => {
       try {
         const cats = await obtenerCategorias();
         setCategories(cats);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
         setCategories([]);
       } finally {
         setCatLoading(false);
       }
     };
-    fetchCategories();
-  }, []);
+
+    fetchInitialData();
+  }, [user]);
 
   const { showToast } = useToast();
 
@@ -68,14 +70,14 @@ export const ServiceForm = () => {
 
     setLoading(true);
     try {
-      if (!auth?.user?.id) {
+      if (!user?.id) {
         showToast("No se pudo obtener el ID del usuario.", "error");
         setLoading(false);
         return;
       }
 
       await sendServiceRequest({
-        worker_id: auth.user.id,
+        worker_id: user.id,
         title: formData.title,
         description: formData.description,
         category: formData.category,
@@ -87,7 +89,7 @@ export const ServiceForm = () => {
       setErrors({});
 
       // Redirigir a perfil de worker
-      router.push(`/worker-profile/${auth.user.id}`);
+      router.push(`/worker-profile/${user.id}`);
 
     } catch (err) {
       if (axios.isAxiosError(err)) {
