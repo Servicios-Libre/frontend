@@ -9,7 +9,7 @@ type Props = {
   fileInputRef: RefObject<HTMLInputElement | null>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setUserImageFile: any;
-  premium: boolean;
+  premium: boolean | undefined;
 };
 
 const ProfilePhoto = ({ userPic, setUserPic, editable, fileInputRef, setUserImageFile, premium }: Props) => {

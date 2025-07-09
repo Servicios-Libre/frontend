@@ -9,39 +9,37 @@ import { Crown } from "lucide-react";
 import { getProfile } from "@/services/profileService";
 
 interface User {
-    id?: string;
-    name?: string;
-    role?: "user" | "worker" | "admin" | null;
-    premium?: boolean
+  id?: string;
+  name?: string;
+  role?: "user" | "worker" | "admin" | null;
+  premium?: boolean;
 }
 
 export function UserDropdown({
-  userName,
   user,
   logout,
 }: {
-  userName: string;
   user: User | null;
   logout: () => void;
 }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const [ profilePremium, setProfilePremium] = useState<boolean>(false)
+  const [profilePremium, setProfilePremium] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
     const fetchProfile = async () => {
       try {
-        const { premium } = await getProfile()
+        const { premium } = await getProfile();
         setProfilePremium(premium);
       } catch (error) {
         console.error("Error fetching profile:", error);
       }
-    }
-    if(user) {
-      fetchProfile()
+    };
+    if (user) {
+      fetchProfile();
     }
   }, [user]);
 
@@ -61,72 +59,78 @@ export function UserDropdown({
 
   if (!mounted) return null;
 
-    if (user && userName) {
-        return (
-            <div className="relative ml-6" ref={dropdownRef}>
-                <button
-                    className={`cursor-pointer ${profilePremium ? "bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-300" : "bg-blue-300 text-white  hover:bg-blue-400 " } font-normal px-4 py-2 rounded transition flex items-center gap-2 cursor-pointerhover:shadow-sm`}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        setDropdownOpen((open) => !open);
-                    }}
-                > 
-                {profilePremium && <Crown className="w-6 h-6 text-orange-400" />}
-                    {userName}
-                    <FontAwesomeIcon
-                        icon={faChevronDown}
-                        className={`text-xs transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""}`}
-                    />
-                </button>
-                {dropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-40 bg-white text-gray-800 rounded shadow-lg z-50 border border-blue-100 animate-fade-in">
-                        <Link
-                            href="/profile"
-                            onClick={() => setDropdownOpen(false)}
-                            className="block px-4 py-2 hover:bg-blue-100 hover:text-blue-700 rounded-t transition-colors duration-150 cursor-pointer"
-                        >
-                            Perfil
-                        </Link>
-                        {user.role === "worker" && user.id && (
-                            <Link
-                                href={`/worker-profile/${user.id}`}
-                                onClick={() => setDropdownOpen(false)}
-                                className="block px-4 py-2 hover:bg-blue-100 hover:text-blue-700 transition-colors duration-150 cursor-pointer"
-                            >
-                                Perfil de trabajador
-                            </Link>
-                        )}
-                        {user.role === "admin" && (
-                            <Link
-                                href="/dashboard"
-                                onClick={() => setDropdownOpen(false)}
-                                className="block px-4 py-2 hover:bg-blue-100 hover:text-blue-700 transition-colors duration-150 cursor-pointer"
-                            >
-                                Panel de administrador
-                            </Link>
-                        )}
-                        <Link
-                            href="/invoices"
-                            onClick={() => setDropdownOpen(false)}
-                            className="block px-4 py-2 hover:bg-blue-100 hover:text-blue-700 transition-colors duration-150 cursor-pointer"
-                        >
-                            Facturas
-                        </Link>
-                        <button
-                            onClick={() => {
-                                logout();
-                                setDropdownOpen(false);
-                                router.push("/landing");
-                            }}
-                            className="w-full text-left px-4 py-2 hover:bg-red-100 hover:text-red-600 rounded-b transition-colors duration-150 cursor-pointer"
-                        >
-                            Cerrar Sesión
-                        </button>
-                    </div>
-                )}
-            </div>
-        );
-    }
+  if (user) {
+    return (
+      <div className="relative ml-6" ref={dropdownRef}>
+        <button
+          className={`cursor-pointer ${
+            profilePremium
+              ? "bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-300"
+              : "bg-blue-300 text-white hover:bg-blue-400"
+          } font-normal px-4 py-2 rounded transition flex items-center gap-2 hover:shadow-sm`}
+          onClick={(e) => {
+            e.stopPropagation();
+            setDropdownOpen((open) => !open);
+          }}
+        >
+          {profilePremium && <Crown className="w-6 h-6 text-orange-400" />}
+          {user.name ?? "Usuario"}
+          <FontAwesomeIcon
+            icon={faChevronDown}
+            className={`text-xs transition-transform duration-200 ${
+              dropdownOpen ? "rotate-180" : ""
+            }`}
+          />
+        </button>
+        {dropdownOpen && (
+          <div className="absolute right-0 mt-2 w-40 bg-white text-gray-800 rounded shadow-lg z-50 border border-blue-100 animate-fade-in">
+            <Link
+              href="/profile"
+              onClick={() => setDropdownOpen(false)}
+              className="block px-4 py-2 hover:bg-blue-100 hover:text-blue-700 rounded-t transition-colors duration-150 cursor-pointer"
+            >
+              Perfil
+            </Link>
+            {user.role === "worker" && user.id && (
+              <Link
+                href={`/worker-profile/${user.id}`}
+                onClick={() => setDropdownOpen(false)}
+                className="block px-4 py-2 hover:bg-blue-100 hover:text-blue-700 transition-colors duration-150 cursor-pointer"
+              >
+                Perfil de trabajador
+              </Link>
+            )}
+            {user.role === "admin" && (
+              <Link
+                href="/dashboard"
+                onClick={() => setDropdownOpen(false)}
+                className="block px-4 py-2 hover:bg-blue-100 hover:text-blue-700 transition-colors duration-150 cursor-pointer"
+              >
+                Panel de administrador
+              </Link>
+            )}
+            <Link
+              href="/invoices"
+              onClick={() => setDropdownOpen(false)}
+              className="block px-4 py-2 hover:bg-blue-100 hover:text-blue-700 transition-colors duration-150 cursor-pointer"
+            >
+              Facturas
+            </Link>
+            <button
+              onClick={() => {
+                logout();
+                setDropdownOpen(false);
+                router.push("/landing");
+              }}
+              className="w-full text-left px-4 py-2 hover:bg-red-100 hover:text-red-600 rounded-b transition-colors duration-150 cursor-pointer"
+            >
+              Cerrar Sesión
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <Link
@@ -140,12 +144,10 @@ export function UserDropdown({
 
 export function MobileUserSection({
   user,
-  userName,
   logout,
   setIsOpen,
 }: {
   user: User | null;
-  userName: string;
   logout: () => void;
   setIsOpen: (open: boolean) => void;
 }) {
@@ -158,11 +160,11 @@ export function MobileUserSection({
 
   if (!mounted) return null;
 
-  if (user && userName) {
+  if (user) {
     return (
       <div className="flex flex-col items-start gap-2 mt-4">
         <div className="flex items-center gap-2 mb-2">
-          <span className="font-semibold text-blue-700">{userName}</span>
+          <span className="font-semibold text-blue-700">{user.name ?? "Usuario"}</span>
         </div>
         <Link
           href="/profile"
