@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { obtenerCategorias } from '@/services/categoriasService';
 import Link from 'next/link';
 import { HiOutlineInformationCircle, HiOutlineCheckCircle } from 'react-icons/hi';
-import { validarServiceForm } from '@/utils/validacionesServiceForm';
+import { validarServiceForm } from '@/utils/validations/validationsServiceForm';
 import { sendServiceRequest } from '@/services/serviceRequest';
 import { useToast } from "@/context/ToastContext";
 import axios from 'axios';

@@ -6,22 +6,19 @@ import { signIn } from "next-auth/react";
 
 type Props = {
   setMessage: (msg: string) => void;
-  setError: (msg: string) => void;
 };
 
-export default function LoginForm({ setMessage, setError }: Props) {
+export default function LoginForm({ setMessage }: Props) {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setError("");
     setMessage("");
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError("");
     setMessage("");
     try {
 
@@ -32,7 +29,7 @@ export default function LoginForm({ setMessage, setError }: Props) {
       });
 
       if (result?.error) {
-        setError("Email o contraseña incorrectos");
+        setMessage("Email o contraseña incorrectos");
       } else if (result?.ok) {
         setMessage("Inicio de sesión exitoso");
         setTimeout(() => {
@@ -41,7 +38,7 @@ export default function LoginForm({ setMessage, setError }: Props) {
       }
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      setError("Error inesperado al iniciar sesión");
+      setMessage("Error inesperado al iniciar sesión");
     }
   };
 

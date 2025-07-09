@@ -1,20 +1,23 @@
 type Props = {
   message?: string;
-  error?: string;
 };
 
-export default function AlertMessage({ message, error }: Props) {
-  if (!message && !error) return null;
+export default function AlertMessage({ message }: Props) {
+  if (!message) return null;
   return (
     <>
       {message && (
-        <div className="text-green-600 text-sm text-center font-medium mb-2">
+        <div
+          className={`${
+            message.includes("rror") ||
+            message.includes("debe") ||
+            message.includes("existe") ||
+            message.includes("incorrecto")
+              ? "text-red-600"
+              : "text-green-600"
+          } text-sm text-center font-medium mb-2`}
+        >
           {message}
-        </div>
-      )}
-      {error && (
-        <div className="text-red-600 text-sm text-center font-medium mb-2">
-          {error}
         </div>
       )}
     </>
