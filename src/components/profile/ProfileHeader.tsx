@@ -293,7 +293,7 @@ export default function ProfileHeader({
         <EditNameModal
           initialName={name}
           onSave={(newName) => {
-            setUserName(newName); // Esta función debe actualizar formData.name en ProfilePage
+            setUserName(newName);
             setNameModalOpen(false);
           }}
           onClose={() => setNameModalOpen(false)}
