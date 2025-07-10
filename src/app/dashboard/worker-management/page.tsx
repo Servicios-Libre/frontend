@@ -102,6 +102,7 @@ export default function WorkerManagementPage() {
       showToast("Solicitud aceptada y usuario promovido a worker", "success");
       await refreshUsers();
       await refreshWorkerRequests();
+      setSearchTerm("");
     } catch {
       showToast("Error al aceptar solicitud", "error");
     }
@@ -115,6 +116,7 @@ export default function WorkerManagementPage() {
       await rejectWorkerRequest(ticket.id);
       showToast("Solicitud rechazada", "success");
       await refreshWorkerRequests();
+      setSearchTerm("");
     } catch {
       showToast("Error al rechazar solicitud", "error");
     }
@@ -128,6 +130,7 @@ export default function WorkerManagementPage() {
       await downgradeToUser(worker.id);
       showToast("Trabajador dado de baja", "success");
       await refreshUsers();
+      setSearchTerm("");
     } catch {
       showToast("Error al dar de baja", "error");
     }

@@ -10,7 +10,7 @@ import { User, WorkerService } from "@/types";
 import WorkerHeader from "./WorkerHeader";
 import WorkerServiceList from "./WorkerServiceList";
 import { jwtDecode } from "jwt-decode";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams, redirect } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import WorkerReviews from "./WorkerReviews";
 import LoadingScreen from "../loading-screen/LoadingScreen";
@@ -33,7 +33,6 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
     null
   );
 
-  const router = useRouter();
   const { showToast } = useToast();
   const searchParams = useSearchParams();
   const serviceIdFromQuery = searchParams.get("serviceId");
@@ -62,8 +61,9 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
     const loadWorker = async () => {
       const stillWorker = await checkIfUserIsWorker(id);
       if (!stillWorker) {
-        showToast("Error: No eres un usuario trabajador.", "error");
+        showToast("Error: Perfil no encontrado.", "error");
         redirect("/profile");
+        return;
       }
 
       try {
@@ -85,7 +85,7 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
     };
 
     loadWorker();
-  }, [id, serviceIdFromQuery, token, authLoading, router, showToast]);
+  }, [id, serviceIdFromQuery, token, authLoading, showToast]);
 
   const handleSaveService = async (
     updatedService: WorkerService,
