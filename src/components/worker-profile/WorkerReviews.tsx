@@ -1,11 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { FaStar, FaRegStar, FaQuoteLeft } from "react-icons/fa";
-import { useAuthUser } from "@/hooks/useAuthUser";
-import Image from "next/image";
+import ReviewList from "@/components/reviews/ReviewList";
 
 type Review = {
   id: string;
@@ -15,176 +11,62 @@ type Review = {
   author: { name: string; user_pic: string };
 };
 
-type WorkerReviewsProps = {
+type Props = {
   workerId: string;
 };
 
-export default function WorkerReviews({ workerId }: WorkerReviewsProps) {
-  const { user, token } = useAuthUser();
+export default function WorkerReviews({ workerId }: Props) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
-  const [comment, setComment] = useState("");
-  const [rate, setRate] = useState(0);
-  const [hasReviewed, setHasReviewed] = useState(false);
-  const [sort, setSort] = useState<"recent" | "best" | "worst" | "oldest">(
-    "recent"
-  );
+  const [sort, setSort] = useState<"recent" | "best" | "worst" | "oldest">("recent");
 
   useEffect(() => {
-    fetchReviews();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sort]);
-
-  const fetchReviews = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/reviews/${workerId}?sort=${sort}`
-      );
-      setReviews(res.data.reviews);
-    } catch (err) {
-      console.error("Error fetching reviews:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSubmit = async () => {
-    if (!token) return;
-    try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/reviews/new/${workerId}`,
-        { comment, rate },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setComment("");
-      setRate(0);
-      setHasReviewed(true);
-      fetchReviews();
-    } catch (err: any) {
-      if (err?.response?.data?.message?.includes("already")) {
-        setHasReviewed(true);
+    const fetchReviews = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/reviews/${workerId}?sort=${sort}`
+        );
+        setReviews(res.data.reviews);
+      } catch (err) {
+        console.error("Error al obtener reseñas:", err);
+      } finally {
+        setLoading(false);
       }
-      console.error("Error sending review:", err);
-    }
-  };
+    };
+
+    fetchReviews();
+  }, [workerId, sort]);
 
   return (
-    <div 
-    id="worker-reviews"
-    className="mt-10 bg-white rounded-2xl border border-gray-200 shadow-lg p-8 space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800">Reseñas de clientes</h2>
+    <div
+      id="worker-reviews"
+      className="my-10 bg-white rounded-2xl border border-gray-200 shadow-lg p-8 space-y-6"
+    >
+      <div className="flex justify-between">
+        <h2 className="text-2xl font-bold text-gray-800">Reseñas de clientes</h2>
 
-      {/* Filtro */}
-      <div className="flex gap-3 text-sm text-gray-500 items-center">
-        <span>Ordenar por:</span>
-        <select
-          className="bg-white border border-gray-300 rounded px-2 py-1 text-sm"
-          value={sort}
-          onChange={(e) => setSort(e.target.value as typeof sort)}
-        >
-          <option value="recent">Más recientes</option>
-          <option value="oldest">Más antiguas</option>
-          <option value="best">Mejores</option>
-          <option value="worst">Peores</option>
-        </select>
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-sm">
+          <span className="text-gray-400 font-medium">Ordenar por:</span>
+          <select
+            disabled={reviews.length === 0}
+            className={`font-medium rounded-full px-4 py-1.5 shadow-sm focus:outline-none transition cursor-pointer appearance-none
+      ${reviews.length === 0
+                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                : "bg-blue-500 text-white focus:ring-2 focus:ring-blue-400"}
+    `}
+            value={sort}
+            onChange={(e) => setSort(e.target.value as typeof sort)}
+          >
+            <option value="recent">Más recientes</option>
+            <option value="oldest">Más antiguas</option>
+            <option value="best">Mejor - Peor</option>
+            <option value="worst">Peor - Mejor</option>
+          </select>
+        </div>
       </div>
 
-      {/* Lista de reseñas */}
-      {loading ? (
-        <p className="text-gray-500">Cargando reseñas...</p>
-      ) : reviews.length === 0 ? (
-        <p className="text-gray-400 italic">
-          Este trabajador aún no tiene reseñas.
-        </p>
-      ) : (
-        <ul className="space-y-4">
-          {reviews.map((r) => (
-            <li
-              key={r.id}
-              className="bg-gray-50 p-5 rounded-xl border border-gray-100 shadow group hover:border-blue-400 transition"
-            >
-              <div className="flex justify-between items-center mb-2">
-                <div className="flex items-center gap-3 font-semibold text-gray-800">
-                  <div className="w-8 h-8 relative flex-shrink-0">
-                    <Image
-                      src={r.author.user_pic}
-                      alt={`Foto de ${r.author.name}`}
-                      fill
-                      sizes="32px"
-                      className="rounded-full object-cover border border-gray-300"
-                    />
-                  </div>
-                  {r.author.name}
-                </div>
-                <div className="flex gap-1">
-                  {[...Array(5)].map((_, i) =>
-                    i < r.rate ? (
-                      <FaStar key={i} className="text-yellow-400" />
-                    ) : (
-                      <FaRegStar key={i} className="text-gray-300" />
-                    )
-                  )}
-                </div>
-              </div>
-              <p className="text-sm text-gray-600 italic flex items-start gap-2">
-                <FaQuoteLeft className="text-amber-400 mt-1" />
-                {r.description}
-              </p>
-              <div className="text-xs text-gray-400 mt-2">
-                {new Date(r.created_at).toLocaleDateString()}
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {/* Formulario para dejar reseña */}
-      {user?.role === "user" && !hasReviewed && (
-        <div className="border-t pt-6 space-y-4">
-          <h3 className="text-lg font-semibold text-gray-700">
-            Dejá tu reseña
-          </h3>
-
-          <div className="flex gap-2">
-            {[1, 2, 3, 4, 5].map((n) => (
-              <button
-                key={n}
-                onClick={() => setRate(n)}
-                className="text-2xl transition"
-              >
-                {n <= rate ? (
-                  <FaStar className="text-yellow-400" />
-                ) : (
-                  <FaRegStar className="text-gray-300" />
-                )}
-              </button>
-            ))}
-          </div>
-
-          <textarea
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            rows={4}
-            placeholder="Escribí un comentario sobre tu experiencia..."
-            className="w-full border border-gray-300 rounded-lg p-3 text-sm"
-          />
-
-          <button
-            onClick={handleSubmit}
-            disabled={!rate || !comment.trim()}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-2 rounded-lg shadow disabled:opacity-50"
-          >
-            Enviar reseña
-          </button>
-        </div>
-      )}
-
-      {hasReviewed && (
-        <p className="text-sm text-green-600 font-medium">
-          Ya dejaste una reseña para este trabajador.
-        </p>
-      )}
+      <ReviewList reviews={reviews} loading={loading} />
     </div>
   );
 }
