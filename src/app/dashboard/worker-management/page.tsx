@@ -58,6 +58,13 @@ export default function WorkerManagementPage() {
     setDisabledUserIds((prev) => [...prev, userId]);
   };
 
+  useEffect(() => {
+    // Limpia los IDs deshabilitados que ya no están en las solicitudes pendientes
+    setDisabledUserIds((prev) =>
+      prev.filter((id) => workerRequests.some((req) => req.user.id === id))
+    );
+  }, [workerRequests]);
+
   // Paginación local para workers activos
   const totalWorkerPages = Math.ceil(filteredWorkers.length / workersPerPage);
   const paginatedWorkers = filteredWorkers.slice(
