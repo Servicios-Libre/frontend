@@ -63,8 +63,7 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
       const stillWorker = await checkIfUserIsWorker(id);
       if (!stillWorker) {
         showToast("Error: No eres un usuario trabajador.", "error");
-        router.push("/");
-        return;
+        redirect("/profile");
       }
 
       try {
