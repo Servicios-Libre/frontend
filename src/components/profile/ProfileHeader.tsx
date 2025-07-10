@@ -48,6 +48,7 @@ export default function ProfileHeader({
   setUserName,
 }: Props) {
   const { user } = useAuth();
+  console.log("🧠 Usuario desde AuthContext:", user);
   const userId = user?.id;
   const premium = user?.premium;
 
@@ -77,6 +78,16 @@ export default function ProfileHeader({
       verifyWorkerStatus();
     }
   }, [userId, isWorker]);
+
+  useEffect(() => {
+    if (user?.tickets) {
+      const hasPending = user.tickets.some(
+        (ticket) => ticket.type === "to-worker" && ticket.status === "pending"
+      );
+      setHasPendingRequest(hasPending);
+      setTicketSuccess(false);
+    }
+  }, [user]);
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -120,7 +131,7 @@ export default function ProfileHeader({
       await createTicket(userId, { type: "to-worker", status: "pending" });
       setTicketSuccess(true);
       setHasPendingRequest(true);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setTicketError(error?.response?.data?.message || "No se pudo enviar la solicitud.");
     } finally {
@@ -158,15 +169,14 @@ export default function ProfileHeader({
         <button
           id="profile-name-section"
           onClick={() => editMode && setNameModalOpen(true)}
-          className={`flex items-center text-xl font-bold mb-1 gap-2 ${
-            premium && editMode
+          className={`flex items-center text-xl font-bold mb-1 gap-2 ${premium && editMode
               ? "text-amber-300 hover:text-amber-200 cursor-pointer"
               : editMode
-              ? "text-white hover:text-blue-200 cursor-pointer"
-              : premium
-              ? "text-amber-300"
-              : "text-white cursor-default"
-          }`}
+                ? "text-white hover:text-blue-200 cursor-pointer"
+                : premium
+                  ? "text-amber-300"
+                  : "text-white cursor-default"
+            }`}
           aria-label="Editar nombre"
           title={editMode ? "Editar nombre" : undefined}
           type="button"
@@ -180,9 +190,8 @@ export default function ProfileHeader({
           {name}
           <FontAwesomeIcon
             icon={faPen}
-            className={`transition-colors ${
-              editMode ? "text-white hover:text-blue-200" : "text-transparent"
-            }`}
+            className={`transition-colors ${editMode ? "text-white hover:text-blue-200" : "text-transparent"
+              }`}
             style={{ fontSize: "1.25rem" }}
           />
         </button>
@@ -219,15 +228,14 @@ export default function ProfileHeader({
             <div className="relative group w-full">
               <button
                 id="profile-worker-request"
-                className={`px-4 py-2 rounded-md font-semibold transition-colors mt-2 sm:mt-0 cursor-pointer ${
-                  !editMode && !hasUnsavedChanges
+                className={`px-4 py-2 rounded-md font-semibold transition-colors mt-2 sm:mt-0 cursor-pointer ${!editMode && !hasUnsavedChanges
                     ? isComplete
                       ? hasPendingRequest
                         ? "bg-yellow-300 text-yellow-900 cursor-not-allowed"
                         : "bg-green-500 hover:bg-green-600 text-white"
                       : "bg-gray-300 hover:bg-gray-400 text-gray-700 cursor-not-allowed"
                     : "bg-gray-300 text-gray-400 cursor-not-allowed"
-                }`}
+                  }`}
                 disabled={
                   !isComplete ||
                   editMode ||
@@ -240,10 +248,10 @@ export default function ProfileHeader({
                 {loadingTicket
                   ? "Enviando..."
                   : ticketSuccess
-                  ? "Solicitud enviada"
-                  : hasPendingRequest
-                  ? "Solicitud pendiente"
-                  : "Solicitar ser trabajador"}
+                    ? "Solicitud enviada"
+                    : hasPendingRequest
+                      ? "Solicitud pendiente"
+                      : "Solicitar ser trabajador"}
               </button>
               {isComplete &&
                 !editMode &&
@@ -300,9 +308,9 @@ export default function ProfileHeader({
         />
       )}
 
-      {!editMode &&  (
+      {!editMode && (
         <div className="absolute bottom-7 right-14 z-10">
-        <HelpTourButton startTour={startProfileTour} />
+          <HelpTourButton startTour={startProfileTour} />
         </div>)}
     </div>
   );
