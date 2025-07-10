@@ -5,16 +5,18 @@ import {
   getWorkerById,
   addPhotosToService,
 } from "@/services/worker-profile/workerServices";
+import { checkIfUserIsWorker } from "@/services/profileService";
 import { User, WorkerService } from "@/types";
 import WorkerHeader from "./WorkerHeader";
 import WorkerServiceList from "./WorkerServiceList";
 import { jwtDecode } from "jwt-decode";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, redirect } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import WorkerReviews from "./WorkerReviews";
 import LoadingScreen from "../loading-screen/LoadingScreen";
 import HelpTourButton from "../profile/HelpTourButton";
 import { useWorkerTour } from "@/hooks/tours/useWorkerTour";
+import { useToast } from "@/context/ToastContext";
 
 type WorkerProfileClientProps = {
   id: string;
@@ -31,6 +33,7 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
     null
   );
 
+  const { showToast } = useToast();
   const searchParams = useSearchParams();
   const serviceIdFromQuery = searchParams.get("serviceId");
   const { token, loading: authLoading } = useAuth();
@@ -48,17 +51,24 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
     try {
       const decoded = jwtDecode<{ id: string }>(token);
       setIsOwner(decoded.id === id);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
       setIsOwner(false);
     }
   }, [id, token, authLoading]);
 
   useEffect(() => {
-    getWorkerById(id)
-      .then((data) => {
-        setUser(data);
+    const loadWorker = async () => {
+      const stillWorker = await checkIfUserIsWorker(id);
+      if (!stillWorker) {
+        showToast("Error: Perfil no encontrado.", "error");
+        redirect("/profile");
+        return;
+      }
 
+      try {
+        const data = await getWorkerById(id);
+        setUser(data);
         setLoading(false);
 
         if (serviceIdFromQuery) {
@@ -67,12 +77,15 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
             setInitialService(found);
           }
         }
-      })
-      .catch((e) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (e: any) {
         setError(e.message || "Error al cargar el perfil");
         setLoading(false);
-      });
-  }, [id, serviceIdFromQuery, token, authLoading]);
+      }
+    };
+
+    loadWorker();
+  }, [id, serviceIdFromQuery, token, authLoading, showToast]);
 
   const handleSaveService = async (
     updatedService: WorkerService,

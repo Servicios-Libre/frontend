@@ -13,6 +13,7 @@ import { Crown } from "lucide-react";
 import { checkIfUserIsWorker } from "@/services/profileService";
 import HelpTourButton from "./HelpTourButton";
 import { useProfileTour } from "@/hooks/tours/useProfileTour";
+import RequestWorkerButton from "./RequestWorkerButton";
 
 interface Props {
   userPic: string;
@@ -47,7 +48,8 @@ export default function ProfileHeader({
   name,
   setUserName,
 }: Props) {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
+  console.log("🧠 Usuario desde AuthContext:", user);
   const userId = user?.id;
   const premium = user?.premium;
 
@@ -77,6 +79,55 @@ export default function ProfileHeader({
       verifyWorkerStatus();
     }
   }, [userId, isWorker]);
+
+  useEffect(() => {
+    if (user?.tickets) {
+      const hasPending = user.tickets.some(
+        (ticket) => ticket.type === "to-worker" && ticket.status === "pending"
+      );
+      setHasPendingRequest(hasPending);
+      setTicketSuccess(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (!user?.tickets) return;
+
+    const hadPending = hasPendingRequest;
+    const hasPendingNow = user.tickets.some(
+      (ticket) => ticket.type === "to-worker" && ticket.status === "pending"
+    );
+
+    if (hadPending && !hasPendingNow) {
+      refreshUser();
+      setHasPendingRequest(false);
+    }
+  }, [user?.tickets, hasPendingRequest, refreshUser]);
+
+  useEffect(() => {
+    if (!user?.tickets) return;
+
+    // Detecta si hay un ticket aceptado de tipo "to-worker"
+    const hasAccept = user.tickets.some(
+      (ticket) => ticket.type === "to-worker" && ticket.status === "accept"
+    );
+
+    // Si hay ticket aceptado, fuerza el refresh del usuario (por si el rol cambió)
+    if (hasAccept && isWorker === false) {
+      refreshUser();
+      setIsWorker(true); // Opcional: fuerza el estado local
+    }
+  }, [user?.tickets, isWorker, refreshUser]);
+
+  const prevRole = useRef<string | undefined>(user?.role);
+
+  useEffect(() => {
+    // Solo refresca si el rol realmente cambió
+    if (user?.role !== prevRole.current) {
+      refreshUser();
+      prevRole.current = user?.role;
+    }
+  }, [user?.role, refreshUser]);
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -118,15 +169,38 @@ export default function ProfileHeader({
 
     try {
       await createTicket(userId, { type: "to-worker", status: "pending" });
+      await refreshUser();
       setTicketSuccess(true);
       setHasPendingRequest(true);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setTicketError(error?.response?.data?.message || "No se pudo enviar la solicitud.");
     } finally {
       setLoadingTicket(false);
     }
   };
+
+  // Calcula si el usuario tiene un ticket aceptado de tipo "to-worker"
+  const hasAcceptedWorkerTicket =
+    user?.role === "worker" &&
+    user?.tickets?.some(
+      (ticket) => ticket.type === "to-worker" && ticket.status === "accepted"
+    );
+
+  const shouldShowRequestButton =
+    !isWorker &&
+    isComplete &&
+    !editMode &&
+    !hasUnsavedChanges &&
+    !loadingTicket &&
+    !hasPendingRequest &&
+    !hasAcceptedWorkerTicket;
+
+  const showWorkerProfileButton =
+    isWorker === true ||
+    user?.tickets?.some(
+      (ticket) => ticket.type === "to-worker" && ticket.status === "accepted"
+    );
 
   return (
     <div className="flex flex-col sm:flex-row items-center sm:items-start sm:justify-between gap-6 sm:gap-8 p-6 rounded-lg bg-blue-500 shadow-md mb-6 text-center sm:text-left relative">
@@ -158,15 +232,14 @@ export default function ProfileHeader({
         <button
           id="profile-name-section"
           onClick={() => editMode && setNameModalOpen(true)}
-          className={`flex items-center text-xl font-bold mb-1 gap-2 ${
-            premium && editMode
-              ? "text-amber-300 hover:text-amber-200 cursor-pointer"
-              : editMode
+          className={`flex items-center text-xl font-bold mb-1 gap-2 ${premium && editMode
+            ? "text-amber-300 hover:text-amber-200 cursor-pointer"
+            : editMode
               ? "text-white hover:text-blue-200 cursor-pointer"
               : premium
-              ? "text-amber-300"
-              : "text-white cursor-default"
-          }`}
+                ? "text-amber-300"
+                : "text-white cursor-default"
+            }`}
           aria-label="Editar nombre"
           title={editMode ? "Editar nombre" : undefined}
           type="button"
@@ -180,9 +253,8 @@ export default function ProfileHeader({
           {name}
           <FontAwesomeIcon
             icon={faPen}
-            className={`transition-colors ${
-              editMode ? "text-white hover:text-blue-200" : "text-transparent"
-            }`}
+            className={`transition-colors ${editMode ? "text-white hover:text-blue-200" : "text-transparent"
+              }`}
             style={{ fontSize: "1.25rem" }}
           />
         </button>
@@ -205,56 +277,39 @@ export default function ProfileHeader({
             </div>
           </div>
 
-          {isWorker === true && (
-            <div id="profile-worker-button" className="flex flex-col gap-2 items-center sm:items-start mt-2">
+          {/* Mostrar solo si ya se sabe el estado */}
+          {showWorkerProfileButton && (
+            <div id="profile-worker-button" className="flex flex-col gap-2 items-center sm:items-start">
               <Link href={`/worker-profile/${userId}`}>
-                <button className="bg-yellow-400 text-yellow-900 font-bold px-4 py-2 rounded-lg shadow flex items-center gap-2 hover:bg-yellow-500 transition-colors">
+                <button className="bg-yellow-400 text-yellow-900 font-bold px-3 py-2 rounded-sm shadow flex items-center gap-2 hover:bg-yellow-500 transition-colors">
                   <span>💼</span> Ver perfil de trabajador
                 </button>
               </Link>
             </div>
           )}
 
-          {!isWorker && (
-            <div className="relative group w-full">
-              <button
-                id="profile-worker-request"
-                className={`px-4 py-2 rounded-md font-semibold transition-colors mt-2 sm:mt-0 cursor-pointer ${
-                  !editMode && !hasUnsavedChanges
-                    ? isComplete
-                      ? hasPendingRequest
-                        ? "bg-yellow-300 text-yellow-900 cursor-not-allowed"
-                        : "bg-green-500 hover:bg-green-600 text-white"
-                      : "bg-gray-300 hover:bg-gray-400 text-gray-700 cursor-not-allowed"
-                    : "bg-gray-300 text-gray-400 cursor-not-allowed"
-                }`}
-                disabled={
-                  !isComplete ||
-                  editMode ||
-                  hasUnsavedChanges ||
-                  loadingTicket ||
-                  hasPendingRequest
-                }
-                onClick={handleRequestWorker}
-              >
-                {loadingTicket
-                  ? "Enviando..."
-                  : ticketSuccess
-                  ? "Solicitud enviada"
-                  : hasPendingRequest
-                  ? "Solicitud pendiente"
-                  : "Solicitar ser trabajador"}
-              </button>
-              {isComplete &&
-                !editMode &&
-                !hasUnsavedChanges &&
-                !loadingTicket &&
-                !hasPendingRequest && (
-                  <span className="absolute left-1/2 -translate-x-1/2 -top-10 z-20 w-64 bg-gray-900 text-white text-xs rounded px-3 py-2 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 shadow-lg">
-                    La solicitud pasará por la aprobación de un administrador y
-                    podría tardar unas horas
-                  </span>
-                )}
+          {isWorker === false && (
+            <div className="relative group w-full flex flex-col items-center sm:items-start">
+              {!loadingTicket ? (
+                <RequestWorkerButton
+                  show={shouldShowRequestButton}
+                  loading={loadingTicket}
+                  ticketSuccess={ticketSuccess}
+                  hasAcceptedWorkerTicket={!!hasAcceptedWorkerTicket}
+                  onClick={handleRequestWorker}
+                />
+              ) : (
+                <div className="flex items-center py-2 self-center sm:self-start">
+                  <span className="loader border-4 border-blue-200 border-t-blue-600 rounded-full w-6 h-6 animate-spin"></span>
+                  <span className="ml-3 text-white">Enviando solicitud...</span>
+                </div>
+              )}
+
+              {hasPendingRequest && (
+                <p className="text-yellow-800 bg-yellow-200 px-3 py-1.5 rounded mt-2 text-sm font-medium">
+                  Tienes una solicitud pendiente. Espera la aprobación del administrador.
+                </p>
+              )}
             </div>
           )}
 
@@ -300,9 +355,9 @@ export default function ProfileHeader({
         />
       )}
 
-      {!editMode &&  (
+      {!editMode && (
         <div className="absolute bottom-7 right-14 z-10">
-        <HelpTourButton startTour={startProfileTour} />
+          <HelpTourButton startTour={startProfileTour} />
         </div>)}
     </div>
   );
