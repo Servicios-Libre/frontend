@@ -64,6 +64,7 @@ export default function WorkerProfileClient({ id }: WorkerProfileClientProps) {
       if (!stillWorker) {
         showToast("Error: No eres un usuario trabajador.", "error");
         redirect("/profile");
+        return;
       }
 
       try {
