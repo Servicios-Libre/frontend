@@ -43,18 +43,18 @@ export default function WorkerReviews({ workerId }: Props) {
       id="worker-reviews"
       className="my-10 bg-white rounded-2xl border border-gray-200 shadow-lg p-8 space-y-6"
     >
-      <div className="flex justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h2 className="text-2xl font-bold text-gray-800">Reseñas de clientes</h2>
 
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-sm">
+        <div className="flex items-center gap-2 sm:gap-3 text-sm self-end">
           <span className="text-gray-400 font-medium">Ordenar por:</span>
           <select
             disabled={reviews.length === 0}
             className={`font-medium rounded-full px-4 py-1.5 shadow-sm focus:outline-none transition cursor-pointer appearance-none
-      ${reviews.length === 0
+        ${reviews.length === 0
                 ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                 : "bg-blue-500 text-white focus:ring-2 focus:ring-blue-400"}
-    `}
+      `}
             value={sort}
             onChange={(e) => setSort(e.target.value as typeof sort)}
           >
