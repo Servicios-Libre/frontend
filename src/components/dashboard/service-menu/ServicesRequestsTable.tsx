@@ -5,19 +5,20 @@ import { Eye } from "lucide-react";
 interface Props {
   requests: Ticket[] | undefined;
   onView: (ticket: Ticket) => void;
+  loadingId?: string;
 }
 
-export default function ServiceRequestsTable({ requests, onView }: Props) {
+export default function ServiceRequestsTable({ requests, onView, loadingId }: Props) {
   if (!requests || requests.length === 0)
-  return (
-    <EmptyState
-      message="No hay solicitudes pendientes."
-      bgColor="bg-purple-50/10"
-      textColor="text-purple-600"
-      borderColor="border-purple-200"
-      icon="tools"
-    />
-  );
+    return (
+      <EmptyState
+        message="No hay solicitudes pendientes."
+        bgColor="bg-purple-50/10"
+        textColor="text-purple-600"
+        borderColor="border-purple-200"
+        icon="tools"
+      />
+    );
 
   return (
     <div className="grid gap-4">
@@ -39,8 +40,9 @@ export default function ServiceRequestsTable({ requests, onView }: Props) {
           {/* Botón */}
           <button
             onClick={() => onView(ticket)}
-            className="cursor-pointer flex items-center justify-center gap-1 px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-semibold w-10 h-10 md:w-auto md:h-auto md:px-6"
+            className="cursor-pointer flex items-center justify-center gap-1 px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-semibold w-10 h-10 md:w-auto md:h-auto md:px-6 disabled:opacity-60"
             title="Ver detalle"
+            disabled={loadingId === ticket.id}
           >
             <Eye className="w-5 h-5" />
             <span className="hidden md:inline">Ver detalle</span>

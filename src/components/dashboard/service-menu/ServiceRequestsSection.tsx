@@ -34,6 +34,7 @@ export default function ServiceRequestsSection({
       <ServiceRequestsTable
         requests={requests}
         onView={(ticket: Ticket) => setSelectedTicket(ticket)}
+        loadingId={loadingId}
       />
 
       {selectedTicket && (
